@@ -93,6 +93,8 @@ options(digits = 1)
   In order to quantify the amount of biofouling on small vessels, the Commonwealth Scientific and Industrial Research Organisation (CSIRO) gathered biomass samples from various locations on each vessel. One of the aims of the project was to relate vessel-related characteristics (for example, the number of days since the vessel was last cleaned) to the wet weight of biomass sampled.
 
   The aim of this paper is to report on the statistical analysis of the data collected. In particular, we estimate the effect of the vessel-level characteristics on the wet weight biomass collected. We found that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to  the wet weight of biomass, yet was different depending on the type of vessel.
+  
+KRH: IGNORE THIS JUST CHECKING RSTUDIO VERSION CONTROL  
 
 \end{abstract}
 
