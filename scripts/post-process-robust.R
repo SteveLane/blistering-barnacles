@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-05-12 14:56:59 (slane)>
+## Time-stamp: <2017-10-05 11:18:10 (slane)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -37,7 +37,7 @@ histData <- biofoul %>%
            `Weight (gm), log-scale` = wwLog) %>%
     gather("logged", "ww", 2:3)
 plHist <- ggplot(histData, aes(x = ww)) + geom_histogram(bins = 11) +
-    facet_grid(LocID ~ logged, scales = "free_x") +
+    facet_grid(LocID ~ logged, scales = "free") +
     xlab("") +
     ylab("Count") +
     theme(panel.grid.major.x = element_blank(),
