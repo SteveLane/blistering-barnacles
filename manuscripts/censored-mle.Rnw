@@ -1,4 +1,4 @@
-% Time-stamp: <2017-10-05 11:47:00 (slane)>
+% Time-stamp: <2017-10-05 12:11:08 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -212,7 +212,7 @@ To allow for the possible effects of outliers we examined the effect of changing
 \end{align}
 are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyper-parameters for the degrees freedom were chosen......MORE HERE.
 
-We initially inferred the latent process - that is the process that determines the log wet-weight of fouling biomass on each vessel - as linear function of the location of the measurement location allowing for a vessel-level random effect:
+We initially inferred the latent process --- that is the process that determines the log wet-weight of fouling biomass on each vessel --- as linear function of the location of the measurement location allowing for a vessel-level intercept:
 \begin{align}
   \mu_{i} & = \mu + \alpha_{j[i]} + \beta^{l1} \cdot \text{location1}_{i} + \beta^{l2} \cdot \text{location2}_{i} \nonumber \\
   \alpha_{j} & \sim \text{cauchy}(0, \sigma_{\alpha}) \label{eq:M0}\tag{M0} \\
@@ -220,9 +220,9 @@ We initially inferred the latent process - that is the process that determines t
   \beta^{l1},\beta^{l2} & \sim t_{3}(0, 1) \nonumber \\
   \sigma,\sigma_{\alpha} & \sim \text{half-cauchy}(0, 2.5) \nonumber
 \end{align}
-where $\mu_{i}$ is the expected log wet-weight in grams; $\mu,\beta^{l}$ are coefficients to be estimated from the data; and $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder (as compared to the hull, which is subsumed within the intercept $\mu$). $\alpha_{j[i]}$ is the vessel-level random effect that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$\footnote{The notation $\alpha_{j[i]}$ denotes the vessel-level ($j\up{th}$) change to the intercept for the $i\up{th}$ observation.}, which is modelled as a cauchy distribution with location 0, and scale $\sigma_{\alpha}$. The intercept is given a mildly informative $N(0, 5)$ prior. Similarly the regression coefficients are given mildly information $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-cauchy}(0, 2.5)$ priors.
+where $\mu_{i}$ is the expected log wet-weight in grams; $\mu,\beta^{l}$ are coefficients to be estimated from the data; and $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder (as compared to the hull, which is subsumed within the intercept $\mu$). $\alpha_{j[i]}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$\footnote{The notation $\alpha_{j[i]}$ denotes the vessel-level ($j\up{th}$) change to the intercept for the $i\up{th}$ observation.}, which is modelled as a cauchy distribution with location 0, and scale $\sigma_{\alpha}$. The intercept is given a mildly informative $N(0, 5)$ prior. Similarly the regression coefficients are given mildly information $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-cauchy}(0, 2.5)$ priors.
 
-We subsequently investigated four alternative specifications for the vessel-level random effect by including various vessel-level characteristics and interaction terms:
+We subsequently investigated four alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
 \begin{align}
   \alpha_{j} & \sim \text{cauchy}(\alpha^{*}_{j}, \sigma_{\alpha}) \nonumber \\
   \alpha^{*}_{j} & = \beta^{d1} \cdot \text{days1}_{i} + \beta^{d2} \cdot  \text{days2}_{i} + \beta^{m} \cdot \text{midTrips}_{i} + \beta^{h} \cdot \text{hullSA}_{i} + \beta^{p1} \cdot \text{paintType1}_{i} + \nonumber \\
@@ -327,7 +327,7 @@ As a further check on model performance we examined if the models produce poster
 \subsubsection{Exploration of candidate interaction terms}
 \label{sec:expl-cand-inter}
 
-Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level random effect models (for each of the four ordinal predictors - the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by anti-fouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet-weight from model \ref{eq:M1}. Each figures, is based on a randomly-selected imputed dataset for display purposes.
+Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors --- the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by anti-fouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet-weight from model \ref{eq:M1}. Each figure, is based on a randomly-selected imputed dataset for display purposes.
 
 \begin{figure}[!hbp]
   \centering
