@@ -1,4 +1,4 @@
-% Time-stamp: <2017-10-05 12:11:08 (slane)>
+% Time-stamp: <2017-10-05 12:17:21 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -200,17 +200,17 @@ Figure~\ref{fig:obs-weight} shows histograms of the observed wet weight of bioma
   \label{fig:obs-weight}
 \end{figure}
 
-Figure~\ref{fig:obs-weight} suggests that the log-transform of the wet weight of biomass is approximately normal, and that there is likely to be a location effect (most notably between Hull versus Keel and Rudder). We thus focus on a log-transform of the wet weight of biomass for the remainder of the analysis. Further, there appears to be the possibility of outliers, especially within the hull and rudder samples. Hence we will also consider a student-$t$ distribution for modelling.
+Figure~\ref{fig:obs-weight} suggests that the log-transform of the wet weight of biomass has an approximately Normal distribution, and that there is likely to be a location effect (most notably between Hull versus Keel and Rudder). We thus focus on a log-transform of the wet weight of biomass for the remainder of the analysis. Further, there appears to be the possibility of outliers, especially within the hull and rudder samples. Hence we will also consider a Student-$t$ distribution for modelling.
 
 It could be tempting to analyse the total (or average) wet weight biomass per vessel, as this would simplify the modelling procedure. However, as noted above, Figure~\ref{fig:obs-weight} suggests that the wet weight of biomass varies with the location from which a sample was taken; hence averaging will mask this variation. Further, the variable number of samples taken per vessel (Section~\ref{sec:data}) means that the total biomass may be dependent upon the number of samples taken. For these reasons, we chose to use a multilevel regression model, in which a modelled intercept allows for the repeated measurements within vessels, whilst also allowing investigation of vessel-level relationships.
 
-To allow for the possible effects of outliers we examined the effect of changing the outcome (or observation) model from Normal to Student t. Let $Y_{i}$ be the log wet weight of biomass for the $i\up{th}$ observation, $i=1,\ldots,\Sexpr{sum(quads)}$. Then:
+To allow for the possible effects of outliers we examined the effect of changing the outcome (or observation) model from Normal to Student-$t$. Let $Y_{i}$ be the log wet weight of biomass for the $i\up{th}$ observation, $i=1,\ldots,\Sexpr{sum(quads)}$. Then:
 \begin{align}
-  Y_{i} & \sim \text{normal}(\mu_{i}, \sigma) \label{eq:O1}\tag{O1} \\
+  Y_{i} & \sim \text{Normal}(\mu_{i}, \sigma) \label{eq:O1}\tag{O1} \\
   Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \label{eq:O2}\tag{O2} \\
   \nu & \sim \text{Gamma}(2, 0.1) \nonumber
 \end{align}
-are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyper-parameters for the degrees freedom were chosen......MORE HERE.
+are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyper-parameters for the degrees freedom were chosen......MORE HERE.
 
 We initially inferred the latent process --- that is the process that determines the log wet-weight of fouling biomass on each vessel --- as linear function of the location of the measurement location allowing for a vessel-level intercept:
 \begin{align}
@@ -310,7 +310,7 @@ compTab <- readRDS("../data/looic-compare.rds")
 
 @ 
 
-The $t$-distribution observation model \eqref{eq:O2} appears to outperform the normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}). A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M4}) is provided in the supplemental results.
+The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}). A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M4}) is provided in the supplemental results.
 
 As a further check on model performance we examined if the models produce posterior predictions that consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row); the specific PPCs are shown as columns in the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model, however, does a stellar job in generating data consistent with the median nor the proportion of measurements below the limit of detection, but nonetheless \ref{eq:O2} still outperforms \ref{eq:O1}. For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model \eqref{eq:O2}.
 
