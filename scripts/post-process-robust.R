@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-10-05 11:30:37 (slane)>
+## Time-stamp: <2017-10-05 14:42:08 (slane)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -293,12 +293,7 @@ coef3 <- extract(m3, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
                               "betaTripsPaint", "sigma_alphaBoat", "sigma"))
 m3Summary <- lapply(coef3, sumMC, qnts = qnts) %>% summRename %>%
     mutate(model = "M3")
-coef4 <- extract(m4, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
-                              "betaType", "betaDaysType", "sigma_alphaBoat",
-                              "sigma"))
-m4Summary <- lapply(coef4, sumMC, qnts = qnts) %>% summRename %>%
-    mutate(model = "M4")
-allSummary <- bind_rows(m0Summary, m1Summary, m2Summary, m3Summary, m4Summary)
+allSummary <- bind_rows(m0Summary, m1Summary, m2Summary, m3Summary)
 ords <- unique(m3Summary$coef)
 inds <- which(ords == "betaMidTrips")
 ords <- c(ords[1:inds], "betaHullSA", ords[(inds+1):length(ords)])
