@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-10-05 11:18:10 (slane)>
+## Time-stamp: <2017-10-05 11:30:37 (slane)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -65,7 +65,7 @@ vessImps <- bind_rows(vessImps, lvl2Imp)
 plDays1 <- ggplot(vessImps, aes(x = factor(nummi), y = days1)) +
     geom_boxplot(outlier.size = 0.5) +
     xlab("Imputation number") +
-    ylab("") +
+    ylab("Standardised value") +
     theme_bw(base_size = 7.7) +
     theme(axis.text.x = element_blank(),
           axis.ticks.x = element_blank(),
@@ -75,7 +75,7 @@ ggsave("../graphics/imp-days1.pdf", plDays1, width = 4.9, height = 4.9)
 plMidTrips <- ggplot(vessImps, aes(x = factor(nummi), y = midTrips)) +
     geom_boxplot(outlier.size = 0.5) +
     xlab("Imputation number") +
-    ylab("") +
+    ylab("Standardised value") +
     theme_bw(base_size = 7.7) +
     theme(axis.text.x = element_blank(),
           axis.ticks.x = element_blank(),
