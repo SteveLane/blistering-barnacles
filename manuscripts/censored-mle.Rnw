@@ -1,4 +1,4 @@
-% Time-stamp: <2017-10-05 12:17:21 (slane)>
+% Time-stamp: <2017-10-06 14:29:11 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -210,7 +210,7 @@ To allow for the possible effects of outliers we examined the effect of changing
   Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \label{eq:O2}\tag{O2} \\
   \nu & \sim \text{Gamma}(2, 0.1) \nonumber
 \end{align}
-are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyper-parameters for the degrees freedom were chosen......MORE HERE.
+are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyperparameters for the degrees freedom were chosen to be weakly informative, favouring a robust $t$ model with lower degrees of freedom.
 
 We initially inferred the latent process --- that is the process that determines the log wet-weight of fouling biomass on each vessel --- as linear function of the location of the measurement location allowing for a vessel-level intercept:
 \begin{align}
@@ -220,7 +220,7 @@ We initially inferred the latent process --- that is the process that determines
   \beta^{l1},\beta^{l2} & \sim t_{3}(0, 1) \nonumber \\
   \sigma,\sigma_{\alpha} & \sim \text{half-cauchy}(0, 2.5) \nonumber
 \end{align}
-where $\mu_{i}$ is the expected log wet-weight in grams; $\mu,\beta^{l}$ are coefficients to be estimated from the data; and $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder (as compared to the hull, which is subsumed within the intercept $\mu$). $\alpha_{j[i]}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$\footnote{The notation $\alpha_{j[i]}$ denotes the vessel-level ($j\up{th}$) change to the intercept for the $i\up{th}$ observation.}, which is modelled as a cauchy distribution with location 0, and scale $\sigma_{\alpha}$. The intercept is given a mildly informative $N(0, 5)$ prior. Similarly the regression coefficients are given mildly information $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-cauchy}(0, 2.5)$ priors.
+where $\mu_{i}$ is the expected log wet-weight in grams; $\mu,\beta^{l}$ are coefficients to be estimated from the data; and $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder (as compared to the hull, which is subsumed within the intercept $\mu$). $\alpha_{j[i]}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$\footnote{The notation $\alpha_{j[i]}$ denotes the vessel-level ($j\up{th}$) change to the intercept for the $i\up{th}$ observation.}, which is modelled as a cauchy distribution with location 0, and scale $\sigma_{\alpha}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-cauchy}(0, 2.5)$ priors.
 
 We subsequently investigated four alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
 \begin{align}
@@ -230,14 +230,12 @@ We subsequently investigated four alternative specifications for the vessel-leve
   \alpha^{*}_{j} & = \text{(M1)} - \beta^{h} \cdot \text{hullSA}_{i} \label{eq:M2}\tag{M2} \\
   \alpha^{*}_{j} & = \text{(M2)} + \beta^{dt1} \cdot \text{days1VesselType1}_{j} + \beta^{dt2} \cdot \text{days1VesselType2}_{j} + \nonumber \\
              & \quad \beta^{mt1} \cdot \text{midTripsVesselType1}_{j} + \beta^{mt2} \cdot \text{midTripsVesselType2}_{j} + \nonumber \\
-             & \quad \beta^{mp1} \cdot \text{midTripsPaintType1}_{j} + \beta^{mp2} \cdot \text{midTripsPaintType2}_{j} \label{eq:M3}\tag{M3} \\
-  \alpha^{*}_{j} & = \text{(M3)} - \beta^{mt1} \cdot \text{midTripsVesselType1}_{j} - \beta^{mt2} \cdot \text{midTripsVesselType2}_{j} - \nonumber \\
-             & \quad \beta^{mp1} \cdot \text{midTripsPaintType1}_{j} - \beta^{mp2} \cdot \text{midTripsPaintType2}_{j} \label{eq:M4}\tag{M4}
+             & \quad \beta^{mp1} \cdot \text{midTripsPaintType1}_{j} + \beta^{mp2} \cdot \text{midTripsPaintType2}_{j} \label{eq:M3}\tag{M3}
 \end{align}
 
-\ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; $\text{hullSA}_{j}$ is the hull surface area; $\text{paintType1}_{j},\text{paintType2}_{j}$ are indicator variables for whether the vessel had hard or self-polishing anti-fouling paint; and $\text{vesselType1}_{j},\text{vesselType2}_{j}$ are indicator variables for whether the vessel was a fishing vessel or a yacht. \ref{eq:M2} consists of all terms in \ref{eq:M1}, less the hull surface area. \ref{eq:M3} adds interaction terms to \ref{eq:M2} between: the number of days since the vessel was last used and the vessel type; the median number of trips and the vessel type; and the median number of trips and the paint type. \ref{eq:M4} removes the interaction terms involving the median number of trips from \ref{eq:M3}.
+\ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; $\text{hullSA}_{j}$ is the hull surface area; $\text{paintType1}_{j},\text{paintType2}_{j}$ are indicator variables for whether the vessel had hard or self-polishing anti-fouling paint; and $\text{vesselType1}_{j},\text{vesselType2}_{j}$ are indicator variables for whether the vessel was a fishing vessel or a yacht. \ref{eq:M2} consists of all terms in \ref{eq:M1}, less the hull surface area. \ref{eq:M3} adds interaction terms to \ref{eq:M2} between: the number of days since the vessel was last used and the vessel type; the median number of trips and the vessel type; and the median number of trips and the paint type.
 
-The choice of these regression models was guided by graphical exploration of the posterior distribution of the random-effect terms in the latent process models (see Section~\ref{sec:results} and supplementary material).
+The choice of these regression models was guided by both theoretical considerations\footnote{Is theoretical the correct word here?} and graphical exploration of the posterior distribution of the random-effect terms in the latent process models. In particular, we expect there to be interactions between paint type and vessel usage predictors: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not. For more details on the graphical exploration, see Section~\ref{sec:results} and the supplementary material.
 
 \subsection{Missing data}
 \label{sec:missing-data}
@@ -310,7 +308,7 @@ compTab <- readRDS("../data/looic-compare.rds")
 
 @ 
 
-The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}). A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M4}) is provided in the supplemental results.
+The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}). A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M3}) is provided in the supplemental results.
 
 As a further check on model performance we examined if the models produce posterior predictions that consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row); the specific PPCs are shown as columns in the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model, however, does a stellar job in generating data consistent with the median nor the proportion of measurements below the limit of detection, but nonetheless \ref{eq:O2} still outperforms \ref{eq:O1}. For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model \eqref{eq:O2}.
 
@@ -339,16 +337,12 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
 
 Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type. There does not appear to be any relationship between the vessel's hull surface area and the vessel-level intercepts. These observations led to the development of \ref{eq:M2} (removing the hull surface area predictor) and \ref{eq:M3} (including the possible interaction terms).
 
-\subsubsection{Reduction to final model form}
+\subsubsection{Final model form}
 \label{sec:reduct-final-model}
 
-Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors remaining in M3: the number of days since the vessel was last used and the median number of trips undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from \ref{eq:M3}.
+Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors remaining in M3: the number of days since the vessel was last used and the median number of trips (per year) undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from \ref{eq:M3}.
 
-Figure~\ref{fig:m3-reg-a} is suggestive of an interaction between the number of days since the vessel was last used and the vessel type, 
-
-PLEASE CHECK THIS: however an interaction between the median number of trips undertaken by the vessel and the vessel type or the anti-fouling paint (Figure~\ref{fig:m3-reg-b}) type do not appear likely. FIG 2B AND FIG 6 SUGGESTS TO ME THAT THERE IS AN IMPORTANT INTERACTION FOR ABLATIVE AND SELF POLISHING PAINTS BUT NOT HARD.
-
-These observations led to the development of \ref{eq:M4} as the most likely model.
+Figure~\ref{fig:m3-reg-a} suggests that the interaction between the number of days since the vessel was last used and the vessel type is large. The evidence for an interaction between the median number of trips per year and vessel type (Figure~\ref{fig:m3-reg-b}), and the median number of trips per year and anti-fouling paint type is weak; these interactions however, are consistent with prior beliefs, and would likely remain given more data, so we leave \ref{eq:M4} as the most likely model.
 
 \begin{figure}[!hbp]
   \centering
@@ -356,15 +350,6 @@ These observations led to the development of \ref{eq:M4} as the most likely mode
   \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m3-reg-b}]{\includegraphics[width=0.45\linewidth]{../graphics/plM3paint-robust.pdf}}
   \caption{Estimated vessel-level intercepts from \ref{eq:M3}, plotted against the two ordinal predictors with interactions being assessed. Regression lines for each estimated interaction are overlaid.}
   \label{fig:m3-reg}
-\end{figure}
-
-Figure~\ref{fig:m4-reg} shows the regression estimates from \ref{eq:M4}, in relation to the estimated vessel-level intercepts. The left panel of Figure~\ref{fig:m4-reg} shows the number of days since the vessel was last used and the vessel-type estimated interaction, and the right panel shows the estimated effect of the number of days since the vessel was last cleaned (adjusted by vessel-type).
-
-\begin{figure}[!hbp]
-  \centering
-  \includegraphics[width=0.9\linewidth]{../graphics/plM4type-robust.pdf}
-  \caption{Estimated vessel-level intercepts from \ref{eq:M4}, plotted against the two ordinal predictors. Regression lines for each estimated regression are overlaid.}
-  \label{fig:m4-reg}
 \end{figure}
 
 Finally, Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered.
@@ -418,7 +403,7 @@ The results presented here demonstrate relationships that are largely consistent
 We also demonstrate that there appears to be an interaction between the type of vessel and length of time since it was last used. This interaction indicates that different types of vessels, e.g. yachts, fishing boats and motor cruisers, can have varied fouling biomass even if their stationary periods are the same. Compare a yacht to a motor cruiser/other vessel and a fishing vessel, all not having been used in \Sexpr{round(mean(vessels[['days1']], na.rm = TRUE))} days, nor cleaned in \Sexpr{round(mean(vessels[['days2']], na.rm = TRUE))} days (the mean number of days since the vessel was last cleaned). The model predicts that there is an 80\% predicted probability that the yacht has \Sexpr{diffs[['diffType']][1]}gm more wet weight biomass within a 0.5m\up{2} area on the hull than the motor cruiser/other vessel, and \Sexpr{diffs[['diffType']][2]}gm more than the fishing vessel.
 
 
-The size of the vessel however, measured by the hull surface area, was not important in predicting biofouling levels. Perhaps somewhat unsurprising was that given the same frequency of use, different types of vesselswere not important predictors of fouling biomass.
+The size of the vessel however, measured by the hull surface area, was not important in predicting biofouling levels. Perhaps somewhat unsurprising was that given the same frequency of use, different types of vessels were not important predictors of fouling biomass.
 
 TEXT HERE ON INTERACTION BETWEEN PAINT TYPE AND VESSEL ACTIVITY?
 
