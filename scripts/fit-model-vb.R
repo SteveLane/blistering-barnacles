@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Title: Fit model (VB)
 ## Author: Steve Lane
 ## Date: Friday, 21 April 2017
-## Time-stamp: <2017-10-06 16:18:10 (slane)>
+## Time-stamp: <2017-10-06 07:47:15 (overlordR)>
 ## Synopsis: Script that drives the censored regression model. Designed to be
 ## called from the Makefile, it requires the model name, a seed for rng, and
 ## number of iterations to be set on the command line, or prior to sourcing the
@@ -49,11 +49,18 @@ model <- stan_model(paste0("../stan/", mname, ".stan"))
 impList <- readRDS("../data/imputations.rds")
 set.seed(myseed)
 out <- mclapply(impList, function(dat){
-    locMod <- vb(model, data = dat$stanData)
+    locMod <- try(vb(model, data = dat$stanData))
     locMod
 })
+keep <- sapply(out, function(x) {
+    if(inherits(x, "try-error")) {
+        return(FALSE)
+    } else {
+        return(TRUE)
+    }
+})
 outname <- paste0("../data/", mname, "-var-bayes.rds")
-output <- sflist2stanfit(out)
+output <- sflist2stanfit(out[keep])
 saveRDS(output, file = outname)
 ################################################################################
 ################################################################################
