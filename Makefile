@@ -1,4 +1,4 @@
-# Time-stamp: <2017-10-06 15:23:47 (slane)>
+# Time-stamp: <2017-10-06 05:28:36 (overlordR)>
 .PHONY: all input-data models output-data \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -77,6 +77,14 @@ data/imputations.rds: scripts/data-cleaning.R \
 stan/%.rds: scripts/compile-model.R stan/%.stan
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
+
+################################################################################
+# Rules to fit variational bayes models
+data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
+	scripts/fit-model-vb.R data/imputations.rds
+	cd scripts; \
+	Rscript --no-save --no-restore fit-model-vb.R \
+		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
 
 ################################################################################
 # Rules to fit models with data
