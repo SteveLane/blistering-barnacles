@@ -1,5 +1,5 @@
-# Time-stamp: <2017-10-06 05:28:36 (overlordR)>
-.PHONY: all input-data models output-data \
+# Time-stamp: <2017-10-06 05:34:39 (overlordR)>
+.PHONY: all input-data models output-VB \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
 	clean-models clean-manuscripts clobber
@@ -24,16 +24,16 @@ models: stan/censored-mle-m0.rds \
 	stan/censored-mle-m3-robust.rds \
 	stan/censored-mle-m4-robust.rds
 
-output-data: data/censored-mle-m0.rds \
-	data/censored-mle-m1.rds \
-	data/censored-mle-m2.rds \
-	data/censored-mle-m3.rds \
-	data/censored-mle-m4.rds \
-	data/censored-mle-m0-robust.rds \
-	data/censored-mle-m1-robust.rds \
-	data/censored-mle-m2-robust.rds \
-	data/censored-mle-m3-robust.rds \
-	data/censored-mle-m4-robust.rds
+output-VB: data/censored-mle-m0-var-bayes.rds \
+	data/censored-mle-m1-var-bayes.rds \
+	data/censored-mle-m2-var-bayes.rds \
+	data/censored-mle-m3-var-bayes.rds \
+	data/censored-mle-m4-var-bayes.rds \
+	data/censored-mle-m0-robust-var-bayes.rds \
+	data/censored-mle-m1-robust-var-bayes.rds \
+	data/censored-mle-m2-robust-var-bayes.rds \
+	data/censored-mle-m3-robust-var-bayes.rds \
+	data/censored-mle-m4-robust-var-bayes.rds
 
 ROBUST-PROC-DATA = graphics/obs-hist.pdf \
 	graphics/imp-days1.pdf \
