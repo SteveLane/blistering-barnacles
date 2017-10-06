@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-05-02 11:41:53 (slane)>
+## Time-stamp: <2017-10-06 14:44:24 (slane)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -78,6 +78,13 @@ data <- left_join(
         cens = ifelse(wetWeight < 1.5, 1, 0),
         paintType = as.factor(paintType)
     )
+## Boat ID 24 has ridiculously high wet weights, as does 36 in the rudder
+## locations. Remove 24 completely, and the bad 36 observations. Relabel boatID
+## for future use.
+data <- data %>%
+    filter(wetWeight <= 1000) %>%
+    mutate(boatIDOld = boatID,
+           boatID = ifelse(boatID > 24, boatID - 1, boatID))
 ## Data for imputations/modelling
 impData <- data %>% select(-samLoc, -cens, -LocID)
 ## Level 1 data
