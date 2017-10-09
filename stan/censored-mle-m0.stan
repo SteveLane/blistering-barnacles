@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
-// Time-stamp: <2017-10-09 13:56:04 (slane)>
+// Time-stamp: <2017-10-09 04:02:39 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,11 +16,11 @@ data{
   int<lower=1> N;
   /* Number of (censored) observations */
   int<lower=1> nCens;
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
   /* Boat random effect */
   int<lower=1> numBoat;
   int<lower=1,upper=numBoat> boatID[N];
@@ -45,9 +45,10 @@ parameters{
   /* Intercept */
   real mu;
   /* Betas for categorical indicators */
-  vector[numLoc - 1] betaLoc;
+  real betaLoc[numLoc];
   /* Alphas for modelled random effect */
   vector[numBoat] alphaBoat;
+  real<lower=0> sigmaLoc;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
   /* Error */
@@ -56,24 +57,25 @@ parameters{
 
 transformed parameters{
   // Make it easier for some sampling statements (not necessary)
-    /* Regression for observed data */
+  /* Regression for observed data */
   vector[N] muHat;
   /* Regression for censored data */
   vector[nCens] muHatCens;
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaBoat[boatIDCens[j]];
   }
 }
 
 model{
   // Model sampling statements
-  /* Priors for categorical indicators */
-  betaLoc ~ student_t(3, 0, 1);
-  /* Priors for modelled random effect */
+  /* Prior for intercept */
   mu ~ normal(0, 5);
+  /* Priors for categorical indicators */
+  sigmaLoc ~ cauchy(0, 2.5);
+  betaLoc ~ student_t(3, 0, sigmaLoc);
   sigma_alphaBoat ~ cauchy(0, 2.5);
   alphaBoat ~ cauchy(0, sigma_alphaBoat);
   /* Prior for observation (model) error */
