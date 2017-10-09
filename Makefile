@@ -1,4 +1,4 @@
-# Time-stamp: <2017-10-06 05:34:39 (overlordR)>
+# Time-stamp: <2017-10-09 01:03:53 (overlordR)>
 .PHONY: all input-data models output-VB \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -96,6 +96,10 @@ data/censored-mle-%.rds: scripts/fit-model.R stan/censored-mle-%.rds \
 
 ################################################################################
 # Rules to process data (add dependencies later).
+data/looic-compare.rds: scripts/post-process-compare.R output-VB
+	cd $(<D); \
+	Rscript --no-save --no-restore $(<F)
+
 $(ROBUST-PROC-DATA): scripts/post-process-robust.R robust-output-data input-data
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
@@ -112,7 +116,7 @@ manuscripts/censored-mle.html: manuscripts/censored-mle.Rmd \
 	Rscript --no-save --no-restore -e "rmarkdown::render('$(<F)')"
 
 manuscripts/model-interrogation.html: manuscripts/model-interrogation.Rmd \
-	robust-output-data
+	output-VB
 	cd $(<D); \
 	Rscript --no-save --no-restore -e "rmarkdown::render('$(<F)')"
 
