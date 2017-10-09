@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 11 May 2017
 ## Synopsis: Performs comparison between outcome models.
-## Time-stamp: <2017-10-09 01:34:53 (overlordR)>
+## Time-stamp: <2017-10-09 03:10:04 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -127,9 +127,10 @@ ppc <- tibble(
     model = "O2"
 )
 yPPCN <- extract(m0N, "y_ppc")$y_ppc
-ppc1 <- rowMeans(yPPCN < 1.5)
-ppc2 <- apply(yPPCN, 1, quantile, probs = 0.5, names = FALSE)
-ppc3 <- apply(yPPCN, 1, IQR)
+yPPCNExp <- exp(yPPCN)
+ppc1 <- rowMeans(yPPCN < log(1.5))
+ppc2 <- apply(yPPCNExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCNExp, 1, IQR)
 ppcN <- tibble(
     `Prop(hat(Y)<1.5)` = ppc1,
     `Median(hat(Y))` = ppc2,
