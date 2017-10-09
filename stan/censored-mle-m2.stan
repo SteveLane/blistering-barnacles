@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // Removed hull surface area.
-// Time-stamp: <2017-10-09 03:15:47 (overlordR)>
+// Time-stamp: <2017-10-09 04:14:43 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,17 +22,17 @@ data{
   real days1[numBoat];
   real days2[numBoat];
   real midTrips[numBoat];
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
-  /* Paint type, ablative as base case */
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
+  /* Paint type */
   int<lower=1> numPaint;
-  matrix[numBoat, numPaint - 1] paintType;
-  /* Boat type, yacht as base case */
+  int<lower=1,upper=numPaint> paintType[numBoat];
+  /* Boat type */
   int<lower=1> numType;
-  matrix[numBoat, numType - 1] boatType;
+  int<lower=1,upper=numType> boatType[numBoat];
   /* Boat random effect */
   int<lower=1,upper=numBoat> boatID[N];
   int<lower=1,upper=numBoat> boatIDCens[nCens];
@@ -60,13 +60,16 @@ parameters{
   real betaDays2;
   real betaMidTrips;
   /* Betas for categorical indicators */
-  vector[numLoc - 1] betaLoc;
-  vector[numPaint - 1] betaPaint;
-  vector[numType - 1] betaType;
+  real betaLoc[numLoc];
+  real betaPaint[numPaint];
+  real betaType[numType];
   /* Alphas for modelled random effect */
   vector[numBoat] alphaBoat;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
+  real<lower=0> sigmaLoc;
+  real<lower=0> sigmaPaint;
+  real<lower=0> sigmaType;
   /* Error */
   real<lower=0> sigma;
 }
@@ -80,28 +83,30 @@ transformed parameters{
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
   for(n in 1:numBoat){
-    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + paintType[n] * betaPaint + boatType[n] * betaType;
+    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]];
   }
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaBoat[boatIDCens[j]];
   }
 }
 
 model{
   // Model sampling statements
-  /* Priors for categorical indicators */
-  betaLoc ~ student_t(3, 0, 1);
-  /* Priors for modelled random effect */
+  /* Priors for intercept + continuous */
   mu ~ normal(0, 5);
   betaDays1 ~ student_t(3, 0, 1);
   betaDays2 ~ student_t(3, 0, 1);
   betaMidTrips ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
-  betaPaint ~ student_t(3, 0, 1);
-  betaType ~ student_t(3, 0, 1);
+  sigmaLoc ~ cauchy(0, 2.5);
+  betaLoc ~ student_t(3, 0, sigmaLoc);
+  sigmaPaint ~ cauchy(0, 2.5);
+  betaPaint ~ student_t(3, 0, sigmaPaint);
+  sigmaType ~ cauchy(0, 2.5);
+  betaType ~ student_t(3, 0, sigmaType);
   sigma_alphaBoat ~ cauchy(0, 2.5);
   alphaBoat ~ cauchy(alphaHat, sigma_alphaBoat);
   /* Prior for observation (model) error */
