@@ -1,30 +1,33 @@
 ---
 title: "Model Interrogation"
-author: Stephen E. Lane
-output:
-  html_document:
-    theme: simplex
-    highlight: zenburn
+author:
+- Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-05-11 14:22:59 (slane)> -->
+<!-- Time-stamp: <2017-10-09 00:23:34 (overlordR)> -->
 
-```{r,knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
-## Add github packages using gitname/reponame format
-source("../scripts/imputation-functions.R")
-packages <- c("dplyr", "tidyr", "ggplot2", "rstan", "loo")
-ipak(packages)
-knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = TRUE,
-                      message = FALSE, echo = FALSE)
+```{r knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
+knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
+                      message = FALSE, echo = FALSE,
+                      cache.path = "interrogate-cache/")
 options(digits = 2, width = 100)
 
 ```
 
-## Introduction
+```{r packages}
+## Add github packages using gitname/reponame format
+source("../scripts/imputation-functions.R")
+packages <- c("dplyr", "tidyr", "ggplot2", "rstan", "loo")
+ipak(packages)
+options(mc.cores = parallel::detectCores()/2)
+
+```
+
+# Introduction
 
 In this document, I detail the model interrogation for the *blistering barnacles* (otherwise known as *biofouling*) project. For the introduction and set up of the problem, see the [manuscript](file:../manuscripts/censored-mle.pdf). This document expands upon the modelling description as given in that paper.
 
-## Models
+# Models
 
 The basic model (which we denote M0) included the location of the measurement as a level one fixed effect, and a modelled intercept for the vessel ID:
 
@@ -42,10 +45,10 @@ $$
 
 where $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder; observations made at the hull are aliased with the intercept, $\mu$. Summary output from this model is given below.
 
-```{r}
-m0 <- readRDS("../data/censored-mle-m0-robust.rds")
+```{r m0,cache=TRUE}
+m0 <- readRDS("../data/censored-mle-m0-robust-var-bayes.rds")
 m0ll <- extract_log_lik(m0)
-m0loo <- loo(m0ll)
+m0loo <- loo::loo(m0ll)
 print(m0, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
               "y_ppc", "y_lower"))
@@ -64,38 +67,38 @@ $$
 
 where $\text{days1}_{i},\text{days2}_{i}$ are the XXX. Summary output from this model is given below.
 
-```{r}
-m1 <- readRDS("../data/censored-mle-m1-robust.rds")
+```{r m1,cache=TRUE}
+m1 <- readRDS("../data/censored-mle-m1-robust-var-bayes.rds")
 m1ll <- extract_log_lik(m1)
-m1loo <- loo(m1ll)
+m1loo <- loo::loo(m1ll)
 print(m1, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
               "y_ppc", "y_lower"))
 
 ```
 
-## Vessel-level intercept interrogation
+# Vessel-level intercept interrogation
 
 In this section we look at the estimated vessel-level intercepts ($\alpha_{j}$) in relation to the vessel-level predictors. From the output above, it is hard to gauge the impact of a product term, but the size of the 50% point estimate of the vessel type coefficients suggest that they may be candidates.
 
-### Candidate interaction terms
+## Candidate interaction terms
 
-The figure below shows the 50% point estimate (and 80% credible intervals) of the vessel-level intercept against the ordinal predictors, coloured by the vessel type. There is a possibility of an interaction between `days1`/`midTrips` and `boatType`.
+The figure below shows the 50% point estimate (and 80% credible intervals) of the vessel-level intercept against the ordinal predictors, coloured by the vessel type; the regression line is at the base category of motor cruiser/other. There is a possibility of an interaction between `days1`/`midTrips` and `boatType`.
 
 ```{r}
 a1 <- extract(m1, "alphaBoat")$alphaBoat
 a1Sum <- t(apply(a1, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a1Dat <- tibble(low = a1Sum[,1], mid = a1Sum[,2], high = a1Sum[,3],
                 boatID = 1:nrow(a1Sum))
-imps <- readRDS("../data/imputations-robust.rds")
+imps <- readRDS("../data/imputations.rds")
 set.seed(13)
 lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2
 a1Dat <- left_join(a1Dat, lvl2) %>%
     gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType)
-slopes <- extract(m1, c("mu", "betaDays1", "betaDays2", "betaMidTrips",
+slopes <- extract(m1, c("betaDays1", "betaDays2", "betaMidTrips",
                         "betaHullSA"))
 slopes <- sapply(slopes, quantile, probs = 0.5)
-slopes <- tibble(intercept = slopes[1], slope = slopes[-1],
+slopes <- tibble(intercept = 0, slope = slopes,
                  type = unique(a1Dat$type))
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
                         colour = boatType)) +
@@ -122,14 +125,14 @@ print(pl)
 
 So combining these two exploratory data analyses, and the results from M1, a possible sequence of models to try next would be: M2, which removes `hullSA` from M1; and M3 which adds the `days1:boatType`, `midTrips:boatType` and `midTrips:paintType` interactions to M2.
 
-### Interrogation of product terms
+## Interrogation of product terms
 
 The choice of predictors in M2 was made based on the candidate interaction terms in M3. Removing `hullSA` from M1 resulted in the following estimates for M2:
 
-```{r}
-m2 <- readRDS("../data/censored-mle-m2-robust.rds")
+```{r m2,cache=TRUE}
+m2 <- readRDS("../data/censored-mle-m2-robust-var-bayes.rds")
 m2ll <- extract_log_lik(m2)
-m2loo <- loo(m2ll)
+m2loo <- loo::loo(m2ll)
 m2comp <- compare(m1loo, m2loo)
 print(m2, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
@@ -141,17 +144,17 @@ As can be seen in these estimates, there is virtually no change in values from t
 
 Moving on to M3, where the interactions `days1:boatType`, `midTrips:boatType` and `midTrips:paintType` are added to M2, we get the following estimates:
 
-```{r}
-m3 <- readRDS("../data/censored-mle-m3-robust.rds")
+```{r m3,cache=TRUE}
+m3 <- readRDS("../data/censored-mle-m3-robust-var-bayes.rds")
 m3ll <- extract_log_lik(m3)
-m3loo <- loo(m3ll)
+m3loo <- loo::loo(m3ll)
 print(m3, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
               "y_ppc", "y_lower"))
 
 ```
 
-Again, there is not enough evidence to state with any certainty how these interactions might affect the wet weight biomass. It is important to remember that there are only `r nrow(a1Dat)` vessels contributing to the regression at the second-level, so we do not expect very small standard errors for these estimates.
+Again, there is not enough evidence to state with any certainty how these interactions might affect the wet weight biomass. It is important to remember that there are only `r nrow(lvl2)` vessels contributing to the regression at the second-level, so we do not expect very small standard errors for these estimates.
 
 ```{r}
 a3 <- extract(m3, "alphaBoat")$alphaBoat
@@ -187,9 +190,9 @@ print(pl)
 
 ```
 
-The figure above plots the marginal regression lines for the `days1:boatType` and `midTrips:boatType` interactions. There appears to be a difference in slopes in the `days1:boatType` interaction; indeed the posterior probability that the difference in slopes between Yachts and Motor cruiser/Other is greater than 0 is `r mean(slopes$betaDaysType[,2] - slopes$betaDaysType[,1] > 0)`.
+The figure above plots the marginal regression lines for the `days1:boatType` and `midTrips:boatType` interactions. There appears to be a difference in slopes in the `days1:boatType` interaction; indeed the posterior probability that the difference in slopes between Yachts and Motor cruiser/Other is greater than 0 is `r mean(slopes$betaDaysType[,2] - slopes$betaDaysType[,1] > 0)`. Similarly for `midTrips:boatType`.
 
-The figure below plots the marginal regression line for the `midTrips:paintType` interaction. There appears to be no difference in slopes here.
+The figure below plots the marginal regression line for the `midTrips:paintType` interaction. Again, there appears to be an interaction.
 
 ```{r}
 intPaint <- c(0, median(slopes$betaPaint[,1]), median(slopes$betaPaint[,2]))
@@ -212,6 +215,14 @@ print(pl)
 
 ```
 
+# Some basic model comparisons
+
+
+
+# Outdated
+
+This section is now outdated (2017-10-09); the candidate predictors for interactions above look reasonably good, and fit in with theory, so we'll stop here.
+
 ## Restricted model form
 
 I think the appropriate place to go now is to eliminate terms that don't appear to add any predictive ability to the model. We'll keep the `days1:boatType` interaction (and its components), but remove other predictors. Model M4, will thus have a vessel-level regression form:
@@ -227,10 +238,10 @@ where $\text{days1vesselType1}_{i},\text{days1vesselType2}_{i}$ are the interact
 
 The output below provides a summary of the estimates from M4, with the figure showing the marginal effects of the `days1:boatType` interaction, and the `days2` marginal effect (adjusted for vessel type in the plot).
 
-```{r}
-m4 <- readRDS("../data/censored-mle-m4-robust.rds")
+```{r m4,cache=TRUE}
+m4 <- readRDS("../data/censored-mle-m4-robust-var-bayes.rds")
 m4ll <- extract_log_lik(m4)
-m4loo <- loo(m4ll)
+m4loo <- loo::loo(m4ll)
 print(m4, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
               "y_ppc", "y_lower"))
