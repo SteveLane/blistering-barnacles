@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-// Title: Censored MLE, Model 1, Group Level
+// Title: Censored MLE, Model 4, Group Level
 // Author: Steve Lane
 // Date: Wednesday, 08 March 2017
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
-// All boat-level intercept predictors included.
-// Based off M1, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-05-10 14:00:07 (slane)>
+// Restricted model form.
+// Based off M4, but with t distribution for outcome for added robustness.
+// Time-stamp: <2017-10-10 22:39:31 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,19 +22,14 @@ data{
   /* Numeric/ordinal predictors */
   real days1[numBoat];
   real days2[numBoat];
-  real midTrips[numBoat];
-  real hullSA[numBoat];
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
-  /* Paint type, ablative as base case */
-  int<lower=1> numPaint;
-  matrix[numBoat, numPaint - 1] paintType;
-  /* Boat type, yacht as base case */
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
+  /* Boat type */
   int<lower=1> numType;
-  matrix[numBoat, numType - 1] boatType;
+  int<lower=1,upper=numType> boatType[numBoat];
   /* Boat random effect */
   int<lower=1,upper=numBoat> boatID[N];
   int<lower=1,upper=numBoat> boatIDCens[nCens];
@@ -60,16 +55,19 @@ parameters{
   /* Betas for continuous */
   real betaDays1;
   real betaDays2;
-  real betaMidTrips;
-  real betaHullSA;
   /* Betas for categorical indicators */
-  vector[numLoc - 1] betaLoc;
-  vector[numPaint - 1] betaPaint;
-  vector[numType - 1] betaType;
+  real betaLoc[numLoc];
+  real betaType[numType];
+  /* Betas for interaction terms */
+  real betaDaysType[numType];
   /* Alphas for modelled random effect */
   vector[numBoat] alphaBoat;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
+  real<lower=0> sigmaLoc;
+  real<lower=0> sigmaType;
+  /* Errors for interaction terms */
+  real<lower=0> sigmaDaysType;
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
@@ -85,7 +83,7 @@ transformed parameters{
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
   for(n in 1:numBoat){
-    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaHullSA * hullSA[n] + paintType[n] * betaPaint + boatType[n] * betaType;
+    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n];
   }
   for(i in 1:N){
     muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
@@ -97,17 +95,19 @@ transformed parameters{
 
 model{
   // Model sampling statements
-  /* Priors for categorical indicators */
-  betaLoc ~ student_t(3, 0, 1);
-  /* Priors for modelled random effect */
+  /* Priors for intercept + continuous */
   mu ~ normal(0, 5);
   betaDays1 ~ student_t(3, 0, 1);
   betaDays2 ~ student_t(3, 0, 1);
-  betaMidTrips ~ student_t(3, 0, 1);
-  betaHullSA ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
-  betaPaint ~ student_t(3, 0, 1);
-  betaType ~ student_t(3, 0, 1);
+  sigmaLoc ~ cauchy(0, 2.5);
+  betaLoc ~ student_t(3, 0, sigmaLoc);
+  sigmaType ~ cauchy(0, 2.5);
+  betaType ~ student_t(3, 0, sigmaType);
+  /* Priors for interactions */
+  sigmaDaysType ~ cauchy(0, 2.5);
+  betaDaysType ~ student_t(3, 0, sigmaDaysType);
+  /* Priors for modelled effects */
   sigma_alphaBoat ~ cauchy(0, 2.5);
   alphaBoat ~ cauchy(alphaHat, sigma_alphaBoat);
   /* Prior for observation (model) error */
