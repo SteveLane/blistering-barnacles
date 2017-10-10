@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
 // Based off M0, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-10 22:28:41 (overlordR)>
+// Time-stamp: <2017-10-10 22:41:52 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -17,11 +17,11 @@ data{
   int<lower=1> N;
   /* Number of (censored) observations */
   int<lower=1> nCens;
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
   /* Boat random effect */
   int<lower=1> numBoat;
   int<lower=1,upper=numBoat> boatID[N];
