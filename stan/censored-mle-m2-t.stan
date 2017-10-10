@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Removed hull surface area.
 // Based off M2, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-10 22:33:30 (overlordR)>
+// Time-stamp: <2017-10-10 23:17:07 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -89,10 +89,10 @@ transformed parameters{
     alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]];
   }
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaBoat[boatIDCens[j]];
   }
 }
 

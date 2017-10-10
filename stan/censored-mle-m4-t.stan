@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Restricted model form.
 // Based off M4, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-10 22:39:31 (overlordR)>
+// Time-stamp: <2017-10-10 23:18:05 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -86,10 +86,10 @@ transformed parameters{
     alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n];
   }
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaBoat[boatIDCens[j]];
   }
 }
 
