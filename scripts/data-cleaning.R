@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-10-06 14:44:24 (slane)>
+## Time-stamp: <2017-10-11 01:24:01 (overlordR)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -74,7 +74,7 @@ data <- left_join(
         boatType = as.factor(boatType),
         LocID = recode(LocID,
                        "HA" = "Hull", "HP" = "Keel", "PJ" = "Rudder"),
-        LocID = as.factor(LocID),
+        LocID = factor(LocID),
         cens = ifelse(wetWeight < 1.5, 1, 0),
         paintType = as.factor(paintType)
     )
@@ -85,17 +85,36 @@ data <- data %>%
     filter(wetWeight <= 1000) %>%
     mutate(boatIDOld = boatID,
            boatID = ifelse(boatID > 24, boatID - 1, boatID))
-## Data for imputations/modelling
-impData <- data %>% select(-samLoc, -cens, -LocID)
-## Level 1 data
-lvl1Data <- data %>% select(boatID, wetWeight, LocID, cens)
 ## Loop to create multiple imputations - give a loop as I want to start each
 ## imputation off with a random draw from a U(0, 1.5) for the censored data just
 ## to inject a little randomness into it.
-## Create numMI imputations, join to full data, and also create stan data
+## Create numMI imputations, join to full data, and also create stan data.
+## Furthermore, I need indicators for categorical values, so probably easiest to
+## create a series of lookup tables.
+locLookup <- data_frame(
+    LocID = levels(data$LocID),
+    LocIDInt = seq_len(length(LocID))
+)
+boatLookup <- data_frame(
+    boatType = levels(data$boatType),
+    boatTypeInt = seq_len(length(boatType))
+)
+paintLookup <- data_frame(
+    paintType = levels(data$paintType),
+    paintTypeInt = seq_len(length(paintType))
+)
+## Data for imputations/modelling
+impData <- data %>% select(-samLoc, -cens, -LocID)
+## Level 1 data
+lvl1Data <- data %>%
+    left_join(., locLookup) %>%
+    select(boatID, wetWeight, LocIDInt, cens)
 set.seed(787, "L'Ecuyer")
 impList <- mclapply(1:numMI, function(i){
-    imp <- lvl2Imp(impData)
+    imp <- lvl2Imp(impData) %>%
+        left_join(., boatLookup) %>%
+        left_join(., paintLookup) %>%
+        select(-boatType, -paintType)
     stanData <- createStanData(lvl1Data, imp)
     list(lvl2 = imp, stanData = stanData)
 })
