@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-10-11 01:24:01 (overlordR)>
+## Time-stamp: <2017-10-11 01:50:28 (overlordR)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -35,6 +35,8 @@ if(!(length(args) %in% 0:1)){
 source("../scripts/imputation-functions.R")
 packages <- c("dplyr", "mice", "parallel")
 ipak(packages)
+## Turn off messages
+options(warn = -1, verbose = FALSE)
 samplesdata <- read.csv("../data-raw/samples.csv")
 ## Bring in vessel data as well.
 vessels <- read.csv("../data-raw/vessel.csv")
@@ -107,18 +109,22 @@ paintLookup <- data_frame(
 impData <- data %>% select(-samLoc, -cens, -LocID)
 ## Level 1 data
 lvl1Data <- data %>%
-    left_join(., locLookup) %>%
+    left_join(., locLookup, by = "LocID") %>%
     select(boatID, wetWeight, LocIDInt, cens)
 set.seed(787, "L'Ecuyer")
 impList <- mclapply(1:numMI, function(i){
     imp <- lvl2Imp(impData) %>%
-        left_join(., boatLookup) %>%
-        left_join(., paintLookup) %>%
+        left_join(., boatLookup, by = "boatType") %>%
+        left_join(., paintLookup, by = "paintType") %>%
         select(-boatType, -paintType)
     stanData <- createStanData(lvl1Data, imp)
     list(lvl2 = imp, stanData = stanData)
 })
 ## Save as rds for further use.
+data <- data %>%
+    left_join(., locLookup, by = "LocID") %>%
+    left_join(., boatLookup, by = "boatType") %>%
+    left_join(., paintLookup, by = "paintType")
 if(!dir.exists("../data/")) dir.create("../data/")
 saveRDS(data, file = "../data/biofouling.rds")
 saveRDS(impList, file = "../data/imputations.rds")
