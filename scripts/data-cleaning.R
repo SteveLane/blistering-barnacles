@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-10-11 01:50:28 (overlordR)>
+## Time-stamp: <2017-10-11 21:16:02 (overlordR)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -128,5 +128,6 @@ data <- data %>%
 if(!dir.exists("../data/")) dir.create("../data/")
 saveRDS(data, file = "../data/biofouling.rds")
 saveRDS(impList, file = "../data/imputations.rds")
+saveRDS(impList[1:10], file = "../data/imputations-short.rds")
 ################################################################################
 ################################################################################
