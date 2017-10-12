@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Title: Fit model
 ## Author: Steve Lane
 ## Date: Friday, 21 April 2017
-## Time-stamp: <2017-10-06 15:22:13 (slane)>
+## Time-stamp: <2017-10-12 22:24:53 (overlordR)>
 ## Synopsis: Script that drives the censored regression model. Designed to be
 ## called from the Makefile, it requires the model name, a seed for rng, and
 ## number of iterations to be set on the command line, or prior to sourcing the
@@ -42,7 +42,12 @@ ipak(packages)
 rstan_options(auto_write = TRUE)
 ## Want cores to be one, we're only running one chain, then combining. Each
 ## imputation will be sent out via mclapply.
-options(mc.cores = parallel::detectCores()/2)
+cores <- round(parallel::detectCores()/2)
+if (cores > 10) {
+    options(mc.cores = 10)
+} else {
+    options(mc.cores = cores)
+}
 model <- stan_model(paste0("../stan/", mname, ".stan"))
 ## Load data
 impList <- readRDS("../data/imputations.rds")
@@ -50,7 +55,7 @@ set.seed(myseed)
 out <- mclapply(impList, function(dat){
     locMod <- sampling(model, data = dat$stanData, iter = iter,
                        chains = 1, cores = 1, open_progress = FALSE,
-                       control = list(adapt_delta = 0.95))
+                       control = list(adapt_delta = 0.97))
     locMod
 })
 outname <- paste0("../data/", mname, ".rds")
