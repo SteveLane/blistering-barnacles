@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-10-06 14:29:01 (slane)>
+## Time-stamp: <2017-10-12 04:50:44 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
