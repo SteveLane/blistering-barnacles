@@ -4,7 +4,7 @@ author:
 - Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-10-12 06:07:03 (overlordR)> -->
+<!-- Time-stamp: <2017-10-12 22:12:09 (overlordR)> -->
 
 ```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
 knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
@@ -280,8 +280,8 @@ pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
     scale_colour_brewer(palette = "Dark2") +
     theme_bw(base_size = 7.7) +
     theme(legend.position = "bottom")
-print(pl)
 ggsave("../graphics/plM1boat-robust.pdf", pl, width = 4.9, height = 4.9)
+print(pl)
 
 ```
 
@@ -308,8 +308,8 @@ pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
     scale_colour_brewer(palette = "Dark2") +
     theme_bw(base_size = 7.7) +
     theme(legend.position = "bottom")
-print(pl)
 ggsave("../graphics/plM1paint-robust.pdf", pl, width = 4.9, height = 4.9)
+print(pl)
 
 ```
 
@@ -387,8 +387,8 @@ pl <- ggplot(a3Dat, aes(x = value, y = mid, ymin = low, ymax = high,
     xlab("Scaled value") +
     scale_colour_brewer(palette = "Dark2") +
     theme(legend.position = "bottom")
-print(pl)
 ggsave("../graphics/plM3boat-var-bayes.pdf", pl, height = 3.5)
+print(pl)
 
 ```
 
@@ -436,6 +436,80 @@ compare(m0loo, m1loo, m2loo, m3loo)
 ```
 
 Clearly, M3 is the best performing model.
+
+## Comparison of Model Coefficients
+
+```{r mod-coefs,out.height=960}
+qnts <- c("low5" = 0.05, "low25" = 0.25, "med" = 0.5, "high75" = 0.75,
+          "high95" = 0.95)
+coef0 <- extract(m0, pars = c("nu", "mu", "betaLoc", "sigma_alphaBoat",
+                              "sigma"))
+m0Summary <- lapply(coef0, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M0")
+coef1 <- extract(m1, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaHullSA", "betaPaint",
+                              "betaType", "sigma_alphaBoat", "sigma"))
+m1Summary <- lapply(coef1, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M1")
+coef2 <- extract(m2, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaPaint",
+                              "betaType", "sigma_alphaBoat", "sigma"))
+m2Summary <- lapply(coef2, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M2")
+coef3 <- extract(m3, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaPaint",
+                              "betaType", "betaDaysType", "betaTripsType",
+                              "betaTripsPaint", "sigma_alphaBoat", "sigma"))
+m3Summary <- lapply(coef3, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M3")
+allSummary <- bind_rows(m0Summary, m1Summary, m2Summary, m3Summary)
+ords <- unique(m3Summary$coef)
+inds <- which(ords == "betaMidTrips")
+ords <- c(ords[1:inds], "betaHullSA", ords[(inds+1):length(ords)])
+allSummary <- allSummary %>%
+    mutate(coef = factor(coef, levels = rev(ords)))
+labs <- c("nu" = expression(nu),
+          "mu" = expression(mu),
+          "betaLoc1" = expression(beta[1]^{L}),
+          "betaLoc2" = expression(beta[2]^{L}),
+          "betaLoc3" = expression(beta[3]^{L}),
+          "betaDays1" = expression(beta^{d1}),
+          "betaDays2" = expression(beta^{d2}),
+          "betaMidTrips" = expression(beta^{m}),
+          "betaHullSA" = expression(beta^{h}),
+          "betaPaint1" = expression(beta[1]^{P}),
+          "betaPaint2" = expression(beta[2]^{P}),
+          "betaPaint3" = expression(beta[3]^{P}),
+          "betaType1" = expression(beta[1]^{T}),
+          "betaType2" = expression(beta[2]^{T}),
+          "betaType3" = expression(beta[3]^{T}),
+          "betaDaysType1" = expression(beta[1]^{DT}),
+          "betaDaysType2" = expression(beta[2]^{DT}),
+          "betaDaysType3" = expression(beta[3]^{DT}),
+          "betaTripsType1" = expression(beta[1]^{MT}),
+          "betaTripsType2" = expression(beta[2]^{MT}),
+          "betaTripsType3" = expression(beta[3]^{MT}),
+          "betaTripsPaint1" = expression(beta[1]^{MP}),
+          "betaTripsPaint2" = expression(beta[2]^{MP}),
+          "betaTripsPaint3" = expression(beta[3]^{MP}),
+          "sigma_alphaBoat" = expression(sigma[alpha]),
+          "sigma" = expression(sigma))
+plSummary <- ggplot(allSummary, aes(x = coef, y = med, ymin = low5,
+                                    ymax = high95, colour = model)) +
+    geom_pointrange(aes(ymin = low25, ymax = high75),
+                    position = position_dodge(width = 1.0), fatten = 0.75,
+                    size = 1, show.legend = FALSE) +
+    geom_pointrange(position = position_dodge(width = 1.0), fatten = 0.5) +
+    coord_flip() +
+    xlab("Variable") +
+    ylab("Value") +
+    scale_x_discrete(labels = labs) +
+    scale_colour_brewer(palette = "Dark2", name = "Model") +
+    theme(legend.position = "bottom")
+ggsave("../graphics/plSummary-var-bayes.pdf", plSummary, width = 3.5)
+plSummary
+
+```
 
 # Outdated
 
