@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 11 May 2017
 ## Synopsis: Performs comparison between outcome models.
-## Time-stamp: <2017-10-09 03:10:04 (overlordR)>
+## Time-stamp: <2017-10-12 04:48:52 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -21,22 +21,22 @@ biofoul <- readRDS("../data/biofouling.rds")
 
 ################################################################################
 ################################################################################
-## Begin Section: looic table for robust model
+## Begin Section: looic table for t model
 ################################################################################
 ################################################################################
-m0 <- readRDS("../data/censored-mle-m0-robust-var-bayes.rds")
+m0 <- readRDS("../data/censored-mle-m0-t-var-bayes.rds")
 m0ll <- extract_log_lik(m0)
 m0loo <- loo(m0ll)
-rm(m0, m0ll)
-m1 <- readRDS("../data/censored-mle-m1-robust-var-bayes.rds")
+rm(m0ll)
+m1 <- readRDS("../data/censored-mle-m1-t-var-bayes.rds")
 m1ll <- extract_log_lik(m1)
 m1loo <- loo(m1ll)
 rm(m1, m1ll)
-m2 <- readRDS("../data/censored-mle-m2-robust-var-bayes.rds")
+m2 <- readRDS("../data/censored-mle-m2-t-var-bayes.rds")
 m2ll <- extract_log_lik(m2)
 m2loo <- loo(m2ll)
 rm(m2, m2ll)
-m3 <- readRDS("../data/censored-mle-m3-robust-var-bayes.rds")
+m3 <- readRDS("../data/censored-mle-m3-t-var-bayes.rds")
 m3ll <- extract_log_lik(m3)
 m3loo <- loo(m3ll)
 rm(m3ll)
@@ -50,7 +50,7 @@ looLookup <- tibble(
 )
 looTab <- left_join(looTab, looLookup) %>%
     select(-mID)
-message("Finished robust section.")
+message("Finished t section.")
 ################################################################################
 ################################################################################
 
@@ -62,7 +62,7 @@ message("Finished robust section.")
 m0N <- readRDS("../data/censored-mle-m0-var-bayes.rds")
 m0Nll <- extract_log_lik(m0N)
 m0Nloo <- loo(m0Nll)
-rm(m0N, m0Nll)
+rm(m0Nll)
 m1N <- readRDS("../data/censored-mle-m1-var-bayes.rds")
 m1Nll <- extract_log_lik(m1N)
 m1Nloo <- loo(m1Nll)
@@ -152,6 +152,47 @@ plPPC <- ggplot(allPPC, aes(x = value)) +
     ylab("Count") +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank())
-ggsave("../graphics/ppc-compare.pdf", plPPC)
+ggsave("../graphics/ppc-compare-m0.pdf", plPPC)
+################################################################################
+################################################################################
+
+################################################################################
+################################################################################
+## Begin Section: PPCs for M3: prop < cens; median; iqr
+################################################################################
+################################################################################
+yPPC <- extract(m3, "y_ppc")$y_ppc
+yPPCExp <- exp(yPPC)
+ppc1 <- rowMeans(yPPC < log(1.5))
+ppc2 <- apply(yPPCExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCExp, 1, IQR)
+ppc <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O2"
+)
+yPPCN <- extract(m3N, "y_ppc")$y_ppc
+yPPCNExp <- exp(yPPCN)
+ppc1 <- rowMeans(yPPCN < log(1.5))
+ppc2 <- apply(yPPCNExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCNExp, 1, IQR)
+ppcN <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O1"
+)
+allPPC <- bind_rows(ppc, ppcN) %>%
+    gather(ppc, value, -model)
+plPPC <- ggplot(allPPC, aes(x = value)) +
+    geom_histogram() +
+    facet_grid(model ~ ppc, scales = "free", labeller = label_parsed) +
+    geom_vline(aes(xintercept = value), data = obs) +
+    xlab("") +
+    ylab("Count") +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank())
+ggsave("../graphics/ppc-compare-m3.pdf", plPPC)
 ################################################################################
 ################################################################################
