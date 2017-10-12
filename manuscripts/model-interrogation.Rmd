@@ -4,12 +4,13 @@ author:
 - Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-10-11 05:50:05 (overlordR)> -->
+<!-- Time-stamp: <2017-10-12 04:37:52 (overlordR)> -->
 
-```{r knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
+```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
 knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
                       message = FALSE, echo = FALSE,
-                      cache.path = "interrogate-cache/")
+                      cache.path = "interrogate-cache/",
+                      fig.path = "html-figures/")
 options(digits = 2, width = 100)
 
 ```
@@ -29,21 +30,45 @@ In this document, I detail the model interrogation for the *blistering barnacles
 
 # Models
 
-The basic model (which we denote M0) included the location of the measurement as a level one fixed effect, and a modelled intercept for the vessel ID:
+The basic model (which we denote M0) included the location of the measurement as a level one fixed effect, and a modelled intercept for the vessel ID. We investigate two different models for the regression error:
 
 $$
 \begin{align}
-  \log Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \\
-  \nu ~ \text{Gamma}(2, 0.1) \\
-  \mu_{i} & = \mu + \alpha_{j[i]} + \beta^{l1} \cdot \text{location1}_{i} + \beta^{l2} \cdot \text{location2}_{i} \\
-  \alpha_{j} & \sim \text{cauchy}(0, \sigma_{\alpha}) \\
+  \log Y_{i} & \sim \text{Normal}(\mu_{i}, \sigma) \\
+  \log Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma)
+\end{align}
+$$
+
+The $t$ distributed model allows us to have a little more robustness, and our expectation is that this model will perform the best. The specification for model M0 is completed with the following:
+
+$$
+\begin{align}
+  \nu & \sim \text{Gamma}(2, 0.1) \\
+  \mu_{i} & = \mu + \alpha_{j[i]} + \beta_{l[i]} \\
   \mu & \sim N(0, 5) \\
-  \beta^{l1},\beta^{l2} & \sim t_{3}(0, 1) \\
+  \alpha_{j} & \sim \text{cauchy}(0, \sigma_{\alpha}) \\
+  \beta_{l} & \sim t_{3}(0, \sigma_{l}) \\
   \sigma,\sigma_{\alpha} & \sim \text{cauchy}(0, 2.5)
 \end{align}
 $$
 
-where $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder; observations made at the hull are aliased with the intercept, $\mu$. Summary output from this model is given below.
+where $j$ references vessels, and $l$ references locations. Thus, $\alpha_{j}$ and $\beta_{l}$ are the variation around the mean due to the location of measurement and particular vessel respectively. Summary output from this model follows.
+
+## M0
+
+### M0 &mdash; Normal distribution
+
+```{r m0N,cache=TRUE}
+m0N <- readRDS("../data/censored-mle-m0-var-bayes.rds")
+m0Nll <- extract_log_lik(m0N)
+m0Nloo <- loo::loo(m0Nll)
+print(m0N, digits = 2, include = FALSE,
+      par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
+              "y_ppc", "y_lower"))
+
+```
+
+### M0 &mdash; $t$ distribution
 
 ```{r m0,cache=TRUE}
 m0 <- readRDS("../data/censored-mle-m0-t-var-bayes.rds")
@@ -55,17 +80,90 @@ print(m0, digits = 2, include = FALSE,
 
 ```
 
+### Comparison between Normal and $t$ assumptions
+
+We now compare the two base models based on their predictive log-likelihoods:
+
+```{r compare-m0}
+compare(m0Nloo, m0loo)
+
+```
+
+So in the M0 models, there's not a huge difference in predictive log-likelihood between the Normal and $t$ distribution regressions.
+
+### Posterior predictive checks
+
+```{r post-pred-m0,cache=TRUE}
+yPPC <- extract(m0, "y_ppc")$y_ppc
+yPPCExp <- exp(yPPC)
+ppc1 <- rowMeans(yPPC < log(1.5))
+ppc2 <- apply(yPPCExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCExp, 1, IQR)
+ppc <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O2"
+)
+yPPCN <- extract(m0N, "y_ppc")$y_ppc
+yPPCNExp <- exp(yPPCN)
+ppc1 <- rowMeans(yPPCN < log(1.5))
+ppc2 <- apply(yPPCNExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCNExp, 1, IQR)
+ppcN <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O1"
+)
+allPPC <- bind_rows(ppc, ppcN) %>%
+    gather(ppc, value, -model)
+## Observed data
+biofouling <- readRDS("../data/biofouling.rds")
+obs <- tibble(ppc = c("Prop(hat(Y)<1.5)", "Median(hat(Y))", "IQR(hat(Y))"),
+              value = with(biofouling,
+                           c(mean(wetWeight < 1.5), median(wetWeight),
+                             IQR(wetWeight))))
+plPPC <- ggplot(allPPC, aes(x = value)) +
+    geom_histogram() +
+    facet_grid(model ~ ppc, scales = "free", labeller = label_parsed) +
+    geom_vline(aes(xintercept = value), data = obs) +
+    xlab("") +
+    ylab("Count") +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank())
+plPPC
+
+```
+
+It appears here that the $t$ model reproduces the lower values better than the normal version.
+
+## M1
+
 The next model fit (M1) included all vessel-level predictors as main effects in a regression on the vessel-level intercept:
 
 $$
 \begin{align}
   \alpha_{j} & \sim \text{cauchy}(\alpha^{*}_{j}, \sigma_{\alpha}) \\
-  \alpha^{*}_{j} & = \beta^{d1} \cdot \text{days1}_{i} + \beta^{d2} \cdot  \text{days2}_{i} + \beta^{m} \cdot \text{midTrips}_{i} + \beta^{h} \cdot \text{hullSA}_{i} + \beta^{p1} \cdot \text{paintType1}_{i} + \beta^{p2} \cdot \text{paintType2}_{i} + \\
-  & \quad \beta^{t1} \cdot \text{vesselType1}_{i} + \beta^{t2} \cdot \text{vesselType2}_{i}
+  \alpha^{*}_{j} & = \beta^{d1} \cdot \text{days1}_{j} + \beta^{d2} \cdot  \text{days2}_{j} + \beta^{m} \cdot \text{midTrips}_{j} + \beta^{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]}
 \end{align}
 $$
 
-where $\text{days1}_{i},\text{days2}_{i}$ are the XXX. Summary output from this model is given below.
+where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; and $\text{hullSA}_{j}$ is the hull surface area. $\beta_{p[j]}$ is the effect of paint type $p$: ablative, hard or self-polishing anti-fouling paint; and $\beta_{t[j]}$ is the effect of vessel type: motor cruiser/other, fishing vessel or a yacht. Summary output from this model is given below.
+
+### M1 &mdash; Normal distribution
+
+```{r m1N,cache=TRUE}
+m1N <- readRDS("../data/censored-mle-m1-var-bayes.rds")
+m1Nll <- extract_log_lik(m1N)
+m1Nloo <- loo::loo(m1Nll)
+print(m1N, digits = 2, include = FALSE,
+      par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
+              "y_ppc", "y_lower"))
+
+```
+
+### M1 &mdash; $t$ distribution
 
 ```{r m1,cache=TRUE}
 m1 <- readRDS("../data/censored-mle-m1-t-var-bayes.rds")
@@ -76,6 +174,58 @@ print(m1, digits = 2, include = FALSE,
               "y_ppc", "y_lower"))
 
 ```
+
+### Comparison between Normal and $t$ assumptions
+
+We now compare the two base models based on their predictive log-likelihoods:
+
+```{r compare-m1}
+compare(m1Nloo, m1loo)
+
+```
+
+So in the M1 models, there is now a difference in predictive log-likelihood between the Normal and $t$ distribution regressions, with the $t$ distribution being preferred.
+
+### Posterior predictive checks
+
+```{r post-pred-m1,cache=TRUE}
+yPPC <- extract(m1, "y_ppc")$y_ppc
+yPPCExp <- exp(yPPC)
+ppc1 <- rowMeans(yPPC < log(1.5))
+ppc2 <- apply(yPPCExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCExp, 1, IQR)
+ppc <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O2"
+)
+yPPCN <- extract(m1N, "y_ppc")$y_ppc
+yPPCNExp <- exp(yPPCN)
+ppc1 <- rowMeans(yPPCN < log(1.5))
+ppc2 <- apply(yPPCNExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCNExp, 1, IQR)
+ppcN <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O1"
+)
+allPPC <- bind_rows(ppc, ppcN) %>%
+    gather(ppc, value, -model)
+plPPC <- ggplot(allPPC, aes(x = value)) +
+    geom_histogram() +
+    facet_grid(model ~ ppc, scales = "free", labeller = label_parsed) +
+    geom_vline(aes(xintercept = value), data = obs) +
+    xlab("") +
+    ylab("Count") +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank())
+plPPC
+
+```
+
+It appears here that the $t$ model reproduces the lower values better than the normal version.
 
 # Vessel-level intercept interrogation
 
@@ -242,6 +392,17 @@ print(pl)
 
 ```
 
+## Model Choice
+
+In terms of model choice, a comparison between all models is shown below:
+
+```{r model-choice}
+compare(m0, m1, m2, m3)
+
+```
+
+Clearly, M3 is the best performing model.
+
 # Outdated
 
 This section is now outdated (2017-10-09); the candidate predictors for interactions above look reasonably good, and fit in with theory, so we'll stop here.
@@ -310,7 +471,6 @@ print(pl)
 ```
 
 ```{r,eval=FALSE}
-biofouling <- readRDS("../data/biofouling.rds")
 nC <- sum(biofouling$boatID %in% which(a4Sum[,2] < -5))
 
 ```
