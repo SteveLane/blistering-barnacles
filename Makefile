@@ -1,4 +1,4 @@
-# Time-stamp: <2017-10-12 04:43:45 (overlordR)>
+# Time-stamp: <2017-10-12 22:28:21 (overlordR)>
 .PHONY: all input-data models output-VB \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -80,7 +80,7 @@ stan/%.rds: scripts/compile-model.R stan/%.stan
 
 ################################################################################
 # Rules to fit variational bayes models
-data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
+data/censored-mle-%-var-bayes.rds: stan/censored-mle-%-var-bayes.rds \
 	scripts/fit-model-vb.R data/imputations.rds
 	cd scripts; \
 	Rscript --no-save --no-restore fit-model-vb.R \
@@ -88,7 +88,7 @@ data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
 
 ################################################################################
 # Rules to fit models with data
-data/censored-mle-%.rds: stan/censored-mle-%.rds \
+data/censored-mle-%-t.rds: stan/censored-mle-%-t.rds \
 	scripts/fit-model.R data/imputations.rds
 	cd scripts; \
 	Rscript --no-save --no-restore fit-model.R \
@@ -100,7 +100,7 @@ data/looic-compare.rds: scripts/post-process-compare.R output-VB
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
 
-$(ROBUST-PROC-DATA): scripts/post-process-robust.R robust-output-data input-data
+data/diffs.rds: scripts/post-process-t.R data/censored-mle-m3-t.rds
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
 
