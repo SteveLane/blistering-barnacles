@@ -1,4 +1,4 @@
-# Time-stamp: <2017-10-12 01:35:37 (overlordR)>
+# Time-stamp: <2017-10-12 04:43:45 (overlordR)>
 .PHONY: all input-data models output-VB \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -88,11 +88,11 @@ data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
 
 ################################################################################
 # Rules to fit models with data
-data/censored-mle-%.rds: scripts/fit-model.R stan/censored-mle-%.rds \
-	data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=737 iter=$(MCITER)
+data/censored-mle-%.rds: stan/censored-mle-%.rds \
+	scripts/fit-model.R data/imputations.rds
+	cd scripts; \
+	Rscript --no-save --no-restore fit-model.R \
+		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
 
 ################################################################################
 # Rules to process data (add dependencies later).
