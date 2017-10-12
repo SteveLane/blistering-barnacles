@@ -4,7 +4,7 @@ author:
 - Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-10-12 04:37:52 (overlordR)> -->
+<!-- Time-stamp: <2017-10-12 05:15:36 (overlordR)> -->
 
 ```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
 knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
@@ -250,7 +250,13 @@ lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2 %>%
     left_join(., bLookup, by = c("boatTypeInt", "paintTypeInt")) %>%
     select(-paintTypeInt, -boatTypeInt)
 a1Dat <- left_join(a1Dat, lvl2, by = "boatID") %>%
-    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType)
+    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType) %>%
+    mutate(type = recode(type,
+                         days1 = "Days since last used",
+                         days2 = "Days since last cleaned",
+                         midTrips = "Median number of trips",
+                         ApproxHullSA = "Hull surface area")) %>%
+    rename(`Vessel type` = boatType, `Paint type` = paintType)
 slopes <- extract(m1, c("betaDays1", "betaDays2", "betaMidTrips",
                         "betaHullSA"))
 slopes <- sapply(slopes, quantile, probs = 0.5)
@@ -261,15 +267,21 @@ coefs <- tibble(slope = rep(slopes, 3),
                 intercept = rep(ints, each = 4),
                 boatTypeInt = rep(1:3, each = 4)) %>%
     left_join(., bLookup %>% select(contains("boat")) %>% distinct(),
-              by = "boatTypeInt")
+              by = "boatTypeInt") %>%
+    rename(`Vessel type` = boatType)
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = boatType)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Vessel type`)) +
+    geom_pointrange(fatten = 0.5) +
     facet_wrap(~ type) +
     geom_abline(aes(slope = slope, intercept = intercept,
-                    colour = boatType), data = coefs) +
-    theme_bw()
+                    colour = `Vessel type`), data = coefs) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
+    theme_bw(base_size = 7.7) +
+    theme(legend.position = "bottom")
 print(pl)
+ggsave("../graphics/plM1boat-robust.pdf", pl, width = 4.9, height = 4.9)
 
 ```
 
@@ -283,16 +295,21 @@ coefs <- tibble(slope = rep(slopes, 3),
                 intercept = rep(ints, each = 4),
                 paintTypeInt = rep(1:3, each = 4)) %>%
     left_join(., bLookup %>% select(contains("paint")) %>% distinct(),
-              by = "paintTypeInt")
+              by = "paintTypeInt") %>%
+    rename(`Paint type` = paintType)
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = paintType)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Paint type`)) +
+    geom_pointrange(fatten = 0.5) +
     facet_wrap(~ type) +
     geom_abline(aes(slope = slope, intercept = intercept,
-                    colour = paintType), data = coefs) +
-    theme_bw() +
+                    colour = `Paint type`), data = coefs) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
+    theme_bw(base_size = 7.7) +
     theme(legend.position = "bottom")
 print(pl)
+ggsave("../graphics/plM1paint-robust.pdf", pl, width = 4.9, height = 4.9)
 
 ```
 
@@ -336,7 +353,11 @@ a3Dat <- tibble(low = a3Sum[,1], mid = a3Sum[,2], high = a3Sum[,3],
                 boatID = 1:nrow(a3Sum))
 a3Dat <- left_join(a3Dat, lvl2) %>%
     select(-ApproxHullSA, -days2) %>%
-    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType)
+    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType) %>%
+    mutate(type = recode(type,
+                         days1 = "Days since last used",
+                         midTrips = "Median number of trips")) %>%
+    rename(`Vessel type` = boatType, `Paint type` = paintType)
 slopes <- extract(m3, c("betaDays1", "betaDays2", "betaMidTrips",
                         "betaPaint", "betaType", "betaDaysType",
                         "betaTripsType", "betaTripsPaint"))
@@ -350,18 +371,24 @@ slopeTripsType <- c(median(slopes$betaMidTrips + slopes$betaTripsType[,1]),
 parsType <- tibble(intercept = rep(intType, 2),
                    slope = c(slopeDaysType, slopeTripsType),
                    boatTypeInt = rep(1:3, 2),
-                   type = rep(c("days1", "midTrips"), each = 3)) %>%
+                   type = rep(c("Days since last used",
+                                "Median number of trips"), each = 3)) %>%
     left_join(., bLookup %>% select(contains("boat")) %>% distinct(),
-              by = "boatTypeInt")
+              by = "boatTypeInt") %>%
+    rename(`Vessel type` = boatType)
 pl <- ggplot(a3Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = boatType)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Vessel type`)) +
+    geom_pointrange(fatten = 0.5) +
     facet_wrap(~ type, ncol = 2) +
-    geom_abline(aes(slope = slope, intercept = intercept, colour = boatType),
-                data = parsType) +    
-    theme_bw() +
+    geom_abline(aes(slope = slope, intercept = intercept,
+                    colour = `Vessel type`),
+                data = parsType) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
     theme(legend.position = "bottom")
 print(pl)
+ggsave("../graphics/plM3boat-var-bayes.pdf", pl, height = 3.5)
 
 ```
 
@@ -377,17 +404,24 @@ slopeTripsPaint <- c(median(slopes$betaMidTrips + slopes$betaTripsPaint[,1]),
 parsType <- tibble(intercept = intPaint,
                    slope = slopeTripsPaint,
                    paintTypeInt = 1:3,
-                   type = rep("midTrips", each = 3)) %>%
+                   type = rep("Median number of trips", each = 3)) %>%
     left_join(., bLookup %>% select(contains("paint")) %>% distinct(),
-              by = "paintTypeInt")
-pl <- ggplot(a3Dat %>% filter(type == "midTrips"),
+              by = "paintTypeInt") %>%
+    rename(`Paint type` = paintType)
+pl <- ggplot(a3Dat %>% filter(type == "Median number of trips"),
              aes(x = value, y = mid, ymin = low, ymax = high,
-                 colour = paintType)) +
+                 colour = `Paint type`)) +
     geom_pointrange(fatten = 1) +
-    geom_abline(aes(slope = slope, intercept = intercept, colour = paintType),
-                data = parsType) +    
-    theme_bw() +
+    facet_wrap(~ type) +
+    geom_abline(aes(slope = slope, intercept = intercept,
+                    colour = `Paint type`),
+                data = parsType) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
+    guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
     theme(legend.position = "bottom")
+ggsave("../graphics/plM3paint-var-bayes.pdf", pl, width = 3.5, height = 3.5)
 print(pl)
 
 ```
