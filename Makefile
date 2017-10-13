@@ -1,4 +1,4 @@
-# Time-stamp: <2017-10-12 22:28:21 (overlordR)>
+# Time-stamp: <2017-10-13 00:00:26 (overlordR)>
 .PHONY: all input-data models output-VB \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -34,31 +34,6 @@ output-VB: data/censored-mle-m0-var-bayes.rds \
 	data/censored-mle-m2-t-var-bayes.rds \
 	data/censored-mle-m3-t-var-bayes.rds \
 	data/censored-mle-m4-t-var-bayes.rds
-
-ROBUST-PROC-DATA = graphics/obs-hist.pdf \
-	graphics/imp-days1.pdf \
-	graphics/imp-trips.pdf \
-	graphics/imp-paint.pdf \
-	graphics/plM1boat-robust.pdf \
-	graphics/plM1paint-robust.pdf \
-	graphics/plM3boat-robust.pdf \
-	graphics/plM3paint-robust.pdf \
-	graphics/plM4Type-robust.pdf \
-	graphics/plSummary-robust.pdf \
-	data/looic-robust.rds \
-	data/diffs.rds
-
-PROC-DATA = graphics/plM1boat.pdf \
-	graphics/plM1paint.pdf \
-	graphics/plM3boat.pdf \
-	graphics/plM3paint.pdf \
-	graphics/plM4Type.pdf \
-	graphics/plSummary.pdf \
-	data/looic.rds
-
-robust-processed-data: $(ROBUST-PROC-DATA)
-
-processed-data: $(PROC-DATA)
 
 # Defaults for number of multiply imputed datasets and HMC iterations if not
 # passed via cmdline.
@@ -101,10 +76,6 @@ data/looic-compare.rds: scripts/post-process-compare.R output-VB
 	Rscript --no-save --no-restore $(<F)
 
 data/diffs.rds: scripts/post-process-t.R data/censored-mle-m3-t.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F)
-
-$(PROC-DATA): scripts/post-process.R output-data
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
 
