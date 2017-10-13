@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-10-12 22:19:50 (overlordR)>
+## Time-stamp: <2017-10-13 00:16:47 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -18,6 +18,10 @@ m3 <- readRDS("../data/censored-mle-m3-t.rds")
 imps <- readRDS("../data/imputations.rds")
 biofoul <- readRDS("../data/biofouling.rds")
 vessels <- biofoul %>% distinct(boatID, .keep_all = TRUE)
+bLookup <- biofoul %>%
+    select(boatType, paintType, boatTypeInt, paintTypeInt) %>%
+    distinct() %>%
+    na.omit()
 ################################################################################
 ################################################################################
 
@@ -102,6 +106,10 @@ ggsave("../graphics/imp-paint.pdf", plPaint, width = 4.9, height = 4.9)
 ## Begin Section: M3 figures
 ################################################################################
 ################################################################################
+set.seed(13)
+lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2 %>%
+    left_join(., bLookup) %>%
+    select(-boatTypeInt, -paintTypeInt)
 a3 <- extract(m3, "alphaBoat")$alphaBoat
 a3Sum <- t(apply(a3, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a3Dat <- tibble(low = a3Sum[,1], mid = a3Sum[,2], high = a3Sum[,3],
