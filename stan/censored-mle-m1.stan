@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // All boat-level intercept predictors included.
-// Time-stamp: <2017-10-09 03:59:15 (overlordR)>
+// Time-stamp: <2017-10-17 22:41:24 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -85,13 +85,13 @@ transformed parameters{
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
   for(n in 1:numBoat){
-    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaHullSA * hullSA[n] + betaPaint[paintType[n]] + betaType[boatType[n]];
+    alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaHullSA * hullSA[n] + betaPaint[paintType[n]] + betaType[boatType[n]];
   }
   for(i in 1:N){
-    muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaHat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaHat[boatIDCens[j]];
   }
 }
 
@@ -111,7 +111,7 @@ model{
   sigmaType ~ cauchy(0, 2.5);
   betaType ~ student_t(3, 0, sigmaType);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ cauchy(alphaHat, sigma_alphaBoat);
+  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Observed log-likelihood */

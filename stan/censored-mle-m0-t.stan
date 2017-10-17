@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
 // Based off M0, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-17 21:04:32 (overlordR)>
+// Time-stamp: <2017-10-17 22:46:39 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -80,7 +80,7 @@ model{
   sigmaLoc ~ cauchy(0, 2.5);
   betaLoc ~ student_t(3, 0, sigmaLoc);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ cauchy(0, sigma_alphaBoat);
+  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */
