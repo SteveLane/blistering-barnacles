@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // All boat-level intercept predictors included.
 // Based off M1, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-10 23:16:34 (overlordR)>
+// Time-stamp: <2017-10-17 21:05:13 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +76,7 @@ parameters{
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=1> nu;
+  real<lower=5> nu;
 }
 
 transformed parameters{
@@ -118,7 +118,7 @@ model{
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */
-  nu ~ gamma(2, 0.1);
+  nu ~ gamma(2, 10);
   /* Observed log-likelihood */
   for(i in 1:N){
     target += student_t_lpdf(logY[i] | nu, muHat[i], sigma);

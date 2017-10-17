@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
 // Based off M0, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-10 22:41:52 (overlordR)>
+// Time-stamp: <2017-10-17 21:04:32 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +55,7 @@ parameters{
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=1> nu;
+  real<lower=5> nu;
 }
 
 transformed parameters{
@@ -83,6 +83,8 @@ model{
   alphaBoat ~ cauchy(0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
+  /* Prior for df */
+  nu ~ gamma(2, 10);
   /* Observed log-likelihood */
   for(i in 1:N){
     target += student_t_lpdf(logY[i] | nu, muHat[i], sigma);
