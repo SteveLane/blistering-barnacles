@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // Restricted model form.
-// Time-stamp: <2017-10-10 22:10:41 (overlordR)>
+// Time-stamp: <2017-10-17 04:04:01 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -111,11 +111,11 @@ model{
   sigma ~ cauchy(0, 2.5);
   /* Observed log-likelihood */
   for(i in 1:N){
-    target += normal_lpdf(logY[i] | muHat[i], sigma);
+    target += lognormal_lpdf(Y[i] | muHat[i], sigma);
   }
   /* Censored log-likelihood */
   for(i in 1:nCens){
-    target += normal_lcdf(logU | muHatCens[i], sigma);
+    target += lognormal_lcdf(U | muHatCens[i], sigma);
   }
 }
 
@@ -125,11 +125,11 @@ generated quantities{
   /* Replications for posterior predictive checks */
   vector[N + nCens] y_ppc;
   for(i in 1:N){
-    log_lik[i] = normal_lpdf(logY[i] | muHat[i], sigma);
-    y_ppc[i] = normal_rng(muHat[i], sigma);
+    log_lik[i] = lognormal_lpdf(Y[i] | muHat[i], sigma);
+    y_ppc[i] = lognormal_rng(muHat[i], sigma);
   }
   for(j in 1:nCens){
-    log_lik[N + j] = normal_lcdf(logU | muHatCens[j], sigma);
-    y_ppc[N + j] = normal_rng(muHatCens[j], sigma);
+    log_lik[N + j] = lognormal_lcdf(U | muHatCens[j], sigma);
+    y_ppc[N + j] = lognormal_rng(muHatCens[j], sigma);
   }
 }
