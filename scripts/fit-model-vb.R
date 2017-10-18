@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Title: Fit model (VB)
 ## Author: Steve Lane
 ## Date: Friday, 21 April 2017
-## Time-stamp: <2017-10-12 04:38:25 (overlordR)>
+## Time-stamp: <2017-10-13 03:47:31 (overlordR)>
 ## Synopsis: Script that drives the censored regression model. Designed to be
 ## called from the Makefile, it requires the model name, a seed for rng, and
 ## number of iterations to be set on the command line, or prior to sourcing the
@@ -47,9 +47,16 @@ options(mc.cores = parallel::detectCores()/2)
 model <- stan_model(paste0("../stan/", mname, ".stan"))
 ## Load data
 impList <- readRDS("../data/imputations.rds")
+newData <- readRDS("../data/newData.rds")
+newStan <- with(
+    newData,
+    list(newN = nrow(newData), days2New = days2, locIDNew = locIDInt,
+         paintTypeNew = paintTypeInt, boatTypeNew = boatTypeInt,
+         days1New = days1, midTripsNew = midTrips)
+)
 set.seed(myseed)
 out <- mclapply(impList, function(dat){
-    locMod <- try(vb(model, data = dat$stanData, elbo_samples = 500,
+    locMod <- try(vb(model, data = c(dat$stanData, newStan), elbo_samples = 500,
                      tol_rel_obj = 1e-3, grad_samples = 2))
     locMod
 })
