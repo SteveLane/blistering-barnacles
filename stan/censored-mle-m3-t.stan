@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Adds in some interactions terms.
 // Based off M3, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-17 22:50:06 (overlordR)>
+// Time-stamp: <2017-10-18 06:48:01 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -41,6 +41,14 @@ data{
   real<lower=1.5> Y[N];
   /* Truncated data (brute force, all equal */
   real<upper=min(Y)> U;
+  /* Data for predictions */
+  int<lower=1> newN;
+  real days1New[newN];
+  real days2New[newN];
+  real midTripsNew[newN];
+  int<lower=1,upper=numLoc> locIDNew[newN];
+  int<lower=1,upper=numPaint> paintTypeNew[newN];
+  int<lower=1,upper=numBoat> boatTypeNew[newN];
 }
 
 transformed data{
@@ -147,6 +155,9 @@ generated quantities{
   vector[N + nCens] log_lik;
   /* Replications for posterior predictive checks */
   vector[N + nCens] y_ppc;
+  /* Predictions (two boats, same predictors just to check) */
+  vector[newN] yNew1;
+  vector[newN] yNew2;
   for(i in 1:N){
     log_lik[i] = student_t_lpdf(logY[i] | nu, muHat[i], sigma);
     y_ppc[i] = student_t_rng(nu, muHat[i], sigma);
@@ -154,5 +165,13 @@ generated quantities{
   for(j in 1:nCens){
     log_lik[N + j] = student_t_lcdf(logU | nu, muHatCens[j], sigma);
     y_ppc[N + j] = student_t_rng(nu, muHatCens[j], sigma);
+  }
+  for (n in 1:newN) {
+    real muNew1;
+    real muNew2;
+    muNew1 = mu + betaLoc[locIDNew[n]] + alphaBoat[37] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
+    yNew1[n] = student_t_rng(nu, muNew1, sigma);
+    muNew2 = mu + betaLoc[locIDNew[n]] + alphaBoat[3] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
+    yNew2[n] = student_t_rng(nu, muNew2, sigma);
   }
 }
