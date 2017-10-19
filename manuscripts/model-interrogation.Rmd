@@ -4,7 +4,7 @@ author:
 - Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-10-12 22:12:09 (overlordR)> -->
+<!-- Time-stamp: <2017-10-19 06:17:29 (overlordR)> -->
 
 ```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
 knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
@@ -240,7 +240,7 @@ bLookup <- readRDS("../data/biofouling.rds") %>%
     select(boatType, paintType, boatTypeInt, paintTypeInt) %>%
     distinct() %>%
     na.omit()
-a1 <- extract(m1, "alphaBoat")$alphaBoat
+a1 <- extract(m1, "alphaHat")$alphaHat
 a1Sum <- t(apply(a1, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a1Dat <- tibble(low = a1Sum[,1], mid = a1Sum[,2], high = a1Sum[,3],
                 boatID = 1:nrow(a1Sum))
@@ -347,7 +347,7 @@ print(m3, digits = 2, include = FALSE,
 Again, there is not enough evidence to state with any certainty how these interactions might affect the wet weight biomass. It is important to remember that there are only `r nrow(lvl2)` vessels contributing to the regression at the second-level, so we do not expect very small standard errors for these estimates.
 
 ```{r}
-a3 <- extract(m3, "alphaBoat")$alphaBoat
+a3 <- extract(m3, "alphaHat")$alphaHat
 a3Sum <- t(apply(a3, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a3Dat <- tibble(low = a3Sum[,1], mid = a3Sum[,2], high = a3Sum[,3],
                 boatID = 1:nrow(a3Sum))
@@ -541,7 +541,7 @@ print(m4, digits = 2, include = FALSE,
 ```
 
 ```{r,eval=FALSE}
-a4 <- extract(m4, "alphaBoat")$alphaBoat
+a4 <- extract(m4, "alphaHat")$alphaHat
 a4Sum <- t(apply(a4, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a4Dat <- tibble(low = a4Sum[,1], mid = a4Sum[,2], high = a4Sum[,3],
                 boatID = 1:nrow(a4Sum))
