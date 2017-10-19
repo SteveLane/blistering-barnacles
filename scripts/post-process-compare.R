@@ -4,14 +4,15 @@
 ## Author: Steve Lane
 ## Date: Thursday, 11 May 2017
 ## Synopsis: Performs comparison between outcome models.
-## Time-stamp: <2017-10-12 04:48:52 (overlordR)>
+## Time-stamp: <2017-10-19 09:21:07 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
 source("../scripts/imputation-functions.R")
 packages <- c("tidyr", "dplyr", "tibble", "rstan", "loo", "ggplot2",
               "RColorBrewer")
-options(mc.cores = parallel::detectCores()/2)
+options(mc.cores = 1)
+options(loo.cores = 1)
 ipak(packages)
 ## This is set for readable text when included at half page width.
 theme_set(theme_bw())
@@ -25,20 +26,24 @@ biofoul <- readRDS("../data/biofouling.rds")
 ################################################################################
 ################################################################################
 m0 <- readRDS("../data/censored-mle-m0-t-var-bayes.rds")
-m0ll <- extract_log_lik(m0)
-m0loo <- loo(m0ll)
+m0ll <- loo::extract_log_lik(m0)
+m0loo <- loo::loo(m0ll)
+message("m0 finished.")
 rm(m0ll)
 m1 <- readRDS("../data/censored-mle-m1-t-var-bayes.rds")
-m1ll <- extract_log_lik(m1)
-m1loo <- loo(m1ll)
+m1ll <- loo::extract_log_lik(m1)
+m1loo <- loo::loo(m1ll)
+message("m1 finished.")
 rm(m1, m1ll)
 m2 <- readRDS("../data/censored-mle-m2-t-var-bayes.rds")
-m2ll <- extract_log_lik(m2)
-m2loo <- loo(m2ll)
+m2ll <- loo::extract_log_lik(m2)
+m2loo <- loo::loo(m2ll)
+message("m2 finished.")
 rm(m2, m2ll)
 m3 <- readRDS("../data/censored-mle-m3-t-var-bayes.rds")
-m3ll <- extract_log_lik(m3)
-m3loo <- loo(m3ll)
+m3ll <- loo::extract_log_lik(m3)
+m3loo <- loo::loo(m3ll)
+message("m3 finished.")
 rm(m3ll)
 looTab <- as.data.frame(compare(m0loo, m1loo, m2loo, m3loo)) %>%
     mutate(mID = rownames(.))
@@ -60,20 +65,20 @@ message("Finished t section.")
 ################################################################################
 ################################################################################
 m0N <- readRDS("../data/censored-mle-m0-var-bayes.rds")
-m0Nll <- extract_log_lik(m0N)
-m0Nloo <- loo(m0Nll)
+m0Nll <- loo::extract_log_lik(m0N)
+m0Nloo <- loo::loo(m0Nll)
 rm(m0Nll)
 m1N <- readRDS("../data/censored-mle-m1-var-bayes.rds")
-m1Nll <- extract_log_lik(m1N)
-m1Nloo <- loo(m1Nll)
+m1Nll <- loo::extract_log_lik(m1N)
+m1Nloo <- loo::loo(m1Nll)
 rm(m1N, m1Nll)
 m2N <- readRDS("../data/censored-mle-m2-var-bayes.rds")
-m2Nll <- extract_log_lik(m2N)
-m2Nloo <- loo(m2Nll)
+m2Nll <- loo::extract_log_lik(m2N)
+m2Nloo <- loo::loo(m2Nll)
 rm(m2N, m2Nll)
 m3N <- readRDS("../data/censored-mle-m3-var-bayes.rds")
-m3Nll <- extract_log_lik(m3N)
-m3Nloo <- loo(m3Nll)
+m3Nll <- loo::extract_log_lik(m3N)
+m3Nloo <- loo::loo(m3Nll)
 rm(m3Nll)
 looTabN <- as.data.frame(compare(m0Nloo, m1Nloo, m2Nloo, m3Nloo)) %>%
     mutate(mID = rownames(.))
