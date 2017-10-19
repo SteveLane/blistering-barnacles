@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-10-13 00:16:47 (overlordR)>
+## Time-stamp: <2017-10-19 20:56:58 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -110,7 +110,7 @@ set.seed(13)
 lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2 %>%
     left_join(., bLookup) %>%
     select(-boatTypeInt, -paintTypeInt)
-a3 <- extract(m3, "alphaBoat")$alphaBoat
+a3 <- extract(m3, "alphaHat")$alphaHat
 a3Sum <- t(apply(a3, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a3Dat <- tibble(low = a3Sum[,1], mid = a3Sum[,2], high = a3Sum[,3],
                 boatID = 1:nrow(a3Sum))
@@ -241,63 +241,26 @@ ggsave("../graphics/plSummary-robust.pdf", plSummary, width = 3.5)
 ## Begin Section: Posterior predictive comparisons
 ################################################################################
 ################################################################################
-## Yacht, with mean days1, mean days2 -> 3 or 6 months longer?, measured at the
-## hull, and ablative paint.
-## Data is scaled, so figure out the scaling.
-## I also need to calculate the actual predictions and difference them, given
-## we're doing posterior predictions.
-## This is probably easy to do via matrix calcs.
-## First the coefficients for alpha hat
-## aHatCoefs <- with(coef3, cbind(betaDays1, betaDays2, betaMidTrips, betaPaint,
-##                                betaType, betaDaysType, betaTripsType,
-##                                betaTripsPaint))
-
-## newData <- data.frame(
-##     days1 = 0,
-##     days2 = c(0, (365/4) / sd(vessels$days2), (365/2) / sd(vessels$days2)),
-##     midTrips = 0,
-##     paintType = factor("Ablative", levels = levels(vessels$paintType)),
-##     boatType = factor("Yacht", levels(vessels$boatType))
-## )
-## newMat <- model.matrix(
-##     ~ days1 + days2 + midTrips + paintType + boatType +
-##         days1:boatType + midTrips:boatType + midTrips:paintType,
-##     data = newData)
-## aHat <- aHatCoefs %*% t(newMat[, -1])
-
-## set.seed(37)
-## days2 <- c((365/4) / sd(vessels$days2), (365/2) / sd(vessels$days2))
-## aHat <- t(days2 %*% t(coef3$betaDays2)) +
-##     cbind(coef3$betaType[, 2], coef3$betaType[, 2])
-## alphaHat <- t(sapply(seq_len(nrow(aHat)), function(i){
-##     a0 <- rcauchy(1, aHat[i, 1], coef3$sigma_alphaBoat[i])
-##     a1 <- rcauchy(1, aHat[i, 2], coef3$sigma_alphaBoat[i])
-##     a2 <- rcauchy(1, aHat[i, 3], coef3$sigma_alphaBoat[i])
-##     c(a0, a1, a2)
-## }))
-## muHat <- alphaHat + cbind(coef3$mu, coef3$mu, coef3$mu)
-## tStd <- t(sapply(seq_len(nrow(aHat)), function(i){
-##     coef3$sigma[i] * rt(3, coef3$nu[i])
-## }))
-## lY <- muHat + tStd
-## diffDays2 <- apply(exp(lY), 2, quantile, probs = 0.2, names = FALSE)
-## ## Difference between yachts and motor cruisers/fishing. Base case is motor
-## ## cruisers. At mean values (so they're zero). Ablative paint (although it
-## ## shouldn't matter).
-## alphaHat <- t(sapply(seq_len(nrow(aHat)), function(i){
-##     aHat1 <- 
-##     a1 <- rcauchy(1, coef3$betaType[i, 2], coef3$sigma_alphaBoat[i])
-##     a2 <- rcauchy(1, coef3$betaType[i, 2] - coef3$betaType[i, 1],
-##                   coef3$sigma_alphaBoat[i])
-##     c(a1, a2)
-## }))
-## muHat <- alphaHat + cbind(coef3$mu, coef3$mu)
-## tStd <- t(sapply(seq_len(nrow(aHat)), function(i){
-##     coef3$sigma[i] * rt(2, coef3$nu[i])
-## }))
-## lY <- muHat + tStd
-## diffType <- apply(exp(lY), 2, quantile, probs = 0.2, names = FALSE)
-## saveRDS(list(diffDays2 = diffDays2, diffType = diffType),
-##         "../data/diffs.rds")
+## New data exists.
+newData <- readRDS("../data/newData.rds") %>%
+    left_join(., bLookup)
+yNew1 <- extract(m3, "yNew1")$yNew1
+## Obs 1, 2, and 3 contain the varying days2 data.
+diffDays2 <- c(
+    mean(exp(yNew1[, 2]) - exp(yNew1[, 1]) > 0),
+    mean(exp(yNew1[, 3]) - exp(yNew1[, 1]) > 0),
+    quantile(exp(yNew1[, 2]) - exp(yNew1[, 1]), probs = 0.5),
+    quantile(exp(yNew1[, 3]) - exp(yNew1[, 1]), probs = 0.5)
+)
+## Obs 55, 28, and 1 contain yachts, fishing and motor cruisers with all other
+## variables the same.
+diffType <- c(
+    mean(exp(yNew1[, 55]) - exp(yNew1[, 28]) > 0),
+    mean(exp(yNew1[, 55]) - exp(yNew1[, 1]) > 0),
+    quantile(exp(yNew1[, 55]) - exp(yNew1[, 28]), probs = 0.5),
+    quantile(exp(yNew1[, 55]) - exp(yNew1[, 1]), probs = 0.5)
+)
+saveRDS(list(diffDays2 = diffDays2, diffType = diffType),
+        "../data/diffs.rds")
 ################################################################################
 ################################################################################
