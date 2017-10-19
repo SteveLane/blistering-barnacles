@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Adds in some interactions terms.
 // Based off M3, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-18 06:48:01 (overlordR)>
+// Time-stamp: <2017-10-19 03:41:30 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -169,9 +169,9 @@ generated quantities{
   for (n in 1:newN) {
     real muNew1;
     real muNew2;
-    muNew1 = mu + betaLoc[locIDNew[n]] + alphaBoat[37] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
+    muNew1 = mu + betaLoc[locIDNew[n]] + alphaBoat[37] + betaDays1 * days1New[n] + betaDays2 * days2New[n] + betaMidTrips * midTripsNew[n] + betaPaint[paintTypeNew[n]] + betaType[boatTypeNew[n]] + betaDaysType[boatTypeNew[n]] * days1New[n] + betaTripsType[boatTypeNew[n]] * midTripsNew[n] + betaTripsPaint[paintTypeNew[n]] * midTripsNew[n];
     yNew1[n] = student_t_rng(nu, muNew1, sigma);
-    muNew2 = mu + betaLoc[locIDNew[n]] + alphaBoat[3] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
+    muNew2 = mu + betaLoc[locIDNew[n]] + alphaBoat[3] + betaDays1 * days1New[n] + betaDays2 * days2New[n] + betaMidTrips * midTripsNew[n] + betaPaint[paintTypeNew[n]] + betaType[boatTypeNew[n]] + betaDaysType[boatTypeNew[n]] * days1New[n] + betaTripsType[boatTypeNew[n]] * midTripsNew[n] + betaTripsPaint[paintTypeNew[n]] * midTripsNew[n];
     yNew2[n] = student_t_rng(nu, muNew2, sigma);
   }
 }
