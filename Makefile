@@ -1,4 +1,4 @@
-# Time-stamp: <2017-10-13 00:00:26 (overlordR)>
+# Time-stamp: <2017-10-19 02:06:27 (overlordR)>
 .PHONY: all input-data models output-VB \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -55,7 +55,7 @@ stan/%.rds: scripts/compile-model.R stan/%.stan
 
 ################################################################################
 # Rules to fit variational bayes models
-data/censored-mle-%-var-bayes.rds: stan/censored-mle-%-var-bayes.rds \
+data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
 	scripts/fit-model-vb.R data/imputations.rds
 	cd scripts; \
 	Rscript --no-save --no-restore fit-model-vb.R \
