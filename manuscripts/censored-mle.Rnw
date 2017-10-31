@@ -1,4 +1,4 @@
-% Time-stamp: <2017-10-06 14:29:11 (slane)>
+% Time-stamp: <2017-10-20 03:46:23 (overlordR)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -208,32 +208,29 @@ To allow for the possible effects of outliers we examined the effect of changing
 \begin{align}
   Y_{i} & \sim \text{Normal}(\mu_{i}, \sigma) \label{eq:O1}\tag{O1} \\
   Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \label{eq:O2}\tag{O2} \\
-  \nu & \sim \text{Gamma}(2, 0.1) \nonumber
+  \nu & \sim \text{Gamma}(2, 10) \nonumber
 \end{align}
-are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyperparameters for the degrees freedom were chosen to be weakly informative, favouring a robust $t$ model with lower degrees of freedom.
+are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyperparameters for the degrees freedom were chosen to be weakly informative, favouring a robust $t$ model with lower degrees of freedom; indeed, the mode of the prior distribution for the degrees of freedom is 10.
 
-We initially inferred the latent process --- that is the process that determines the log wet-weight of fouling biomass on each vessel --- as linear function of the location of the measurement location allowing for a vessel-level intercept:
+We initially inferred the latent process --- that is the process that determines the log wet-weight of fouling biomass on each vessel --- as a linear function of the location of the measurement location allowing for a vessel-level intercept:
 \begin{align}
-  \mu_{i} & = \mu + \alpha_{j[i]} + \beta^{l1} \cdot \text{location1}_{i} + \beta^{l2} \cdot \text{location2}_{i} \nonumber \\
-  \alpha_{j} & \sim \text{cauchy}(0, \sigma_{\alpha}) \label{eq:M0}\tag{M0} \\
+  \mu_{i} & = \mu + \alpha_{j[i]} + \beta_{l[i]} \nonumber \\
+  \alpha_{j} & \sim t_{3}(0, \sigma_{\alpha}) \label{eq:M0}\tag{M0} \\
   \mu & \sim N(0, 5) \nonumber \\
-  \beta^{l1},\beta^{l2} & \sim t_{3}(0, 1) \nonumber \\
-  \sigma,\sigma_{\alpha} & \sim \text{half-cauchy}(0, 2.5) \nonumber
+  \beta_{l} & \sim t_{3}(0, \sigma_{l}) \nonumber \\
+  \sigma,\sigma_{\alpha},\sigma_{l} & \sim \text{half-cauchy}(0, 2.5) \nonumber
 \end{align}
-where $\mu_{i}$ is the expected log wet-weight in grams; $\mu,\beta^{l}$ are coefficients to be estimated from the data; and $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder (as compared to the hull, which is subsumed within the intercept $\mu$). $\alpha_{j[i]}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$\footnote{The notation $\alpha_{j[i]}$ denotes the vessel-level ($j\up{th}$) change to the intercept for the $i\up{th}$ observation.}, which is modelled as a cauchy distribution with location 0, and scale $\sigma_{\alpha}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-cauchy}(0, 2.5)$ priors.
+where $\mu_{i}$ is the expected log wet-weight in grams; $\mu$ is the intercept for the model; $\beta_{l}$ are coefficients that measure the effect of location on the log wet-weight of fouling biomass: $l=1$ denotes the measurement was taken at the hull, $l=2$ denotes the measurement was taken at the rudder, and $l=3$ for measurements taken at the keel\footnote{The notation $l[i]$ denotes the location level ($l$) of the $i\up{th}$ observation. The vessel-level intercept ($\alpha_{j[i]}$)is similarly referenced.}. $\alpha_{j}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$, which is modelled as a $t$ distribution with 3 degrees of freedom, and scale $\sigma_{l}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-cauchy}(0, 2.5)$ priors.
 
-We subsequently investigated four alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
+We subsequently investigated three alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
 \begin{align}
-  \alpha_{j} & \sim \text{cauchy}(\alpha^{*}_{j}, \sigma_{\alpha}) \nonumber \\
-  \alpha^{*}_{j} & = \beta^{d1} \cdot \text{days1}_{i} + \beta^{d2} \cdot  \text{days2}_{i} + \beta^{m} \cdot \text{midTrips}_{i} + \beta^{h} \cdot \text{hullSA}_{i} + \beta^{p1} \cdot \text{paintType1}_{i} + \nonumber \\
-             & \quad \beta^{p2} \cdot \text{paintType2}_{i} + \beta^{t1} \cdot \text{vesselType1}_{i} + \beta^{t2} \cdot \text{vesselType2}_{i} \label{eq:M1}\tag{M1} \\
-  \alpha^{*}_{j} & = \text{(M1)} - \beta^{h} \cdot \text{hullSA}_{i} \label{eq:M2}\tag{M2} \\
-  \alpha^{*}_{j} & = \text{(M2)} + \beta^{dt1} \cdot \text{days1VesselType1}_{j} + \beta^{dt2} \cdot \text{days1VesselType2}_{j} + \nonumber \\
-             & \quad \beta^{mt1} \cdot \text{midTripsVesselType1}_{j} + \beta^{mt2} \cdot \text{midTripsVesselType2}_{j} + \nonumber \\
-             & \quad \beta^{mp1} \cdot \text{midTripsPaintType1}_{j} + \beta^{mp2} \cdot \text{midTripsPaintType2}_{j} \label{eq:M3}\tag{M3}
+  \mu_{i} & = \mu + \gamma_{j[i]} + \beta_{l[i]} \nonumber \\
+  \gamma_{j}^{*} & = \alpha_{j} + \beta_{d1} \cdot \text{days1}_{j} + \beta_{d2} \cdot \text{days2}_{j} + \beta_{m} \cdot \text{midTrips}_{j} + \beta_{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]} \label{eq:M1}\tag{M1} \\
+  \gamma^{*}_{j} & = \text{(M1)} - \beta_{h} \cdot \text{hullSA}_{j} \label{eq:M2}\tag{M2} \\
+  \gamma^{*}_{j} & = \text{(M2)} + \beta_{dt[j]} \cdot \text{days1}_{j} + \beta_{mt[j]} \cdot \text{midTrips}_{j} + \beta_{mp[j]} \cdot \text{midTrips}_{j} \label{eq:M3}\tag{M3}
 \end{align}
 
-\ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; $\text{hullSA}_{j}$ is the hull surface area; $\text{paintType1}_{j},\text{paintType2}_{j}$ are indicator variables for whether the vessel had hard or self-polishing anti-fouling paint; and $\text{vesselType1}_{j},\text{vesselType2}_{j}$ are indicator variables for whether the vessel was a fishing vessel or a yacht. \ref{eq:M2} consists of all terms in \ref{eq:M1}, less the hull surface area. \ref{eq:M3} adds interaction terms to \ref{eq:M2} between: the number of days since the vessel was last used and the vessel type; the median number of trips and the vessel type; and the median number of trips and the paint type.
+\ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; and $\text{hullSA}_{j}$ is the hull surface area. $\beta_{p[j]}$ is the effect of paint type $p$ on vessel $j$, $p=1$ denotes ablative paint, $p=2$ denotes hard paint, and $p=3$ denotes self-polishing anti-fouling paint. $\beta_{t[j]}$ is an effect for vessel type; $t=1$ denotes motor cruiser/other, $p=2$ denotes fishing vessels, and $p=3$ denotes yachts. \ref{eq:M2} consists of all terms in \ref{eq:M1}, less the hull surface area. \ref{eq:M3} adds interaction terms to \ref{eq:M2} between: the number of days since the vessel was last used and the vessel type ($\beta_{dt[j]}$); the median number of trips and the vessel type ($\beta_{mt[j]}$); and the median number of trips and the paint type ($\beta_{mp[j]}$).
 
 The choice of these regression models was guided by both theoretical considerations\footnote{Is theoretical the correct word here?} and graphical exploration of the posterior distribution of the random-effect terms in the latent process models. In particular, we expect there to be interactions between paint type and vessel usage predictors: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not. For more details on the graphical exploration, see Section~\ref{sec:results} and the supplementary material.
 
@@ -241,7 +238,8 @@ The choice of these regression models was guided by both theoretical considerati
 \label{sec:missing-data}
 
 <<missingness>>=
-missVessels <- vessels %>% select(days1, midTrips, paintType)
+missVessels <- vessels %>% select(days1, midTrips, paintType) %>%
+    mutate(paintType = as.factor(paintType))
 miss <- md.pattern(missVessels)
 ccData <- biofoul %>% na.omit()
 miss <- miss[-nrow(miss),]
@@ -252,7 +250,7 @@ pattern <- data_frame(
 
 @
 
-There is missing data at the vessel-level; Table~\ref{tab:miss} displays the observed data pattern, shown as (Days since last used, Paint type, Days since last trip), where a 1 denotes the variable is observed, and a 0 denotes the variable is missing. We can see that there are \Sexpr{rownames(miss)[1]} observations with complete vessel-level data. There are \Sexpr{paste0(rownames(miss)[2:4], collapse = ",")} vessels missing data on the number of days since the vessel was last used (days1); the median number of trips by the vessel (midTrips); and the paint type (paintType) respectively. There are \Sexpr{paste0(rownames(miss)[5:6], collapse = ",")} vessels missing data on both the number of days since the vessel was last used and the median number of trips by the vessel (days1 and midTrips), and all of the number of days since the vessel was last used, the median number of trips by the vessel, and the type of paint (days1, paintType and midTrips) respectively.
+There is missing data at the vessel-level; Table~\ref{tab:miss} displays the observed data pattern, shown as (Days since last used, Paint type, Days since last trip), where a 1 denotes the variable is observed, and a 0 denotes the variable is missing. For example, Table~\ref{tab:miss} shows there are \Sexpr{rownames(miss)[1]} observations with complete vessel-level data, and 1 observation that is missing all measurements of days since last used, paint type, and days since last trip.
 
 <<missingness-table,results="asis">>=
 latex(pattern, file = "",
@@ -269,7 +267,7 @@ latex(pattern, file = "",
 
 A complete-case data analysis would only utilise \Sexpr{as.integer(rownames(miss)[1])/nrow(vessels)*100}\% of the vessel-level data, and subsequently, this would result in \Sexpr{nrow(ccData)} (\Sexpr{nrow(ccData)/nrow(biofoul)*100}\%) measurements of wet weight biomass being available for the complete-case analysis at the measurement (first) level.
 
-Because of the amount of missing data, we used multiple imputation to impute the missing vessel-level data. We used iterative conditional imputation, with all vessel-level variables used in the imputation specification. To account for any non-linearities, random forest imputation was used.
+Because of the amount of missing data, we used multiple imputation to impute the missing vessel-level data. Specifically, we used iterative conditional imputation, with all vessel-level variables used in the imputation specification; to account for any non-linearities, random forest imputation was used.
 
 As all missing data was at the vessel-level, we used the median wet weight of biomass as a predictor in the imputation models \citep{Gelman2007-lc}. To account for the censoring in the wet weight of biomass (observations below the 1.5gm limit of detection), we replaced the censored data by a random draw from a Uniform(0, 1.5) distribution. We justify this procedure in the following way: i) some level of variability is required as we don't know the true value of the censored observations; ii) Figure~\ref{fig:obs-weight} shows that weights below 1.5gm (\Sexpr{log(1.5)} on the log-scale) form a very small part of the range of observed values. This small variability will have limited impact in the imputation of the missing data due to the fact that we are summarising within-vessel wet weight of biomass measurements by the median for input into the imputation models.
 
