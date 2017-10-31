@@ -4,7 +4,7 @@ author:
 - Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-10-19 06:17:29 (overlordR)> -->
+<!-- Time-stamp: <2017-10-31 20:42:49 (overlordR)> -->
 
 ```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
 knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
@@ -21,6 +21,7 @@ source("../scripts/imputation-functions.R")
 packages <- c("dplyr", "tidyr", "ggplot2", "rstan", "loo")
 ipak(packages)
 options(mc.cores = round(parallel::detectCores()/2))
+options(loo.cores = 1)
 
 ```
 
