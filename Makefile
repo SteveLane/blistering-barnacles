@@ -1,5 +1,5 @@
-# Time-stamp: <2017-10-19 02:06:27 (overlordR)>
-.PHONY: all input-data models output-VB \
+# Time-stamp: <2017-11-01 06:39:28 (overlordR)>
+.PHONY: all input-data models output-VB output-t \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
 	clean-models clean-manuscripts clobber
@@ -34,6 +34,12 @@ output-VB: data/censored-mle-m0-var-bayes.rds \
 	data/censored-mle-m2-t-var-bayes.rds \
 	data/censored-mle-m3-t-var-bayes.rds \
 	data/censored-mle-m4-t-var-bayes.rds
+
+output-t: data/censored-mle-m0-t.rds \
+	data/censored-mle-m1-t.rds \
+	data/censored-mle-m2-t.rds \
+	data/censored-mle-m3-t.rds \
+	data/censored-mle-m4-t.rds
 
 # Defaults for number of multiply imputed datasets and HMC iterations if not
 # passed via cmdline.
