@@ -1,4 +1,4 @@
-# Time-stamp: <2017-11-01 06:39:28 (overlordR)>
+# Time-stamp: <2017-11-01 06:48:17 (overlordR)>
 .PHONY: all input-data models output-VB output-t \
 	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
 	paper supplement \
@@ -17,29 +17,24 @@ models: stan/censored-mle-m0.rds \
 	stan/censored-mle-m1.rds \
 	stan/censored-mle-m2.rds \
 	stan/censored-mle-m3.rds \
-	stan/censored-mle-m4.rds \
 	stan/censored-mle-m0-t.rds \
 	stan/censored-mle-m1-t.rds \
 	stan/censored-mle-m2-t.rds \
-	stan/censored-mle-m3-t.rds \
-	stan/censored-mle-m4-t.rds
+	stan/censored-mle-m3-t.rds
 
 output-VB: data/censored-mle-m0-var-bayes.rds \
 	data/censored-mle-m1-var-bayes.rds \
 	data/censored-mle-m2-var-bayes.rds \
 	data/censored-mle-m3-var-bayes.rds \
-	data/censored-mle-m4-var-bayes.rds \
 	data/censored-mle-m0-t-var-bayes.rds \
 	data/censored-mle-m1-t-var-bayes.rds \
 	data/censored-mle-m2-t-var-bayes.rds \
-	data/censored-mle-m3-t-var-bayes.rds \
-	data/censored-mle-m4-t-var-bayes.rds
+	data/censored-mle-m3-t-var-bayes.rds
 
 output-t: data/censored-mle-m0-t.rds \
 	data/censored-mle-m1-t.rds \
 	data/censored-mle-m2-t.rds \
-	data/censored-mle-m3-t.rds \
-	data/censored-mle-m4-t.rds
+	data/censored-mle-m3-t.rds
 
 # Defaults for number of multiply imputed datasets and HMC iterations if not
 # passed via cmdline.
