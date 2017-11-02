@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // Adds in some interactions terms.
-// Time-stamp: <2017-11-02 00:49:08 (overlordR)>
+// Time-stamp: <2017-10-17 22:44:15 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -105,26 +105,26 @@ model{
   // Model sampling statements
   /* Priors for intercept + continuous */
   mu ~ normal(0, 5);
-  betaDays1 ~ normal(0, 1);
-  betaDays2 ~ normal(0, 1);
-  betaMidTrips ~ normal(0, 1);
+  betaDays1 ~ student_t(3, 0, 1);
+  betaDays2 ~ student_t(3, 0, 1);
+  betaMidTrips ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
-  betaLoc ~ normal(0, sigmaLoc);
+  betaLoc ~ student_t(3, 0, sigmaLoc);
   sigmaPaint ~ cauchy(0, 2.5);
-  betaPaint ~ normal(0, sigmaPaint);
+  betaPaint ~ student_t(3, 0, sigmaPaint);
   sigmaType ~ cauchy(0, 2.5);
-  betaType ~ normal(0, sigmaType);
+  betaType ~ student_t(3, 0, sigmaType);
   /* Priors for interactions */
   sigmaDaysType ~ cauchy(0, 2.5);
-  betaDaysType ~ normal(0, sigmaDaysType);
+  betaDaysType ~ student_t(3, 0, sigmaDaysType);
   sigmaTripsType ~ cauchy(0, 2.5);
-  betaTripsType ~ normal(0, sigmaTripsType);
+  betaTripsType ~ student_t(3, 0, sigmaTripsType);
   sigmaTripsPaint ~ cauchy(0, 2.5);
-  betaTripsPaint ~ normal(0, sigmaTripsPaint);
+  betaTripsPaint ~ student_t(3, 0, sigmaTripsPaint);
   /* Priors for modelled effects */
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ normal(0, sigma_alphaBoat);
+  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Observed log-likelihood */
