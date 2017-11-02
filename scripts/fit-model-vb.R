@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Title: Fit model (VB)
 ## Author: Steve Lane
 ## Date: Friday, 21 April 2017
-## Time-stamp: <2017-10-13 03:47:31 (overlordR)>
+## Time-stamp: <2017-11-02 00:43:46 (overlordR)>
 ## Synopsis: Script that drives the censored regression model. Designed to be
 ## called from the Makefile, it requires the model name, a seed for rng, and
 ## number of iterations to be set on the command line, or prior to sourcing the
@@ -56,8 +56,8 @@ newStan <- with(
 )
 set.seed(myseed)
 out <- mclapply(impList, function(dat){
-    locMod <- try(vb(model, data = c(dat$stanData, newStan), elbo_samples = 500,
-                     tol_rel_obj = 1e-3, grad_samples = 2))
+    locMod <- try(vb(model, data = c(dat$stanData, newStan), elbo_samples = 250,
+                     adapt_iter = 100))
     locMod
 })
 keep <- sapply(out, function(x) {
