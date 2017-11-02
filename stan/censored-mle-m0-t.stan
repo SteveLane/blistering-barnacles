@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
 // Based off M0, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-17 22:46:39 (overlordR)>
+// Time-stamp: <2017-11-02 00:50:06 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +55,7 @@ parameters{
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=5> nu;
+  real<lower=2> nu;
 }
 
 transformed parameters{
@@ -78,9 +78,9 @@ model{
   mu ~ normal(0, 5);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
-  betaLoc ~ student_t(3, 0, sigmaLoc);
+  betaLoc ~ normal(0, sigmaLoc);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
+  alphaBoat ~ normal(0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */

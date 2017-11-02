@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Restricted model form.
 // Based off M4, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-17 22:50:49 (overlordR)>
+// Time-stamp: <2017-11-02 00:52:41 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -71,7 +71,7 @@ parameters{
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=5> nu;
+  real<lower=2> nu;
 }
 
 transformed parameters{
@@ -97,19 +97,19 @@ model{
   // Model sampling statements
   /* Priors for intercept + continuous */
   mu ~ normal(0, 5);
-  betaDays1 ~ student_t(3, 0, 1);
-  betaDays2 ~ student_t(3, 0, 1);
+  betaDays1 ~ normal(0, 1);
+  betaDays2 ~ normal(0, 1);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
-  betaLoc ~ student_t(3, 0, sigmaLoc);
+  betaLoc ~ normal(0, sigmaLoc);
   sigmaType ~ cauchy(0, 2.5);
-  betaType ~ student_t(3, 0, sigmaType);
+  betaType ~ normal(0, sigmaType);
   /* Priors for interactions */
   sigmaDaysType ~ cauchy(0, 2.5);
-  betaDaysType ~ student_t(3, 0, sigmaDaysType);
+  betaDaysType ~ normal(0, sigmaDaysType);
   /* Priors for modelled effects */
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
+  alphaBoat ~ normal(0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */
