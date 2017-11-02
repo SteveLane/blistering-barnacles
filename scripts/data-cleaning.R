@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-10-13 03:42:40 (overlordR)>
+## Time-stamp: <2017-11-02 21:35:38 (overlordR)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -33,7 +33,7 @@ if(!(length(args) %in% 0:1)){
 }
 ## Add github packages using gitname/reponame format
 source("../scripts/imputation-functions.R")
-packages <- c("dplyr", "mice", "parallel")
+packages <- c("dplyr", "mice")
 ipak(packages)
 ## Turn off messages
 options(warn = -1, verbose = FALSE)
@@ -111,8 +111,8 @@ impData <- data %>% select(-samLoc, -cens, -LocID)
 lvl1Data <- data %>%
     left_join(., locLookup, by = "LocID") %>%
     select(boatID, wetWeight, LocIDInt, cens)
-set.seed(787, "L'Ecuyer")
-impList <- mclapply(1:numMI, function(i){
+set.seed(13)
+impList <- lapply(1:numMI, function(i){
     imp <- lvl2Imp(impData) %>%
         left_join(., boatLookup, by = "boatType") %>%
         left_join(., paintLookup, by = "paintType") %>%
