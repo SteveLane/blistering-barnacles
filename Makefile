@@ -1,6 +1,5 @@
-# Time-stamp: <2017-11-01 06:48:17 (overlordR)>
-.PHONY: all input-data models output-VB output-t \
-	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
+# Time-stamp: <2017-11-03 00:10:19 (overlordR)>
+.PHONY: all input-data models output-VB output-MCMC \
 	paper supplement \
 	clean-models clean-manuscripts clobber
 
@@ -31,7 +30,11 @@ output-VB: data/censored-mle-m0-var-bayes.rds \
 	data/censored-mle-m2-t-var-bayes.rds \
 	data/censored-mle-m3-t-var-bayes.rds
 
-output-t: data/censored-mle-m0-t.rds \
+output-MCMC: data/censored-mle-m0.rds \
+	data/censored-mle-m1.rds \
+	data/censored-mle-m2.rds \
+	data/censored-mle-m3.rds \
+	data/censored-mle-m0-t.rds \
 	data/censored-mle-m1-t.rds \
 	data/censored-mle-m2-t.rds \
 	data/censored-mle-m3-t.rds
@@ -39,7 +42,7 @@ output-t: data/censored-mle-m0-t.rds \
 # Defaults for number of multiply imputed datasets and HMC iterations if not
 # passed via cmdline.
 NUMMI?=50
-MCITER?=2000
+MCITER?=4000
 
 ################################################################################
 # Make data for feeding into models and manuscript
