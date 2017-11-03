@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Removed hull surface area.
 // Based off M2, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-17 22:48:32 (overlordR)>
+// Time-stamp: <2017-11-03 00:25:14 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -60,12 +60,12 @@ parameters{
   real betaDays1;
   real betaDays2;
   real betaMidTrips;
-  /* Betas for categorical indicators */
-  real betaLoc[numLoc];
-  real betaPaint[numPaint];
-  real betaType[numType];
-  /* Alphas for modelled random effect */
-  vector[numBoat] alphaBoat;
+  /* Raw betas for categorical indicators */
+  vector[numLoc] locRaw;
+  vector[numPaint] paintRaw;
+  vector[numType] typeRaw;
+  /* Raw alphas for modelled random effect */
+  vector[numBoat] alphaRaw;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
   real<lower=0> sigmaLoc;
@@ -74,17 +74,28 @@ parameters{
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=5> nu;
+  real<lower=2> nu;
 }
 
 transformed parameters{
-  // Make it easier for some sampling statements (not necessary)
+  /* Location intercept */
+  vector[numLoc] betaLoc;
+  /* Boat intercept */
+  vector[numBoat] alphaBoat;
+  /* Paint intercept */
+  vector[numPaint] betaPaint;
+  /* Vessel type intercept */
+  vector[numType] betaType;
   /* Regression for observed data */
   vector[N] muHat;
   /* Regression for censored data */
   vector[nCens] muHatCens;
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
+  betaLoc = sigmaLoc * locRaw;
+  betaPaint = sigmaPaint * paintRaw;
+  betaType = sigmaType * typeRaw;
+  alphaBoat = sigma_alphaBoat * alphaRaw;
   for(n in 1:numBoat){
     alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]];
   }
@@ -105,13 +116,13 @@ model{
   betaMidTrips ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
-  betaLoc ~ student_t(3, 0, sigmaLoc);
+  locRaw ~ student_t(3, 0, 1);
   sigmaPaint ~ cauchy(0, 2.5);
-  betaPaint ~ student_t(3, 0, sigmaPaint);
+  paintRaw ~ student_t(3, 0, 1);
   sigmaType ~ cauchy(0, 2.5);
-  betaType ~ student_t(3, 0, sigmaType);
+  typeRaw ~ student_t(3, 0, 1);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
+  alphaRaw ~ student_t(3, 0, 1);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */

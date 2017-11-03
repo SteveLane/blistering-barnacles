@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Adds in some interactions terms.
 // Based off M3, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-10-19 03:41:30 (overlordR)>
+// Time-stamp: <2017-11-03 00:26:55 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -68,16 +68,16 @@ parameters{
   real betaDays1;
   real betaDays2;
   real betaMidTrips;
-  /* Betas for categorical indicators */
-  real betaLoc[numLoc];
-  real betaPaint[numPaint];
-  real betaType[numType];
-  /* Betas for interaction terms */
-  real betaDaysType[numType];
-  real betaTripsType[numType];
-  real betaTripsPaint[numPaint];
-  /* Alphas for modelled random effect */
-  vector[numBoat] alphaBoat;
+  /* Raw betas for categorical indicators */
+  vector[numLoc] locRaw;
+  vector[numPaint] paintRaw;
+  vector[numType] typeRaw;
+  /* Raw betas for interaction terms */
+  vector[numType] daysTypeRaw;
+  vector[numType] tripsTypeRaw;
+  vector[numPaint] tripsPaintRaw;
+  /* Raw alphas for modelled random effect */
+  vector[numBoat] alphaRaw;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
   real<lower=0> sigmaLoc;
@@ -90,17 +90,37 @@ parameters{
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=5> nu;
+  real<lower=2> nu;
 }
 
 transformed parameters{
-  // Make it easier for some sampling statements (not necessary)
+  /* Location intercept */
+  vector[numLoc] betaLoc;
+  /* Boat intercept */
+  vector[numBoat] alphaBoat;
+  /* Paint intercept */
+  vector[numPaint] betaPaint;
+  /* Vessel type intercept */
+  vector[numType] betaType;
+  /* days1 by vessel type interaction */
+  vector[numType] betaDaysType;
+  /* midtrips  by vessel type interaction */
+  vector[numType] betaTripsType;
+  /* midtrips by paint type interaction */
+  vector[numPaint] betaTripsPaint;
   /* Regression for observed data */
   vector[N] muHat;
   /* Regression for censored data */
   vector[nCens] muHatCens;
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
+  betaLoc = sigmaLoc * locRaw;
+  betaPaint = sigmaPaint * paintRaw;
+  betaType = sigmaType * typeRaw;
+  betaDaysType = sigmaDaysType * daysTypeRaw;
+  betaTripsType = sigmaTripsType * tripsTypeRaw;
+  betaTripsPaint = sigmaTripsPaint * tripsPaintRaw;
+  alphaBoat = sigma_alphaBoat * alphaRaw;
   for(n in 1:numBoat){
     alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
   }
@@ -121,21 +141,20 @@ model{
   betaMidTrips ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
-  betaLoc ~ student_t(3, 0, sigmaLoc);
+  locRaw ~ student_t(3, 0, 1);
   sigmaPaint ~ cauchy(0, 2.5);
-  betaPaint ~ student_t(3, 0, sigmaPaint);
+  paintRaw ~ student_t(3, 0, 1);
   sigmaType ~ cauchy(0, 2.5);
-  betaType ~ student_t(3, 0, sigmaType);
+  typeRaw ~ student_t(3, 0, 1);
+  sigma_alphaBoat ~ cauchy(0, 2.5);
+  alphaRaw ~ student_t(3, 0, 1);
   /* Priors for interactions */
   sigmaDaysType ~ cauchy(0, 2.5);
-  betaDaysType ~ student_t(3, 0, sigmaDaysType);
+  daysTypeRaw ~ student_t(3, 0, 1);
   sigmaTripsType ~ cauchy(0, 2.5);
-  betaTripsType ~ student_t(3, 0, sigmaTripsType);
+  tripsTypeRaw ~ student_t(3, 0, 1);
   sigmaTripsPaint ~ cauchy(0, 2.5);
-  betaTripsPaint ~ student_t(3, 0, sigmaTripsPaint);
-  /* Priors for modelled effects */
-  sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
+  tripsPaintRaw ~ student_t(3, 0, 1);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */
