@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // All boat-level intercept predictors included.
 // Based off M1, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-11-03 00:24:35 (overlordR)>
+// Time-stamp: <2017-11-03 00:56:35 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -98,8 +98,6 @@ transformed parameters{
   betaPaint = sigmaPaint * paintRaw;
   betaType = sigmaType * typeRaw;
   alphaBoat = sigma_alphaBoat * alphaRaw;
-  /* Regression for boat-level intercept */
-  vector[numBoat] alphaHat;
   for(n in 1:numBoat){
     alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaHullSA * hullSA[n] + betaPaint[paintType[n]] + betaType[boatType[n]];
   }
