@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
-// Time-stamp: <2017-10-17 22:40:17 (overlordR)>
+// Time-stamp: <2017-11-02 22:02:49 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -44,10 +44,10 @@ parameters{
   // Parameters for the model
   /* Intercept */
   real mu;
-  /* Betas for categorical indicators */
-  real betaLoc[numLoc];
-  /* Alphas for modelled random effect */
-  vector[numBoat] alphaBoat;
+  /* Raw betas for categorical indicators */
+  vector[numLoc] locRaw;
+  /* Raw alphas for modelled random effect */
+  vector[numBoat] alphaRaw;
   real<lower=0> sigmaLoc;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
@@ -56,11 +56,16 @@ parameters{
 }
 
 transformed parameters{
-  // Make it easier for some sampling statements (not necessary)
+  /* Location intercept */
+  vector[numLoc] betaLoc;
+  /* Boat intercept */
+  vector[numBoat] alphaBoat;
   /* Regression for observed data */
   vector[N] muHat;
   /* Regression for censored data */
   vector[nCens] muHatCens;
+  betaLoc = sigmaLoc * locRaw;
+  alphaBoat = sigma_alphaBoat * alphaRaw;
   for(i in 1:N){
     muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
   }
@@ -75,9 +80,9 @@ model{
   mu ~ normal(0, 5);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
-  betaLoc ~ student_t(3, 0, sigmaLoc);
+  locRaw ~ student_t(3, 0, 1);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
+  alphaRaw ~ student_t(3, 0, 1);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Observed log-likelihood */
