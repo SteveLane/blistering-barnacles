@@ -1,4 +1,4 @@
-# Time-stamp: <2017-11-03 00:10:19 (overlordR)>
+# Time-stamp: <2017-11-03 00:29:46 (overlordR)>
 .PHONY: all input-data models output-VB output-MCMC \
 	paper supplement \
 	clean-models clean-manuscripts clobber
@@ -66,7 +66,13 @@ data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
 		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
 
 ################################################################################
-# Rules to fit models with data
+# Rules to fit mcmc models
+data/censored-mle-%.rds: stan/censored-mle-%.rds \
+	scripts/fit-model.R data/imputations.rds
+	cd scripts; \
+	Rscript --no-save --no-restore fit-model.R \
+		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
+
 data/censored-mle-%-t.rds: stan/censored-mle-%-t.rds \
 	scripts/fit-model.R data/imputations.rds
 	cd scripts; \
