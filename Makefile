@@ -1,4 +1,4 @@
-# Time-stamp: <2017-11-03 00:29:46 (overlordR)>
+# Time-stamp: <2017-11-05 23:03:12 (overlordR)>
 .PHONY: all input-data models output-VB output-MCMC \
 	paper supplement \
 	clean-models clean-manuscripts clobber
@@ -82,6 +82,10 @@ data/censored-mle-%-t.rds: stan/censored-mle-%-t.rds \
 ################################################################################
 # Rules to process data (add dependencies later).
 data/looic-compare.rds: scripts/post-process-compare.R output-VB
+	cd $(<D); \
+	Rscript --no-save --no-restore $(<F)
+
+data/looic-compare-full.rds: scripts/post-process-compare-full.R output-MCMC
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
 
