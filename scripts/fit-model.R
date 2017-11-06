@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Title: Fit model
 ## Author: Steve Lane
 ## Date: Friday, 21 April 2017
-## Time-stamp: <2017-11-02 00:46:00 (overlordR)>
+## Time-stamp: <2017-11-06 02:42:36 (overlordR)>
 ## Synopsis: Script that drives the censored regression model. Designed to be
 ## called from the Makefile, it requires the model name, a seed for rng, and
 ## number of iterations to be set on the command line, or prior to sourcing the
@@ -56,7 +56,7 @@ newStan <- with(
     newData,
     list(newN = nrow(newData), days2New = days2, locIDNew = locIDInt,
          paintTypeNew = paintTypeInt, boatTypeNew = boatTypeInt,
-         days1New = days1, midTripsNew = midTrips)
+         days1New = days1, midTripsNew = midTrips, hullSANew = hullSA)
 )
 set.seed(myseed)
 out <- mclapply(impList, function(dat){
