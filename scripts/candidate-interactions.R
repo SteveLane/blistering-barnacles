@@ -4,11 +4,12 @@
 ## Author: Steve Lane
 ## Date: Monday, 06 November 2017
 ## Synopsis: Plot marginal random effects to look at interactions.
-## Time-stamp: <2017-11-06 00:45:08 (overlordR)>
+## Time-stamp: <2017-11-06 02:44:01 (overlordR)>
 ################################################################################
 ################################################################################
 rm(list = ls())
 library(dplyr)
+library(tidyr)
 library(rstan)
 library(ggplot2)
 theme_set(theme_bw())
