@@ -4,7 +4,7 @@ author:
 - Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-11-02 22:30:30 (overlordR)> -->
+<!-- Time-stamp: <2017-11-06 00:54:28 (overlordR)> -->
 
 ```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
 knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
@@ -342,7 +342,7 @@ m3loo <- loo::loo(m3ll)
 print(m3, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
               "y_ppc", "y_lower", "locRaw", "alphaRaw", "paintRaw", "typeRaw",
-              "daysTypeRaw", "tripsTrypRaw", "tripsTypePaint"))
+              "daysTypeRaw", "tripsTypeRaw", "tripsTypePaint"))
 
 ```
 
