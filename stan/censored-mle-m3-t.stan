@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Adds in some interactions terms.
 // Based off M3, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-11-03 00:26:55 (overlordR)>
+// Time-stamp: <2017-11-06 00:52:58 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -23,6 +23,7 @@ data{
   real days1[numBoat];
   real days2[numBoat];
   real midTrips[numBoat];
+  real hullSA[numBoat];
   /* Categorical predictors */
   /* Location of measurement */
   int<lower=1> numLoc;
@@ -46,6 +47,7 @@ data{
   real days1New[newN];
   real days2New[newN];
   real midTripsNew[newN];
+  real hullSANew[newN];
   int<lower=1,upper=numLoc> locIDNew[newN];
   int<lower=1,upper=numPaint> paintTypeNew[newN];
   int<lower=1,upper=numBoat> boatTypeNew[newN];
@@ -68,6 +70,7 @@ parameters{
   real betaDays1;
   real betaDays2;
   real betaMidTrips;
+  real betaHullSA;
   /* Raw betas for categorical indicators */
   vector[numLoc] locRaw;
   vector[numPaint] paintRaw;
@@ -122,7 +125,7 @@ transformed parameters{
   betaTripsPaint = sigmaTripsPaint * tripsPaintRaw;
   alphaBoat = sigma_alphaBoat * alphaRaw;
   for(n in 1:numBoat){
-    alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
+    alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaHullSA * hullSA[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
   }
   for(i in 1:N){
     muHat[i] = mu + betaLoc[locID[i]] + alphaHat[boatID[i]];
@@ -139,6 +142,7 @@ model{
   betaDays1 ~ student_t(3, 0, 1);
   betaDays2 ~ student_t(3, 0, 1);
   betaMidTrips ~ student_t(3, 0, 1);
+  betaHullSA ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
   sigmaLoc ~ cauchy(0, 2.5);
   locRaw ~ student_t(3, 0, 1);
@@ -188,9 +192,9 @@ generated quantities{
   for (n in 1:newN) {
     real muNew1;
     real muNew2;
-    muNew1 = mu + betaLoc[locIDNew[n]] + alphaBoat[37] + betaDays1 * days1New[n] + betaDays2 * days2New[n] + betaMidTrips * midTripsNew[n] + betaPaint[paintTypeNew[n]] + betaType[boatTypeNew[n]] + betaDaysType[boatTypeNew[n]] * days1New[n] + betaTripsType[boatTypeNew[n]] * midTripsNew[n] + betaTripsPaint[paintTypeNew[n]] * midTripsNew[n];
+    muNew1 = mu + betaLoc[locIDNew[n]] + alphaBoat[37] + betaDays1 * days1New[n] + betaDays2 * days2New[n] + betaMidTrips * midTripsNew[n] + betaHullSA * hullSANew[n] + betaPaint[paintTypeNew[n]] + betaType[boatTypeNew[n]] + betaDaysType[boatTypeNew[n]] * days1New[n] + betaTripsType[boatTypeNew[n]] * midTripsNew[n] + betaTripsPaint[paintTypeNew[n]] * midTripsNew[n];
     yNew1[n] = student_t_rng(nu, muNew1, sigma);
-    muNew2 = mu + betaLoc[locIDNew[n]] + alphaBoat[3] + betaDays1 * days1New[n] + betaDays2 * days2New[n] + betaMidTrips * midTripsNew[n] + betaPaint[paintTypeNew[n]] + betaType[boatTypeNew[n]] + betaDaysType[boatTypeNew[n]] * days1New[n] + betaTripsType[boatTypeNew[n]] * midTripsNew[n] + betaTripsPaint[paintTypeNew[n]] * midTripsNew[n];
+    muNew2 = mu + betaLoc[locIDNew[n]] + alphaBoat[3] + betaDays1 * days1New[n] + betaDays2 * days2New[n] + betaMidTrips * midTripsNew[n] + betaHullSA * hullSANew[n] + betaPaint[paintTypeNew[n]] + betaType[boatTypeNew[n]] + betaDaysType[boatTypeNew[n]] * days1New[n] + betaTripsType[boatTypeNew[n]] * midTripsNew[n] + betaTripsPaint[paintTypeNew[n]] * midTripsNew[n];
     yNew2[n] = student_t_rng(nu, muNew2, sigma);
   }
 }
