@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-07 20:50:59 (overlordR)>
+## Time-stamp: <2017-11-07 23:49:26 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -310,7 +310,7 @@ diffs <- rbind(
     compare(m1loo, m3loo)
 ) %>%
     as_tibble() %>%
-    mutate(Model = c("M3", "M0", "M1"))
+    mutate(Model = c("M2", "M0", "M1"))
 ## Put differences on LOOIC scale (LOOIC = -2*ELPD)
 looTab <- left_join(looTab, diffs) %>%
     mutate(elpd_diff = 2 * elpd_diff,
