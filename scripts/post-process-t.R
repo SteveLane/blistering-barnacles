@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-07 05:09:49 (overlordR)>
+## Time-stamp: <2017-11-07 20:50:59 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -316,7 +316,8 @@ looTab <- left_join(looTab, diffs) %>%
     mutate(elpd_diff = 2 * elpd_diff,
            se = sqrt(2) * se) %>%
     rename(`$\\Delta$LOOIC` = elpd_diff,
-           `se($\\Delta$LOOIC)` = se)
+           `se($\\Delta$LOOIC)` = se) %>%
+    select(Model, everything())
 saveRDS(looTab, "../data/looic-t.rds")
 ################################################################################
 ################################################################################
