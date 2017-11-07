@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-07 03:40:53 (overlordR)>
+## Time-stamp: <2017-11-07 05:09:49 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -12,6 +12,7 @@ source("../scripts/imputation-functions.R")
 packages <- c("tidyr", "dplyr", "tibble", "rstan", "loo", "ggplot2",
               "RColorBrewer")
 ipak(packages)
+options(loo.cores = 1)
 ## This is set for readable text when included at half page width.
 theme_set(theme_bw())
 m0 <- readRDS("../data/censored-mle-m0-t.rds")
@@ -278,5 +279,44 @@ diffType <- c(
 )
 saveRDS(list(diffDays1 = diffDays1, diffType = diffType),
         "../data/diffs.rds")
+################################################################################
+################################################################################
+
+################################################################################
+################################################################################
+## Begin Section: Create data for looic table.
+################################################################################
+################################################################################
+m0ll <- extract_log_lik(m0)
+m0loo <- loo(m0ll)
+m1ll <- extract_log_lik(m1)
+m1loo <- loo(m1ll)
+m3ll <- extract_log_lik(m3)
+m3loo <- loo(m3ll)
+looTab <- as.data.frame(compare(m0loo, m1loo, m3loo)) %>%
+    mutate(mID = rownames(.))
+names(looTab) <- c("LOOIC", "se(LOOIC)", "ELPD", "se(ELPD)", "Eff. P",
+                   "se(Eff. P)", "mID")
+looLookup <- tibble(
+    mID = paste0("m", 0:3, "loo"),
+    Model = paste0("M", 0:3)
+)
+looTab <- left_join(looTab, looLookup) %>%
+    select(-mID)
+## Model 7 has the lowest looic/elpd, but not more so than model 5:
+diffs <- rbind(
+    rep(NA, 2),
+    compare(m0loo, m3loo),
+    compare(m1loo, m3loo)
+) %>%
+    as_tibble() %>%
+    mutate(Model = c("M3", "M0", "M1"))
+## Put differences on LOOIC scale (LOOIC = -2*ELPD)
+looTab <- left_join(looTab, diffs) %>%
+    mutate(elpd_diff = 2 * elpd_diff,
+           se = sqrt(2) * se) %>%
+    rename(`$\\Delta$LOOIC` = elpd_diff,
+           `se($\\Delta$LOOIC)` = se)
+saveRDS(looTab, "../data/looic-t.rds")
 ################################################################################
 ################################################################################
