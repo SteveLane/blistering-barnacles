@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-10-19 20:56:58 (overlordR)>
+## Time-stamp: <2017-11-07 03:40:53 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -14,6 +14,8 @@ packages <- c("tidyr", "dplyr", "tibble", "rstan", "loo", "ggplot2",
 ipak(packages)
 ## This is set for readable text when included at half page width.
 theme_set(theme_bw())
+m0 <- readRDS("../data/censored-mle-m0-t.rds")
+m1 <- readRDS("../data/censored-mle-m1-t.rds")
 m3 <- readRDS("../data/censored-mle-m3-t.rds")
 imps <- readRDS("../data/imputations.rds")
 biofoul <- readRDS("../data/biofouling.rds")
@@ -52,7 +54,8 @@ ggsave("../graphics/obs-hist.pdf", plHist)
 ################################################################################
 ################################################################################
 lvl2Imp <- lapply(imps, function(x) x$lvl2) %>% bind_rows() %>%
-    mutate(nummi = rep(seq_along(imps), each = nrow(vessels)))
+    mutate(nummi = rep(seq_along(imps), each = nrow(vessels))) %>%
+    left_join(., bLookup)
 vessImps <- vessels %>%
     mutate(
         days1 = as.numeric(scale(days1)),
@@ -89,12 +92,14 @@ if(length(imps) < 15){
 } else {
     impSelect <- sample(seq_along(imps), 15)
 }
-plPaint <- ggplot(vessImps %>% filter(nummi %in% c(0, impSelect),
-                                      !is.na(paintType)),
-                  aes(x = paintType)) +
+paintDat <- vessImps %>% filter(nummi %in% c(0, impSelect),
+                                !is.na(paintType)) %>%
+    mutate(numMI = factor(nummi))
+plPaint <- ggplot(paintDat, aes(x = paintType)) +
     geom_bar() +
-    facet_wrap(~ factor(nummi)) +
+    facet_wrap(~ numMI) +
     xlab("Anti-fouling paint type") +
+    ylab("Count") +
     theme_bw(base_size = 7.7) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ggsave("../graphics/imp-paint.pdf", plPaint, width = 4.9, height = 4.9)
@@ -108,8 +113,8 @@ ggsave("../graphics/imp-paint.pdf", plPaint, width = 4.9, height = 4.9)
 ################################################################################
 set.seed(13)
 lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2 %>%
-    left_join(., bLookup) %>%
-    select(-boatTypeInt, -paintTypeInt)
+    left_join(., bLookup, by = c("boatTypeInt", "paintTypeInt")) %>%
+    select(-paintTypeInt, -boatTypeInt)
 a3 <- extract(m3, "alphaHat")$alphaHat
 a3Sum <- t(apply(a3, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a3Dat <- tibble(low = a3Sum[,1], mid = a3Sum[,2], high = a3Sum[,3],
@@ -121,18 +126,18 @@ a3Dat <- left_join(a3Dat, lvl2) %>%
                          days1 = "Days since last used",
                          midTrips = "Median number of trips")) %>%
     rename(`Vessel type` = boatType, `Paint type` = paintType)
-slopes <- extract(m3, c("betaDays1", "betaDays2", "betaMidTrips",
-                        "betaPaint", "betaType", "betaDaysType",
-                        "betaTripsType", "betaTripsPaint"))
-intType <- apply(slopes$betaType, 2, median)
-slopeDaysType <- c(median(slopes$betaDays1 + slopes$betaDaysType[,1]),
-                   median(slopes$betaDays1 + slopes$betaDaysType[,2]),
-                   median(slopes$betaDays1 + slopes$betaDaysType[,3]))
-slopeTripsType <- c(median(slopes$betaMidTrips + slopes$betaTripsType[,1]),
-                    median(slopes$betaMidTrips + slopes$betaTripsType[,2]),
-                    median(slopes$betaMidTrips + slopes$betaTripsType[,3]))
+coefs <- extract(m3, c("betaDays1", "betaDays2", "betaMidTrips", "betaHullSA",
+                       "betaPaint", "betaType", "betaDaysType",
+                       "betaTripsType", "betaTripsPaint"))
+intType <- apply(coefs$betaType, 2, median)
+coefDaysType <- c(median(coefs$betaDays1 + coefs$betaDaysType[,1]),
+                  median(coefs$betaDays1 + coefs$betaDaysType[,2]),
+                  median(coefs$betaDays1 + coefs$betaDaysType[,3]))
+coefTripsType <- c(median(coefs$betaMidTrips + coefs$betaTripsType[,1]),
+                   median(coefs$betaMidTrips + coefs$betaTripsType[,2]),
+                   median(coefs$betaMidTrips + coefs$betaTripsType[,3]))
 parsType <- tibble(intercept = rep(intType, 2),
-                   slope = c(slopeDaysType, slopeTripsType),
+                   slope = c(coefDaysType, coefTripsType),
                    boatTypeInt = rep(1:3, 2),
                    type = rep(c("Days since last used",
                                 "Median number of trips"), each = 3)) %>%
@@ -150,13 +155,13 @@ plM3boat <- ggplot(a3Dat, aes(x = value, y = mid, ymin = low, ymax = high,
     xlab("Scaled value") +
     scale_colour_brewer(palette = "Dark2") +
     theme(legend.position = "bottom")
-ggsave("../graphics/plM3boat-robust.pdf", plM3boat, height = 3.5)
-intPaint <- apply(slopes$betaPaint, 2, median)
-slopeTripsPaint <- c(median(slopes$betaMidTrips + slopes$betaTripsPaint[,1]),
-                     median(slopes$betaMidTrips + slopes$betaTripsPaint[,2]),
-                     median(slopes$betaMidTrips + slopes$betaTripsPaint[,3]))
+ggsave("../graphics/plM3boat-t.pdf", plM3boat, height = 3.5)
+intPaint <- apply(coefs$betaPaint, 2, median)
+coefTripsPaint <- c(median(coefs$betaMidTrips + coefs$betaTripsPaint[,1]),
+                    median(coefs$betaMidTrips + coefs$betaTripsPaint[,2]),
+                    median(coefs$betaMidTrips + coefs$betaTripsPaint[,3]))
 parsType <- tibble(intercept = intPaint,
-                   slope = slopeTripsPaint,
+                   slope = coefTripsPaint,
                    paintTypeInt = 1:3,
                    type = rep("Median number of trips", each = 3)) %>%
     left_join(., bLookup %>% select(contains("paint")) %>% distinct(),
@@ -175,25 +180,35 @@ plM3paint <- ggplot(a3Dat %>% filter(type == "Median number of trips"),
     scale_colour_brewer(palette = "Dark2") +
     guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
     theme(legend.position = "bottom")
-ggsave("../graphics/plM3paint-robust.pdf", plM3paint, width = 3.5, height = 3.5)
+ggsave("../graphics/plM3paint-t.pdf", plM3paint, width = 3.5, height = 3.5)
 ################################################################################
 ################################################################################
 
 ################################################################################
 ################################################################################
-## Begin Section: Regression coefficients
+## Begin Section: Comparison of regression coefficients
 ################################################################################
 ################################################################################
+qnts <- c("low5" = 0.05, "low25" = 0.25, "med" = 0.5, "high75" = 0.75,
+          "high95" = 0.95)
+coef0 <- extract(m0, pars = c("nu", "mu", "betaLoc", "sigma_alphaBoat",
+                              "sigma"))
+m0Summary <- lapply(coef0, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M0")
+coef1 <- extract(m1, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaHullSA", "betaPaint",
+                              "betaType", "sigma_alphaBoat", "sigma"))
+m1Summary <- lapply(coef1, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M1")
 coef3 <- extract(m3, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
-                              "betaMidTrips", "betaPaint",
+                              "betaMidTrips", "betaHullSA", "betaPaint",
                               "betaType", "betaDaysType", "betaTripsType",
                               "betaTripsPaint", "sigma_alphaBoat", "sigma"))
 m3Summary <- lapply(coef3, sumMC, qnts = qnts) %>% summRename %>%
-    mutate(model = "M3")
+    mutate(model = "M2")
+allSummary <- bind_rows(m0Summary, m1Summary, m3Summary)
 ords <- unique(m3Summary$coef)
-inds <- which(ords == "betaMidTrips")
-ords <- c(ords[1:inds], "betaHullSA", ords[(inds+1):length(ords)])
-m3Summary <- m3Summary %>%
+allSummary <- allSummary %>%
     mutate(coef = factor(coef, levels = rev(ords)))
 labs <- c("nu" = expression(nu),
           "mu" = expression(mu),
@@ -221,9 +236,8 @@ labs <- c("nu" = expression(nu),
           "betaTripsPaint3" = expression(beta[3]^{MP}),
           "sigma_alphaBoat" = expression(sigma[alpha]),
           "sigma" = expression(sigma))
-plSummary <- ggplot(m3Summary, aes(x = coef, y = med, ymin = low5,
-                                   ymax = high95)) +
-    geom_hline(yintercept = 0, lty = 2) +
+plSummary <- ggplot(allSummary, aes(x = coef, y = med, ymin = low5,
+                                    ymax = high95, colour = model)) +
     geom_pointrange(aes(ymin = low25, ymax = high75),
                     position = position_dodge(width = 1.0), fatten = 0.75,
                     size = 1, show.legend = FALSE) +
@@ -231,8 +245,10 @@ plSummary <- ggplot(m3Summary, aes(x = coef, y = med, ymin = low5,
     coord_flip() +
     xlab("Variable") +
     ylab("Value") +
-    scale_x_discrete(labels = labs)
-ggsave("../graphics/plSummary-robust.pdf", plSummary, width = 3.5)
+    scale_x_discrete(labels = labs) +
+    scale_colour_brewer(palette = "Dark2", name = "Model") +
+    theme(legend.position = "bottom")
+ggsave("../graphics/plSummary-t.pdf", plSummary, width = 3.5)
 ################################################################################
 ################################################################################
 
@@ -246,7 +262,7 @@ newData <- readRDS("../data/newData.rds") %>%
     left_join(., bLookup)
 yNew1 <- extract(m3, "yNew1")$yNew1
 ## Obs 1, 2, and 3 contain the varying days2 data.
-diffDays2 <- c(
+diffDays1 <- c(
     mean(exp(yNew1[, 2]) - exp(yNew1[, 1]) > 0),
     mean(exp(yNew1[, 3]) - exp(yNew1[, 1]) > 0),
     quantile(exp(yNew1[, 2]) - exp(yNew1[, 1]), probs = 0.5),
@@ -260,7 +276,7 @@ diffType <- c(
     quantile(exp(yNew1[, 55]) - exp(yNew1[, 28]), probs = 0.5),
     quantile(exp(yNew1[, 55]) - exp(yNew1[, 1]), probs = 0.5)
 )
-saveRDS(list(diffDays2 = diffDays2, diffType = diffType),
+saveRDS(list(diffDays1 = diffDays1, diffType = diffType),
         "../data/diffs.rds")
 ################################################################################
 ################################################################################
