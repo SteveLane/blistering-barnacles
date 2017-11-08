@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-08 00:16:27 (overlordR)>
+## Time-stamp: <2017-11-08 22:07:49 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -277,7 +277,15 @@ diffType <- c(
     quantile(exp(yNew1[, 55]) - exp(yNew1[, 28]), probs = 0.5),
     quantile(exp(yNew1[, 55]) - exp(yNew1[, 1]), probs = 0.5)
 )
-saveRDS(list(diffDays2 = diffDays2, diffType = diffType),
+## Differences in location, everything else held same. Hull (row 1) and Rudder
+## (row 7) vs keel (row 4).
+diffLoc <- c(
+    mean(exp(yNew1[, 1]) - exp(yNew1[, 4]) > 0),
+    mean(exp(yNew1[, 7]) - exp(yNew1[, 4]) > 0),
+    quantile(exp(yNew1[, 1]) - exp(yNew1[, 4]), probs = 0.5),
+    quantile(exp(yNew1[, 7]) - exp(yNew1[, 4]), probs = 0.5)
+)
+saveRDS(list(diffDays2 = diffDays2, diffType = diffType, diffLoc = diffLoc),
         "../data/diffs.rds")
 ################################################################################
 ################################################################################
