@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-07 23:49:26 (overlordR)>
+## Time-stamp: <2017-11-08 00:16:27 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -263,7 +263,7 @@ newData <- readRDS("../data/newData.rds") %>%
     left_join(., bLookup)
 yNew1 <- extract(m3, "yNew1")$yNew1
 ## Obs 1, 2, and 3 contain the varying days2 data.
-diffDays1 <- c(
+diffDays2 <- c(
     mean(exp(yNew1[, 2]) - exp(yNew1[, 1]) > 0),
     mean(exp(yNew1[, 3]) - exp(yNew1[, 1]) > 0),
     quantile(exp(yNew1[, 2]) - exp(yNew1[, 1]), probs = 0.5),
@@ -277,7 +277,7 @@ diffType <- c(
     quantile(exp(yNew1[, 55]) - exp(yNew1[, 28]), probs = 0.5),
     quantile(exp(yNew1[, 55]) - exp(yNew1[, 1]), probs = 0.5)
 )
-saveRDS(list(diffDays1 = diffDays1, diffType = diffType),
+saveRDS(list(diffDays2 = diffDays2, diffType = diffType),
         "../data/diffs.rds")
 ################################################################################
 ################################################################################
