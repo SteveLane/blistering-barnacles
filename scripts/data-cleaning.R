@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-11-06 02:42:04 (overlordR)>
+## Time-stamp: <2017-11-08 00:13:05 (overlordR)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -133,10 +133,10 @@ data <- data %>%
 ################################################################################
 ################################################################################
 ## Days2 at 0, 3, and 6 months.
-subData <- data %>% select(boatID, days1) %>% distinct(boatID, .keep_all = TRUE)
+subData <- data %>% select(boatID, days2) %>% distinct(boatID, .keep_all = TRUE)
 newData <- expand.grid(
-    days1 = c(0, (365/4) / sd(subData$days1, na.rm = TRUE),
-    (365/2) / sd(subData$days1, na.rm = TRUE)),
+    days2 = c(0, (365/4) / sd(subData$days2, na.rm = TRUE),
+    (365/2) / sd(subData$days2, na.rm = TRUE)),
     locIDInt = 1:3, paintTypeInt = 1:3, boatTypeInt = 1:3) %>%
     mutate(days2 = 0, midTrips = 0, hullSA = 0)
 ################################################################################
