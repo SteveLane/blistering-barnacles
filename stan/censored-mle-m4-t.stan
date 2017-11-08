@@ -7,7 +7,7 @@
 // Includes boat-level intercept, and observation level location ID.
 // Restricted model form.
 // Based off M4, but with t distribution for outcome for added robustness.
-// Time-stamp: <2017-05-10 13:59:51 (slane)>
+// Time-stamp: <2017-10-17 22:50:49 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,16 +22,14 @@ data{
   /* Numeric/ordinal predictors */
   real days1[numBoat];
   real days2[numBoat];
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
-  /* Boat type, yacht as base case */
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
+  /* Boat type */
   int<lower=1> numType;
-  matrix[numBoat, numType - 1] boatType;
-  /* Days1:BoatType interaction */
-  matrix[numBoat, numType - 1] days1boat;
+  int<lower=1,upper=numType> boatType[numBoat];
   /* Boat random effect */
   int<lower=1,upper=numBoat> boatID[N];
   int<lower=1,upper=numBoat> boatIDCens[nCens];
@@ -58,18 +56,22 @@ parameters{
   real betaDays1;
   real betaDays2;
   /* Betas for categorical indicators */
-  vector[numLoc - 1] betaLoc;
-  vector[numType - 1] betaType;
+  real betaLoc[numLoc];
+  real betaType[numType];
   /* Betas for interaction terms */
-  vector[numType - 1] betaDaysType;
+  real betaDaysType[numType];
   /* Alphas for modelled random effect */
   vector[numBoat] alphaBoat;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
+  real<lower=0> sigmaLoc;
+  real<lower=0> sigmaType;
+  /* Errors for interaction terms */
+  real<lower=0> sigmaDaysType;
   /* Error */
   real<lower=0> sigma;
   /* Degrees of freedom */
-  real<lower=1> nu;
+  real<lower=5> nu;
 }
 
 transformed parameters{
@@ -81,35 +83,37 @@ transformed parameters{
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
   for(n in 1:numBoat){
-    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + boatType[n] * betaType + days1boat[n] * betaDaysType;
+    alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n];
   }
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaHat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaHat[boatIDCens[j]];
   }
 }
 
 model{
   // Model sampling statements
-  /* Priors for categorical indicators */
-  betaLoc ~ student_t(3, 0, 1);
-  /* Priors for modelled random effect */
+  /* Priors for intercept + continuous */
   mu ~ normal(0, 5);
   betaDays1 ~ student_t(3, 0, 1);
   betaDays2 ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
-  betaType ~ student_t(3, 0, 1);
+  sigmaLoc ~ cauchy(0, 2.5);
+  betaLoc ~ student_t(3, 0, sigmaLoc);
+  sigmaType ~ cauchy(0, 2.5);
+  betaType ~ student_t(3, 0, sigmaType);
   /* Priors for interactions */
-  betaDaysType ~ student_t(3, 0, 1);
+  sigmaDaysType ~ cauchy(0, 2.5);
+  betaDaysType ~ student_t(3, 0, sigmaDaysType);
   /* Priors for modelled effects */
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ cauchy(alphaHat, sigma_alphaBoat);
+  alphaBoat ~ student_t(3, 0, sigma_alphaBoat);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Prior for df */
-  nu ~ gamma(2, 0.1);
+  nu ~ gamma(2, 10);
   /* Observed log-likelihood */
   for(i in 1:N){
     target += student_t_lpdf(logY[i] | nu, muHat[i], sigma);

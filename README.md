@@ -18,7 +18,7 @@ Head over to [https://www.docker.com/](https://www.docker.com/) to install docke
 
 Once you have docker up and running, pull the docker image into your system:
 
-```bash
+```sh
 $ docker pull stevelane/analysis-dockerfiles:blistering-barnacles
 ```
 
@@ -30,8 +30,9 @@ This command pulls down the required software to reproduce the analysis. This co
 
 We're almost ready to `make` the analysis. First, we need to run the container that will do the work:
 
-```
-$ docker run -v /path/on/your/machine:/home/blistering-barnacles -it stevelane/analysis-dockerfiles:blistering-barnacles
+```sh
+$ docker run -v $(pwd):/home/blistering-barnacles -it \
+  stevelane/analysis-dockerfiles:blistering-barnacles
 ```
 
 Here, `/path/on/your/machine` refers to where you would like to store the code and all the output from the analysis. When you run the above command, it will download the data from git repository and make it available for use.

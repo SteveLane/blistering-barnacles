@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Wednesday, 29 March 2017
 ## Synopsis: Functions to run the censored regression imputation models
-## Time-stamp: <2017-05-08 08:16:32 (slane)>
+## Time-stamp: <2017-10-11 01:36:59 (overlordR)>
 ################################################################################
 ################################################################################
 
@@ -68,56 +68,28 @@ lvl2Imp <- function(data){
 ################################################################################
 ################################################################################
 createStanData <- function(lvl1, lvl2){
-    ## Use model matrix to get indicators of what I need. These will be created
-    ## alphabetically/numerically, just need to be careful feeding them in to
-    ## stan.
-    lvl1Mat <- model.matrix(
-        ~ wetWeight + LocID + boatID + cens, data = lvl1) %>% as.data.frame()
-    lvl2Mat <- model.matrix(
-        ~ days1 + days2 + midTrips + ApproxHullSA + paintType + boatType +
-            days1:paintType + days1:boatType + days2:paintType +
-            days2:boatType + midTrips:paintType + midTrips:boatType +
-            ApproxHullSA:paintType + ApproxHullSA:boatType, data = lvl2) %>%
-        as.data.frame() %>% mutate(boatID = lvl2$boatID)
     ## Can pass list with too many variables to stan, so just add all as it
     ## makes it easier in the long run.
-    obsData <- lvl1Mat %>% filter(cens == 0)
-    censData <- lvl1Mat %>% filter(cens == 1)
-    stanData <- c(with(obsData,
-                       list(Y = wetWeight, N = nrow(obsData), numLoc = 3,
-                            locID = cbind(LocIDKeel, LocIDRudder),
-                            numBoat = max(boatID), boatID = boatID)),
-                  with(censData,
-                       list(nCens = nrow(censData), U = 1.5, 
-                            locIDCens = cbind(LocIDKeel, LocIDRudder),
-                            boatIDCens = boatID)),
-                  with(lvl2Mat,
-                       list(days1 = days1, days2 = days2, midTrips = midTrips,
-                            hullSA = ApproxHullSA, numPaint = 3,
-                            paintType = cbind(paintType2, paintType3),
-                            numType = 3,
-                            boatType = cbind(boatType2, boatType3),
-                            days1paint = cbind(`days1:paintType2`,
-                                               `days1:paintType3`),
-                            days1boat = cbind(`days1:boatType2`,
-                                              `days1:boatType3`),
-                            days2paint = cbind(`days2:paintType2`,
-                                               `days2:paintType3`),
-                            days2boat = cbind(`days2:boatType2`,
-                                              `days2:boatType3`),
-                            midTripspaint = cbind(`midTrips:paintType2`,
-                                                  `midTrips:paintType3`),
-                            midTripsboat = cbind(`midTrips:boatType2`,
-                                                 `midTrips:boatType3`),
-                            ApproxHullSApaint =
-                                cbind(`ApproxHullSA:paintType2`,
-                                      `ApproxHullSA:paintType3`),
-                            ApproxHullSAboat =
-                                cbind(`ApproxHullSA:boatType2`,
-                                      `ApproxHullSA:boatType3`)))
-                  )
-    ## Do a scaled version as well (centre and divide by sd)
-    ## I've pre-scaled now, so removed what was here (see previous commits).
+    obsData <- lvl1 %>% filter(cens == 0)
+    censData <- lvl1 %>% filter(cens == 1)
+    stanObs <- with(
+        obsData,
+        list(Y = wetWeight, N = nrow(obsData), numLoc = max(LocIDInt),
+             locID = LocIDInt, numBoat = max(boatID), boatID = boatID)
+    )
+    stanMiss <- with(
+        censData,
+        list(nCens = nrow(censData), U = 1.5, locIDCens = LocIDInt,
+             boatIDCens = boatID)
+    )
+    stanLvl2 <- with(
+        lvl2,
+        list(days1 = days1, days2 = days2, midTrips = midTrips,
+             hullSA = ApproxHullSA, numPaint = max(paintTypeInt),
+             paintType = paintTypeInt, numType = max(boatTypeInt),
+             boatType = boatTypeInt)
+    )
+    stanData <- c(stanObs, stanMiss, stanLvl2)
     return(stanData)
 }
 ################################################################################

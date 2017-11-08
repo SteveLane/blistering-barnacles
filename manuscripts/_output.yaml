@@ -1,0 +1,18 @@
+# Time-stamp: <2017-09-18 23:42:08 (overlordR)>
+# Control output for RMarkdown
+bookdown::html_document2:
+  toc: yes
+  toc_depth: 2
+  theme: yeti
+  highlight: zenburn
+  fig_caption: true
+  bibliography: refs.bib
+  biblio-style: "apalike"
+  link-citations: true
+  includes:
+    after_body: math-config.html
+
+bookdown::pdf_document2:
+  latex_engine: pdflatex
+  number_sections: yes
+  citation_package: biblatex

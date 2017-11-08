@@ -1,108 +1,287 @@
 ---
 title: "Model Interrogation"
-author: Stephen E. Lane
-output:
-  html_document:
-    theme: simplex
-    highlight: zenburn
+author:
+- Stephen E. Lane
 ---
 
-<!-- Time-stamp: <2017-05-11 14:22:59 (slane)> -->
+<!-- Time-stamp: <2017-11-06 00:54:28 (overlordR)> -->
 
-```{r,knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
-## Add github packages using gitname/reponame format
-source("../scripts/imputation-functions.R")
-packages <- c("dplyr", "tidyr", "ggplot2", "rstan", "loo")
-ipak(packages)
-knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = TRUE,
-                      message = FALSE, echo = FALSE)
+```{r setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide"}
+knitr::opts_chunk$set(error = FALSE, warning = FALSE, cache = FALSE,
+                      message = FALSE, echo = FALSE,
+                      cache.path = "interrogate-cache/",
+                      fig.path = "html-figures/")
 options(digits = 2, width = 100)
 
 ```
 
-## Introduction
+```{r packages}
+## Add github packages using gitname/reponame format
+source("../scripts/imputation-functions.R")
+packages <- c("dplyr", "tidyr", "ggplot2", "rstan", "loo")
+ipak(packages)
+options(mc.cores = round(parallel::detectCores()/2))
+options(loo.cores = 1)
+
+```
+
+# Introduction
 
 In this document, I detail the model interrogation for the *blistering barnacles* (otherwise known as *biofouling*) project. For the introduction and set up of the problem, see the [manuscript](file:../manuscripts/censored-mle.pdf). This document expands upon the modelling description as given in that paper.
 
-## Models
+# Models
 
-The basic model (which we denote M0) included the location of the measurement as a level one fixed effect, and a modelled intercept for the vessel ID:
+The basic model (which we denote M0) included the location of the measurement as a level one fixed effect, and a modelled intercept for the vessel ID. We investigate two different models for the regression error:
 
 $$
 \begin{align}
-  \log Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \\
-  \nu ~ \text{Gamma}(2, 0.1) \\
-  \mu_{i} & = \mu + \alpha_{j[i]} + \beta^{l1} \cdot \text{location1}_{i} + \beta^{l2} \cdot \text{location2}_{i} \\
-  \alpha_{j} & \sim \text{cauchy}(0, \sigma_{\alpha}) \\
+  \log Y_{i} & \sim \text{Normal}(\mu_{i}, \sigma) \\
+  \log Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma)
+\end{align}
+$$
+
+The $t$ distributed model allows us to have a little more robustness, and our expectation is that this model will perform the best. The specification for model M0 is completed with the following:
+
+$$
+\begin{align}
+  \nu & \sim \text{Gamma}(2, 0.1) \\
+  \mu_{i} & = \mu + \alpha_{j[i]} + \beta_{l[i]} \\
   \mu & \sim N(0, 5) \\
-  \beta^{l1},\beta^{l2} & \sim t_{3}(0, 1) \\
+  \alpha_{j} & \sim \text{cauchy}(0, \sigma_{\alpha}) \\
+  \beta_{l} & \sim t_{3}(0, \sigma_{l}) \\
   \sigma,\sigma_{\alpha} & \sim \text{cauchy}(0, 2.5)
 \end{align}
 $$
 
-where $\text{location1}_{i},\text{location2}_{i}$ are indicator variables for whether the observation was measured at the keel or the rudder; observations made at the hull are aliased with the intercept, $\mu$. Summary output from this model is given below.
+where $j$ references vessels, and $l$ references locations. Thus, $\alpha_{j}$ and $\beta_{l}$ are the variation around the mean due to the location of measurement and particular vessel respectively. Summary output from this model follows.
 
-```{r}
-m0 <- readRDS("../data/censored-mle-m0-robust.rds")
-m0ll <- extract_log_lik(m0)
-m0loo <- loo(m0ll)
-print(m0, digits = 2, include = FALSE,
+## M0
+
+### M0 &mdash; Normal distribution
+
+```{r m0N,cache=TRUE}
+m0N <- readRDS("../data/censored-mle-m0-var-bayes.rds")
+m0Nll <- extract_log_lik(m0N)
+m0Nloo <- loo::loo(m0Nll)
+print(m0N, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
-              "y_ppc", "y_lower"))
+              "y_ppc", "y_lower", "locRaw", "alphaRaw"))
 
 ```
+
+### M0 &mdash; $t$ distribution
+
+```{r m0,cache=TRUE}
+m0 <- readRDS("../data/censored-mle-m0-t-var-bayes.rds")
+m0ll <- extract_log_lik(m0)
+m0loo <- loo::loo(m0ll)
+print(m0, digits = 2, include = FALSE,
+      par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
+              "y_ppc", "y_lower", "locRaw", "alphaRaw"))
+
+```
+
+### Comparison between Normal and $t$ assumptions
+
+We now compare the two base models based on their predictive log-likelihoods:
+
+```{r compare-m0}
+compare(m0Nloo, m0loo)
+
+```
+
+So in the M0 models, there's not a huge difference in predictive log-likelihood between the Normal and $t$ distribution regressions.
+
+### Posterior predictive checks
+
+```{r post-pred-m0,cache=TRUE}
+yPPC <- extract(m0, "y_ppc")$y_ppc
+yPPCExp <- exp(yPPC)
+ppc1 <- rowMeans(yPPC < log(1.5))
+ppc2 <- apply(yPPCExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCExp, 1, IQR)
+ppc <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O2"
+)
+yPPCN <- extract(m0N, "y_ppc")$y_ppc
+yPPCNExp <- exp(yPPCN)
+ppc1 <- rowMeans(yPPCN < log(1.5))
+ppc2 <- apply(yPPCNExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCNExp, 1, IQR)
+ppcN <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O1"
+)
+allPPC <- bind_rows(ppc, ppcN) %>%
+    gather(ppc, value, -model)
+## Observed data
+biofouling <- readRDS("../data/biofouling.rds")
+obs <- tibble(ppc = c("Prop(hat(Y)<1.5)", "Median(hat(Y))", "IQR(hat(Y))"),
+              value = with(biofouling,
+                           c(mean(wetWeight < 1.5), median(wetWeight),
+                             IQR(wetWeight))))
+plPPC <- ggplot(allPPC, aes(x = value)) +
+    geom_histogram() +
+    facet_grid(model ~ ppc, scales = "free", labeller = label_parsed) +
+    geom_vline(aes(xintercept = value), data = obs) +
+    xlab("") +
+    ylab("Count") +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank())
+plPPC
+
+```
+
+It appears here that the $t$ model reproduces the lower values better than the normal version.
+
+## M1
 
 The next model fit (M1) included all vessel-level predictors as main effects in a regression on the vessel-level intercept:
 
 $$
 \begin{align}
   \alpha_{j} & \sim \text{cauchy}(\alpha^{*}_{j}, \sigma_{\alpha}) \\
-  \alpha^{*}_{j} & = \beta^{d1} \cdot \text{days1}_{i} + \beta^{d2} \cdot  \text{days2}_{i} + \beta^{m} \cdot \text{midTrips}_{i} + \beta^{h} \cdot \text{hullSA}_{i} + \beta^{p1} \cdot \text{paintType1}_{i} + \beta^{p2} \cdot \text{paintType2}_{i} + \\
-  & \quad \beta^{t1} \cdot \text{vesselType1}_{i} + \beta^{t2} \cdot \text{vesselType2}_{i}
+  \alpha^{*}_{j} & = \beta^{d1} \cdot \text{days1}_{j} + \beta^{d2} \cdot  \text{days2}_{j} + \beta^{m} \cdot \text{midTrips}_{j} + \beta^{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]}
 \end{align}
 $$
 
-where $\text{days1}_{i},\text{days2}_{i}$ are the XXX. Summary output from this model is given below.
+where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; and $\text{hullSA}_{j}$ is the hull surface area. $\beta_{p[j]}$ is the effect of paint type $p$: ablative, hard or self-polishing anti-fouling paint; and $\beta_{t[j]}$ is the effect of vessel type: motor cruiser/other, fishing vessel or a yacht. Summary output from this model is given below.
 
-```{r}
-m1 <- readRDS("../data/censored-mle-m1-robust.rds")
-m1ll <- extract_log_lik(m1)
-m1loo <- loo(m1ll)
-print(m1, digits = 2, include = FALSE,
+### M1 &mdash; Normal distribution
+
+```{r m1N,cache=TRUE}
+m1N <- readRDS("../data/censored-mle-m1-var-bayes.rds")
+m1Nll <- extract_log_lik(m1N)
+m1Nloo <- loo::loo(m1Nll)
+print(m1N, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
-              "y_ppc", "y_lower"))
+              "y_ppc", "y_lower", "locRaw", "alphaRaw", "paintRaw", "typeRaw"))
 
 ```
 
-## Vessel-level intercept interrogation
+### M1 &mdash; $t$ distribution
+
+```{r m1,cache=TRUE}
+m1 <- readRDS("../data/censored-mle-m1-t-var-bayes.rds")
+m1ll <- extract_log_lik(m1)
+m1loo <- loo::loo(m1ll)
+print(m1, digits = 2, include = FALSE,
+      par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
+              "y_ppc", "y_lower", "locRaw", "alphaRaw", "paintRaw", "typeRaw"))
+
+```
+
+### Comparison between Normal and $t$ assumptions
+
+We now compare the two base models based on their predictive log-likelihoods:
+
+```{r compare-m1}
+compare(m1Nloo, m1loo)
+
+```
+
+So in the M1 models, there is now a difference in predictive log-likelihood between the Normal and $t$ distribution regressions, with the $t$ distribution being preferred.
+
+### Posterior predictive checks
+
+```{r post-pred-m1,cache=TRUE}
+yPPC <- extract(m1, "y_ppc")$y_ppc
+yPPCExp <- exp(yPPC)
+ppc1 <- rowMeans(yPPC < log(1.5))
+ppc2 <- apply(yPPCExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCExp, 1, IQR)
+ppc <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O2"
+)
+yPPCN <- extract(m1N, "y_ppc")$y_ppc
+yPPCNExp <- exp(yPPCN)
+ppc1 <- rowMeans(yPPCN < log(1.5))
+ppc2 <- apply(yPPCNExp, 1, quantile, probs = 0.5, names = FALSE)
+ppc3 <- apply(yPPCNExp, 1, IQR)
+ppcN <- tibble(
+    `Prop(hat(Y)<1.5)` = ppc1,
+    `Median(hat(Y))` = ppc2,
+    `IQR(hat(Y))` = ppc3,
+    model = "O1"
+)
+allPPC <- bind_rows(ppc, ppcN) %>%
+    gather(ppc, value, -model)
+plPPC <- ggplot(allPPC, aes(x = value)) +
+    geom_histogram() +
+    facet_grid(model ~ ppc, scales = "free", labeller = label_parsed) +
+    geom_vline(aes(xintercept = value), data = obs) +
+    xlab("") +
+    ylab("Count") +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank())
+plPPC
+
+```
+
+It appears here that the $t$ model reproduces the lower values better than the normal version.
+
+# Vessel-level intercept interrogation
 
 In this section we look at the estimated vessel-level intercepts ($\alpha_{j}$) in relation to the vessel-level predictors. From the output above, it is hard to gauge the impact of a product term, but the size of the 50% point estimate of the vessel type coefficients suggest that they may be candidates.
 
-### Candidate interaction terms
+## Candidate interaction terms
 
-The figure below shows the 50% point estimate (and 80% credible intervals) of the vessel-level intercept against the ordinal predictors, coloured by the vessel type. There is a possibility of an interaction between `days1`/`midTrips` and `boatType`.
+The figure below shows the 50% point estimate (and 80% credible intervals) of the vessel-level intercept against the ordinal predictors, coloured by the vessel type; the regression line is at the base category of motor cruiser/other. There is a possibility of an interaction between `days1`/`midTrips` and `boatType`.
 
 ```{r}
-a1 <- extract(m1, "alphaBoat")$alphaBoat
+bLookup <- readRDS("../data/biofouling.rds") %>%
+    select(boatType, paintType, boatTypeInt, paintTypeInt) %>%
+    distinct() %>%
+    na.omit()
+a1 <- extract(m1, "alphaHat")$alphaHat
 a1Sum <- t(apply(a1, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a1Dat <- tibble(low = a1Sum[,1], mid = a1Sum[,2], high = a1Sum[,3],
                 boatID = 1:nrow(a1Sum))
-imps <- readRDS("../data/imputations-robust.rds")
+imps <- readRDS("../data/imputations.rds")
 set.seed(13)
-lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2
-a1Dat <- left_join(a1Dat, lvl2) %>%
-    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType)
-slopes <- extract(m1, c("mu", "betaDays1", "betaDays2", "betaMidTrips",
+lvl2 <- imps[[sample(seq_along(imps), 1)]]$lvl2 %>%
+    left_join(., bLookup, by = c("boatTypeInt", "paintTypeInt")) %>%
+    select(-paintTypeInt, -boatTypeInt)
+a1Dat <- left_join(a1Dat, lvl2, by = "boatID") %>%
+    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType) %>%
+    mutate(type = recode(type,
+                         days1 = "Days since last used",
+                         days2 = "Days since last cleaned",
+                         midTrips = "Median number of trips",
+                         ApproxHullSA = "Hull surface area")) %>%
+    rename(`Vessel type` = boatType, `Paint type` = paintType)
+slopes <- extract(m1, c("betaDays1", "betaDays2", "betaMidTrips",
                         "betaHullSA"))
 slopes <- sapply(slopes, quantile, probs = 0.5)
-slopes <- tibble(intercept = slopes[1], slope = slopes[-1],
-                 type = unique(a1Dat$type))
+ints <- extract(m1, "betaType")$betaType
+ints <- apply(ints, 2, quantile, probs = 0.5)
+coefs <- tibble(slope = rep(slopes, 3),
+                type = rep(unique(a1Dat$type), 3),
+                intercept = rep(ints, each = 4),
+                boatTypeInt = rep(1:3, each = 4)) %>%
+    left_join(., bLookup %>% select(contains("boat")) %>% distinct(),
+              by = "boatTypeInt") %>%
+    rename(`Vessel type` = boatType)
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = boatType)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Vessel type`)) +
+    geom_pointrange(fatten = 0.5) +
     facet_wrap(~ type) +
-    geom_abline(aes(slope = slope, intercept = intercept), data = slopes) +
-    theme_bw()
+    geom_abline(aes(slope = slope, intercept = intercept,
+                    colour = `Vessel type`), data = coefs) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
+    theme_bw(base_size = 7.7) +
+    theme(legend.position = "bottom")
+ggsave("../graphics/plM1boat-robust.pdf", pl, width = 4.9, height = 4.9)
 print(pl)
 
 ```
@@ -110,30 +289,45 @@ print(pl)
 The next figure is similar to above, but it shows the points coloured by paint type. This plot is suggestive of an interaction between `midTrips` and `paintType`.
 
 ```{r}
+ints <- extract(m1, "betaPaint")$betaPaint
+ints <- apply(ints, 2, quantile, probs = 0.5)
+coefs <- tibble(slope = rep(slopes, 3),
+                type = rep(unique(a1Dat$type), 3),
+                intercept = rep(ints, each = 4),
+                paintTypeInt = rep(1:3, each = 4)) %>%
+    left_join(., bLookup %>% select(contains("paint")) %>% distinct(),
+              by = "paintTypeInt") %>%
+    rename(`Paint type` = paintType)
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = paintType)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Paint type`)) +
+    geom_pointrange(fatten = 0.5) +
     facet_wrap(~ type) +
-    geom_abline(aes(slope = slope, intercept = intercept), data = slopes) +
-    theme_bw()
+    geom_abline(aes(slope = slope, intercept = intercept,
+                    colour = `Paint type`), data = coefs) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
+    theme_bw(base_size = 7.7) +
+    theme(legend.position = "bottom")
+ggsave("../graphics/plM1paint-robust.pdf", pl, width = 4.9, height = 4.9)
 print(pl)
 
 ```
 
 So combining these two exploratory data analyses, and the results from M1, a possible sequence of models to try next would be: M2, which removes `hullSA` from M1; and M3 which adds the `days1:boatType`, `midTrips:boatType` and `midTrips:paintType` interactions to M2.
 
-### Interrogation of product terms
+## Interrogation of product terms
 
 The choice of predictors in M2 was made based on the candidate interaction terms in M3. Removing `hullSA` from M1 resulted in the following estimates for M2:
 
-```{r}
-m2 <- readRDS("../data/censored-mle-m2-robust.rds")
+```{r m2,cache=TRUE}
+m2 <- readRDS("../data/censored-mle-m2-t-var-bayes.rds")
 m2ll <- extract_log_lik(m2)
-m2loo <- loo(m2ll)
+m2loo <- loo::loo(m2ll)
 m2comp <- compare(m1loo, m2loo)
 print(m2, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
-              "y_ppc", "y_lower"))
+              "y_ppc", "y_lower", "locRaw", "alphaRaw", "paintRaw", "typeRaw"))
 
 ```
 
@@ -141,76 +335,187 @@ As can be seen in these estimates, there is virtually no change in values from t
 
 Moving on to M3, where the interactions `days1:boatType`, `midTrips:boatType` and `midTrips:paintType` are added to M2, we get the following estimates:
 
-```{r}
-m3 <- readRDS("../data/censored-mle-m3-robust.rds")
+```{r m3,cache=TRUE}
+m3 <- readRDS("../data/censored-mle-m3-t-var-bayes.rds")
 m3ll <- extract_log_lik(m3)
-m3loo <- loo(m3ll)
+m3loo <- loo::loo(m3ll)
 print(m3, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
-              "y_ppc", "y_lower"))
+              "y_ppc", "y_lower", "locRaw", "alphaRaw", "paintRaw", "typeRaw",
+              "daysTypeRaw", "tripsTypeRaw", "tripsTypePaint"))
 
 ```
 
-Again, there is not enough evidence to state with any certainty how these interactions might affect the wet weight biomass. It is important to remember that there are only `r nrow(a1Dat)` vessels contributing to the regression at the second-level, so we do not expect very small standard errors for these estimates.
+Again, there is not enough evidence to state with any certainty how these interactions might affect the wet weight biomass. It is important to remember that there are only `r nrow(lvl2)` vessels contributing to the regression at the second-level, so we do not expect very small standard errors for these estimates.
 
 ```{r}
-a3 <- extract(m3, "alphaBoat")$alphaBoat
+a3 <- extract(m3, "alphaHat")$alphaHat
 a3Sum <- t(apply(a3, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a3Dat <- tibble(low = a3Sum[,1], mid = a3Sum[,2], high = a3Sum[,3],
                 boatID = 1:nrow(a3Sum))
 a3Dat <- left_join(a3Dat, lvl2) %>%
     select(-ApproxHullSA, -days2) %>%
-    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType)
-slopes <- extract(m3, c("mu", "betaDays1", "betaDays2", "betaMidTrips",
+    gather(type, value, -low, -mid, -high, -boatID, -paintType, -boatType) %>%
+    mutate(type = recode(type,
+                         days1 = "Days since last used",
+                         midTrips = "Median number of trips")) %>%
+    rename(`Vessel type` = boatType, `Paint type` = paintType)
+slopes <- extract(m3, c("betaDays1", "betaDays2", "betaMidTrips",
                         "betaPaint", "betaType", "betaDaysType",
                         "betaTripsType", "betaTripsPaint"))
-intType <- c(0, median(slopes$betaType[,1]), median(slopes$betaType[,2]))
-slopeDaysType <- c(median(slopes$betaDays1),
-                   median(slopes$betaDays1 + slopes$betaDaysType[,1]),
-                   median(slopes$betaDays1 + slopes$betaDaysType[,2]))
-slopeTripsType <- c(median(slopes$betaMidTrips),
-                    median(slopes$betaMidTrips + slopes$betaTripsType[,1]),
-                    median(slopes$betaMidTrips + slopes$betaTripsType[,2]))
+intType <- apply(slopes$betaType, 2, median)
+slopeDaysType <- c(median(slopes$betaDays1 + slopes$betaDaysType[,1]),
+                   median(slopes$betaDays1 + slopes$betaDaysType[,2]),
+                   median(slopes$betaDays1 + slopes$betaDaysType[,3]))
+slopeTripsType <- c(median(slopes$betaMidTrips + slopes$betaTripsType[,1]),
+                    median(slopes$betaMidTrips + slopes$betaTripsType[,2]),
+                    median(slopes$betaMidTrips + slopes$betaTripsType[,3]))
 parsType <- tibble(intercept = rep(intType, 2),
                    slope = c(slopeDaysType, slopeTripsType),
-                   boatType = factor(rep(levels(a3Dat$boatType), 2)),
-                   type = rep(c("days1", "midTrips"), each = 3))
+                   boatTypeInt = rep(1:3, 2),
+                   type = rep(c("Days since last used",
+                                "Median number of trips"), each = 3)) %>%
+    left_join(., bLookup %>% select(contains("boat")) %>% distinct(),
+              by = "boatTypeInt") %>%
+    rename(`Vessel type` = boatType)
 pl <- ggplot(a3Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = boatType)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Vessel type`)) +
+    geom_pointrange(fatten = 0.5) +
     facet_wrap(~ type, ncol = 2) +
-    geom_abline(aes(slope = slope, intercept = intercept, colour = boatType),
-                data = parsType) +    
-    theme_bw() +
+    geom_abline(aes(slope = slope, intercept = intercept,
+                    colour = `Vessel type`),
+                data = parsType) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
     theme(legend.position = "bottom")
+ggsave("../graphics/plM3boat-var-bayes.pdf", pl, height = 3.5)
 print(pl)
 
 ```
 
-The figure above plots the marginal regression lines for the `days1:boatType` and `midTrips:boatType` interactions. There appears to be a difference in slopes in the `days1:boatType` interaction; indeed the posterior probability that the difference in slopes between Yachts and Motor cruiser/Other is greater than 0 is `r mean(slopes$betaDaysType[,2] - slopes$betaDaysType[,1] > 0)`.
+The figure above plots the marginal regression lines for the `days1:boatType` and `midTrips:boatType` interactions. There appears to be a difference in slopes in the `days1:boatType` interaction; indeed the posterior probability that the difference in slopes between Yachts and Motor cruiser/Other is greater than 0 is `r mean(slopes$betaDaysType[,3] - slopes$betaDaysType[,1] > 0)`. Similarly for `midTrips:boatType`.
 
-The figure below plots the marginal regression line for the `midTrips:paintType` interaction. There appears to be no difference in slopes here.
+The figure below plots the marginal regression line for the `midTrips:paintType` interaction. Again, there appears to be an interaction.
 
 ```{r}
-intPaint <- c(0, median(slopes$betaPaint[,1]), median(slopes$betaPaint[,2]))
-slopeTripsPaint <- c(median(slopes$betaMidTrips),
-                     median(slopes$betaMidTrips + slopes$betaTripsPaint[,1]),
-                     median(slopes$betaMidTrips + slopes$betaTripsPaint[,2]))
+intPaint <- apply(slopes$betaPaint, 2, median)
+slopeTripsPaint <- c(median(slopes$betaMidTrips + slopes$betaTripsPaint[,1]),
+                     median(slopes$betaMidTrips + slopes$betaTripsPaint[,2]),
+                     median(slopes$betaMidTrips + slopes$betaTripsPaint[,3]))
 parsType <- tibble(intercept = intPaint,
                    slope = slopeTripsPaint,
-                   paintType = factor(levels(a3Dat$paintType)),
-                   type = rep("midTrips", each = 3))
-pl <- ggplot(a3Dat %>% filter(type == "midTrips"),
+                   paintTypeInt = 1:3,
+                   type = rep("Median number of trips", each = 3)) %>%
+    left_join(., bLookup %>% select(contains("paint")) %>% distinct(),
+              by = "paintTypeInt") %>%
+    rename(`Paint type` = paintType)
+pl <- ggplot(a3Dat %>% filter(type == "Median number of trips"),
              aes(x = value, y = mid, ymin = low, ymax = high,
-                 colour = paintType)) +
+                 colour = `Paint type`)) +
     geom_pointrange(fatten = 1) +
-    geom_abline(aes(slope = slope, intercept = intercept, colour = paintType),
-                data = parsType) +    
-    theme_bw() +
+    facet_wrap(~ type) +
+    geom_abline(aes(slope = slope, intercept = intercept,
+                    colour = `Paint type`),
+                data = parsType) +
+    ylab("Vessel-level intercept") +
+    xlab("Scaled value") +
+    scale_colour_brewer(palette = "Dark2") +
+    guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
     theme(legend.position = "bottom")
+ggsave("../graphics/plM3paint-var-bayes.pdf", pl, width = 3.5, height = 3.5)
 print(pl)
 
 ```
+
+## Model Choice
+
+In terms of model choice, a comparison between all models is shown below:
+
+```{r model-choice}
+compare(m0loo, m1loo, m2loo, m3loo)
+
+```
+
+Clearly, M3 is the best performing model.
+
+## Comparison of Model Coefficients
+
+```{r mod-coefs,out.height=960}
+qnts <- c("low5" = 0.05, "low25" = 0.25, "med" = 0.5, "high75" = 0.75,
+          "high95" = 0.95)
+coef0 <- extract(m0, pars = c("nu", "mu", "betaLoc", "sigma_alphaBoat",
+                              "sigma"))
+m0Summary <- lapply(coef0, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M0")
+coef1 <- extract(m1, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaHullSA", "betaPaint",
+                              "betaType", "sigma_alphaBoat", "sigma"))
+m1Summary <- lapply(coef1, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M1")
+coef2 <- extract(m2, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaPaint",
+                              "betaType", "sigma_alphaBoat", "sigma"))
+m2Summary <- lapply(coef2, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M2")
+coef3 <- extract(m3, pars = c("nu", "mu", "betaLoc", "betaDays1", "betaDays2",
+                              "betaMidTrips", "betaPaint",
+                              "betaType", "betaDaysType", "betaTripsType",
+                              "betaTripsPaint", "sigma_alphaBoat", "sigma"))
+m3Summary <- lapply(coef3, sumMC, qnts = qnts) %>% summRename %>%
+    mutate(model = "M3")
+allSummary <- bind_rows(m0Summary, m1Summary, m2Summary, m3Summary)
+ords <- unique(m3Summary$coef)
+inds <- which(ords == "betaMidTrips")
+ords <- c(ords[1:inds], "betaHullSA", ords[(inds+1):length(ords)])
+allSummary <- allSummary %>%
+    mutate(coef = factor(coef, levels = rev(ords)))
+labs <- c("nu" = expression(nu),
+          "mu" = expression(mu),
+          "betaLoc1" = expression(beta[1]^{L}),
+          "betaLoc2" = expression(beta[2]^{L}),
+          "betaLoc3" = expression(beta[3]^{L}),
+          "betaDays1" = expression(beta^{d1}),
+          "betaDays2" = expression(beta^{d2}),
+          "betaMidTrips" = expression(beta^{m}),
+          "betaHullSA" = expression(beta^{h}),
+          "betaPaint1" = expression(beta[1]^{P}),
+          "betaPaint2" = expression(beta[2]^{P}),
+          "betaPaint3" = expression(beta[3]^{P}),
+          "betaType1" = expression(beta[1]^{T}),
+          "betaType2" = expression(beta[2]^{T}),
+          "betaType3" = expression(beta[3]^{T}),
+          "betaDaysType1" = expression(beta[1]^{DT}),
+          "betaDaysType2" = expression(beta[2]^{DT}),
+          "betaDaysType3" = expression(beta[3]^{DT}),
+          "betaTripsType1" = expression(beta[1]^{MT}),
+          "betaTripsType2" = expression(beta[2]^{MT}),
+          "betaTripsType3" = expression(beta[3]^{MT}),
+          "betaTripsPaint1" = expression(beta[1]^{MP}),
+          "betaTripsPaint2" = expression(beta[2]^{MP}),
+          "betaTripsPaint3" = expression(beta[3]^{MP}),
+          "sigma_alphaBoat" = expression(sigma[alpha]),
+          "sigma" = expression(sigma))
+plSummary <- ggplot(allSummary, aes(x = coef, y = med, ymin = low5,
+                                    ymax = high95, colour = model)) +
+    geom_pointrange(aes(ymin = low25, ymax = high75),
+                    position = position_dodge(width = 1.0), fatten = 0.75,
+                    size = 1, show.legend = FALSE) +
+    geom_pointrange(position = position_dodge(width = 1.0), fatten = 0.5) +
+    coord_flip() +
+    xlab("Variable") +
+    ylab("Value") +
+    scale_x_discrete(labels = labs) +
+    scale_colour_brewer(palette = "Dark2", name = "Model") +
+    theme(legend.position = "bottom")
+ggsave("../graphics/plSummary-var-bayes.pdf", plSummary, width = 3.5)
+plSummary
+
+```
+
+# Outdated
+
+This section is now outdated (2017-10-09); the candidate predictors for interactions above look reasonably good, and fit in with theory, so we'll stop here.
 
 ## Restricted model form
 
@@ -227,18 +532,18 @@ where $\text{days1vesselType1}_{i},\text{days1vesselType2}_{i}$ are the interact
 
 The output below provides a summary of the estimates from M4, with the figure showing the marginal effects of the `days1:boatType` interaction, and the `days2` marginal effect (adjusted for vessel type in the plot).
 
-```{r}
-m4 <- readRDS("../data/censored-mle-m4-robust.rds")
+```{r m4,cache=TRUE,eval=FALSE}
+m4 <- readRDS("../data/censored-mle-m4-t-var-bayes.rds")
 m4ll <- extract_log_lik(m4)
-m4loo <- loo(m4ll)
+m4loo <- loo::loo(m4ll)
 print(m4, digits = 2, include = FALSE,
       par = c("alphaBoat", "muHat", "muHatCens", "log_lik", "alphaHat",
               "y_ppc", "y_lower"))
 
 ```
 
-```{r}
-a4 <- extract(m4, "alphaBoat")$alphaBoat
+```{r,eval=FALSE}
+a4 <- extract(m4, "alphaHat")$alphaHat
 a4Sum <- t(apply(a4, 2, quantile, probs = c(0.1, 0.5, 0.9)))
 a4Dat <- tibble(low = a4Sum[,1], mid = a4Sum[,2], high = a4Sum[,3],
                 boatID = 1:nrow(a4Sum))
@@ -275,13 +580,12 @@ print(pl)
 
 ```
 
-```{r}
-biofouling <- readRDS("../data/biofouling.rds")
+```{r,eval=FALSE}
 nC <- sum(biofouling$boatID %in% which(a4Sum[,2] < -5))
 
 ```
 
-As in all model output previously, there are some large (negative) effects estimated for the vessel-level intercepts of three vessels. These vessels had a total of `r nC` wet weight biomass measurements taken, all of them under the limit of detection. The model appears to be doing a good job at estimating this in the vessel-level intercepts.
+As in all model output previously, there are some large (negative) effects estimated for the vessel-level intercepts of three vessels. These vessels had a total of `nC` wet weight biomass measurements taken, all of them under the limit of detection. The model appears to be doing a good job at estimating this in the vessel-level intercepts.
 
 <p>
   <br><br><br>

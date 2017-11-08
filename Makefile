@@ -1,6 +1,5 @@
-# Time-stamp: <2017-05-12 16:46:27 (slane)>
-.PHONY: all models robust-models input-data output-data robust-output-data \
-	ROBUST-PROC-DATA PROC-DATA robust-processed-data processed-data \
+# Time-stamp: <2017-11-05 23:03:12 (overlordR)>
+.PHONY: all input-data models output-VB output-MCMC \
 	paper supplement \
 	clean-models clean-manuscripts clobber
 
@@ -11,185 +10,86 @@ all: manuscripts/censored-mle.html \
 
 .INTERMEDIATES: manuscripts/censored-mle.tex
 
+input-data: data/imputations.rds
+
 models: stan/censored-mle-m0.rds \
 	stan/censored-mle-m1.rds \
 	stan/censored-mle-m2.rds \
 	stan/censored-mle-m3.rds \
-	stan/censored-mle-m4.rds
+	stan/censored-mle-m0-t.rds \
+	stan/censored-mle-m1-t.rds \
+	stan/censored-mle-m2-t.rds \
+	stan/censored-mle-m3-t.rds
 
-robust-models: stan/censored-mle-m0-robust.rds \
-	stan/censored-mle-m1-robust.rds \
-	stan/censored-mle-m2-robust.rds \
-	stan/censored-mle-m3-robust.rds \
-	stan/censored-mle-m4-robust.rds
+output-VB: data/censored-mle-m0-var-bayes.rds \
+	data/censored-mle-m1-var-bayes.rds \
+	data/censored-mle-m2-var-bayes.rds \
+	data/censored-mle-m3-var-bayes.rds \
+	data/censored-mle-m0-t-var-bayes.rds \
+	data/censored-mle-m1-t-var-bayes.rds \
+	data/censored-mle-m2-t-var-bayes.rds \
+	data/censored-mle-m3-t-var-bayes.rds
 
-input-data: data/biofouling.rds data/imputations.rds
-
-output-data: data/censored-mle-m0.rds \
+output-MCMC: data/censored-mle-m0.rds \
 	data/censored-mle-m1.rds \
 	data/censored-mle-m2.rds \
 	data/censored-mle-m3.rds \
-	data/censored-mle-m4.rds
-
-robust-output-data: data/censored-mle-m0-robust.rds \
-	data/censored-mle-m1-robust.rds \
-	data/censored-mle-m2-robust.rds \
-	data/censored-mle-m3-robust.rds \
-	data/censored-mle-m4-robust.rds
-
-ROBUST-PROC-DATA = graphics/obs-hist.pdf \
-	graphics/imp-days1.pdf \
-	graphics/imp-trips.pdf \
-	graphics/imp-paint.pdf \
-	graphics/plM1boat-robust.pdf \
-	graphics/plM1paint-robust.pdf \
-	graphics/plM3boat-robust.pdf \
-	graphics/plM3paint-robust.pdf \
-	graphics/plM4Type-robust.pdf \
-	graphics/plSummary-robust.pdf \
-	data/looic-robust.rds \
-	data/diffs.rds
-
-PROC-DATA = graphics/plM1boat.pdf \
-	graphics/plM1paint.pdf \
-	graphics/plM3boat.pdf \
-	graphics/plM3paint.pdf \
-	graphics/plM4Type.pdf \
-	graphics/plSummary.pdf \
-	data/looic.rds
-
-robust-processed-data: $(ROBUST-PROC-DATA)
-
-processed-data: $(PROC-DATA)
+	data/censored-mle-m0-t.rds \
+	data/censored-mle-m1-t.rds \
+	data/censored-mle-m2-t.rds \
+	data/censored-mle-m3-t.rds
 
 # Defaults for number of multiply imputed datasets and HMC iterations if not
 # passed via cmdline.
 NUMMI?=50
-MCITER?=2000
+MCITER?=4000
 
 ################################################################################
 # Make data for feeding into models and manuscript
-data/imputations.rds data/biofouling.rds: scripts/data-cleaning.R \
+data/imputations.rds: scripts/data-cleaning.R \
 	data-raw/samples.csv data-raw/vessel.csv
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F) numMI=$(NUMMI)
 
 ################################################################################
-# Rules for making stan models
-stan/censored-mle-m0.rds: scripts/compile-model.R stan/censored-mle-m0.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m0-robust.rds: scripts/compile-model.R \
-	stan/censored-mle-m0-robust.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m1.rds: scripts/compile-model.R stan/censored-mle-m1.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m1-robust.rds: scripts/compile-model.R \
-	stan/censored-mle-m1-robust.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m2.rds: scripts/compile-model.R stan/censored-mle-m2.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m2-robust.rds: scripts/compile-model.R \
-	stan/censored-mle-m2-robust.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m3.rds: scripts/compile-model.R stan/censored-mle-m3.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m3-robust.rds: scripts/compile-model.R \
-	stan/censored-mle-m3-robust.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m4.rds: scripts/compile-model.R stan/censored-mle-m4.stan
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
-
-stan/censored-mle-m4-robust.rds: scripts/compile-model.R \
-	stan/censored-mle-m4-robust.stan
+# Rule for making stan models
+stan/%.rds: scripts/compile-model.R stan/%.stan
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds)
 
 ################################################################################
-# Rules to fit models with data
-data/censored-mle-m0.rds: scripts/fit-model.R \
-	stan/censored-mle-m0.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=737 iter=$(MCITER)
+# Rules to fit variational bayes models
+data/censored-mle-%-var-bayes.rds: stan/censored-mle-%.rds \
+	scripts/fit-model-vb.R data/imputations.rds
+	cd scripts; \
+	Rscript --no-save --no-restore fit-model-vb.R \
+		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
 
-data/censored-mle-m0-robust.rds: scripts/fit-model.R \
-	stan/censored-mle-m0-robust.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=737 iter=$(MCITER)
+################################################################################
+# Rules to fit mcmc models
+data/censored-mle-%.rds: stan/censored-mle-%.rds \
+	scripts/fit-model.R data/imputations.rds
+	cd scripts; \
+	Rscript --no-save --no-restore fit-model.R \
+		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
 
-data/censored-mle-m1.rds: scripts/fit-model.R \
-	stan/censored-mle-m1.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=666 iter=$(MCITER)
-
-data/censored-mle-m1-robust.rds: scripts/fit-model.R \
-	stan/censored-mle-m1-robust.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=666 iter=$(MCITER)
-
-data/censored-mle-m2.rds: scripts/fit-model.R \
-	stan/censored-mle-m2.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=42 iter=$(MCITER)
-
-data/censored-mle-m2-robust.rds: scripts/fit-model.R \
-	stan/censored-mle-m2-robust.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=42 iter=$(MCITER)
-
-data/censored-mle-m3.rds: scripts/fit-model.R \
-	stan/censored-mle-m3.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=13 iter=$(MCITER)
-
-data/censored-mle-m3-robust.rds: scripts/fit-model.R \
-	stan/censored-mle-m3-robust.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=13 iter=$(MCITER)
-
-data/censored-mle-m4.rds: scripts/fit-model.R \
-	stan/censored-mle-m4.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=987 iter=$(MCITER)
-
-data/censored-mle-m4-robust.rds: scripts/fit-model.R \
-	stan/censored-mle-m4-robust.rds data/imputations.rds
-	cd $(<D); \
-	Rscript --no-save --no-restore $(<F) mname=$(basename $(@F) .rds) \
-		myseed=987 iter=$(MCITER)
+data/censored-mle-%-t.rds: stan/censored-mle-%-t.rds \
+	scripts/fit-model.R data/imputations.rds
+	cd scripts; \
+	Rscript --no-save --no-restore fit-model.R \
+		mname=$(basename $(<F) .rds) myseed=737 iter=$(MCITER)
 
 ################################################################################
 # Rules to process data (add dependencies later).
-$(ROBUST-PROC-DATA): scripts/post-process-robust.R robust-output-data input-data
+data/looic-compare.rds: scripts/post-process-compare.R output-VB
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
 
-$(PROC-DATA): scripts/post-process.R output-data
+data/looic-compare-full.rds: scripts/post-process-compare-full.R output-MCMC
+	cd $(<D); \
+	Rscript --no-save --no-restore $(<F)
+
+data/diffs.rds: scripts/post-process-t.R data/censored-mle-m3-t.rds
 	cd $(<D); \
 	Rscript --no-save --no-restore $(<F)
 
@@ -201,7 +101,7 @@ manuscripts/censored-mle.html: manuscripts/censored-mle.Rmd \
 	Rscript --no-save --no-restore -e "rmarkdown::render('$(<F)')"
 
 manuscripts/model-interrogation.html: manuscripts/model-interrogation.Rmd \
-	robust-output-data
+	output-VB
 	cd $(<D); \
 	Rscript --no-save --no-restore -e "rmarkdown::render('$(<F)')"
 

@@ -2,14 +2,15 @@
 args <- commandArgs(trailingOnly = TRUE)
 ################################################################################
 ################################################################################
-## Title: Fit model
+## Title: Fit model (VB)
 ## Author: Steve Lane
 ## Date: Friday, 21 April 2017
-## Time-stamp: <2017-11-06 02:42:36 (overlordR)>
+## Time-stamp: <2017-11-06 02:42:20 (overlordR)>
 ## Synopsis: Script that drives the censored regression model. Designed to be
 ## called from the Makefile, it requires the model name, a seed for rng, and
 ## number of iterations to be set on the command line, or prior to sourcing the
 ## script.
+## This particular version runs a variational bayes sampler for speed.
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 2:3)){
@@ -18,7 +19,7 @@ if(!(length(args) %in% 2:3)){
 } else {
     if(length(args) == 2){
         ## Default if option not specified
-        iter <- 2000
+        iter <- 1000
     }
     hasOpt <- grepl("=", args)
     argLocal <- strsplit(args[hasOpt], "=")
@@ -42,12 +43,7 @@ ipak(packages)
 rstan_options(auto_write = TRUE)
 ## Want cores to be one, we're only running one chain, then combining. Each
 ## imputation will be sent out via mclapply.
-cores <- round(parallel::detectCores()/2)
-if (cores > 10) {
-    options(mc.cores = 10)
-} else {
-    options(mc.cores = cores)
-}
+options(mc.cores = round(parallel::detectCores()/2))
 model <- stan_model(paste0("../stan/", mname, ".stan"))
 ## Load data
 impList <- readRDS("../data/imputations.rds")
@@ -60,13 +56,19 @@ newStan <- with(
 )
 set.seed(myseed)
 out <- mclapply(impList, function(dat){
-    locMod <- sampling(model, data = c(dat$stanData, newStan), iter = iter,
-                       chains = 1, cores = 1, open_progress = FALSE,
-                       control = list(adapt_delta = 0.99))
+    locMod <- try(vb(model, data = c(dat$stanData, newStan), elbo_samples = 250,
+                     adapt_iter = 100, grad_samples = 2, tol_rel_obj = 1e-3))
     locMod
 })
-outname <- paste0("../data/", mname, ".rds")
-output <- sflist2stanfit(out)
+keep <- sapply(out, function(x) {
+    if(inherits(x, "try-error")) {
+        return(FALSE)
+    } else {
+        return(TRUE)
+    }
+})
+outname <- paste0("../data/", mname, "-var-bayes.rds")
+output <- sflist2stanfit(out[keep])
 saveRDS(output, file = outname)
 ################################################################################
 ################################################################################

@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // No boat-level predictors.
-// Time-stamp: <2017-05-02 11:55:00 (slane)>
+// Time-stamp: <2017-11-02 22:02:49 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,11 +16,11 @@ data{
   int<lower=1> N;
   /* Number of (censored) observations */
   int<lower=1> nCens;
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
   /* Boat random effect */
   int<lower=1> numBoat;
   int<lower=1,upper=numBoat> boatID[N];
@@ -31,14 +31,24 @@ data{
   real<upper=min(Y)> U;
 }
 
+transformed data{
+  real logY[N];
+  real logU;
+  for(n in 1:N){
+    logY[n] = log(Y[n]);
+  }
+  logU = log(U);
+}
+
 parameters{
   // Parameters for the model
   /* Intercept */
   real mu;
-  /* Betas for categorical indicators */
-  vector[numLoc - 1] betaLoc;
-  /* Alphas for modelled random effect */
-  vector[numBoat] alphaBoat;
+  /* Raw betas for categorical indicators */
+  vector[numLoc] locRaw;
+  /* Raw alphas for modelled random effect */
+  vector[numBoat] alphaRaw;
+  real<lower=0> sigmaLoc;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
   /* Error */
@@ -46,34 +56,42 @@ parameters{
 }
 
 transformed parameters{
-  // Make it easier for some sampling statements (not necessary)
-    /* Regression for observed data */
+  /* Location intercept */
+  vector[numLoc] betaLoc;
+  /* Boat intercept */
+  vector[numBoat] alphaBoat;
+  /* Regression for observed data */
   vector[N] muHat;
   /* Regression for censored data */
   vector[nCens] muHatCens;
+  betaLoc = sigmaLoc * locRaw;
+  alphaBoat = sigma_alphaBoat * alphaRaw;
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaBoat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaBoat[boatIDCens[j]];
   }
 }
 
 model{
   // Model sampling statements
-  /* Priors for categorical indicators */
-  betaLoc ~ student_t(3, 0, 1);
-  /* Priors for modelled random effect */
+  /* Prior for intercept */
   mu ~ normal(0, 5);
+  /* Priors for categorical indicators */
+  sigmaLoc ~ cauchy(0, 2.5);
+  locRaw ~ student_t(3, 0, 1);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ cauchy(0, sigma_alphaBoat);
+  alphaRaw ~ student_t(3, 0, 1);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Observed log-likelihood */
-  Y ~ lognormal(muHat, sigma);
+  for(i in 1:N){
+    target += normal_lpdf(logY[i] | muHat[i], sigma);
+  }
   /* Censored log-likelihood */
   for(i in 1:nCens){
-    target += lognormal_lcdf(U | muHatCens[i], sigma);
+    target += normal_lcdf(logU | muHatCens[i], sigma);
   }
 }
 
@@ -83,11 +101,11 @@ generated quantities{
   /* Replications for posterior predictive checks */
   vector[N + nCens] y_ppc;
   for(i in 1:N){
-    log_lik[i] = lognormal_lpdf(Y[i] | muHat[i], sigma);
-    y_ppc[i] = lognormal_rng(muHat[i], sigma);
+    log_lik[i] = normal_lpdf(logY[i] | muHat[i], sigma);
+    y_ppc[i] = normal_rng(muHat[i], sigma);
   }
   for(j in 1:nCens){
-    log_lik[N + j] = lognormal_lcdf(U | muHatCens[j], sigma);
-    y_ppc[N + j] = lognormal_rng(muHatCens[j], sigma);
+    log_lik[N + j] = normal_lcdf(logU | muHatCens[j], sigma);
+    y_ppc[N + j] = normal_rng(muHatCens[j], sigma);
   }
 }

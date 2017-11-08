@@ -6,7 +6,7 @@
 // Synopsis: Sampling statements to fit a regression with censored outcome data.
 // Includes boat-level intercept, and observation level location ID.
 // Adds in some interactions terms.
-// Time-stamp: <2017-05-02 11:56:00 (slane)>
+// Time-stamp: <2017-11-02 22:18:14 (overlordR)>
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,23 +22,17 @@ data{
   real days1[numBoat];
   real days2[numBoat];
   real midTrips[numBoat];
-  /* Categorical predictors, entered as matrices of indicators */
-  /* Location of measurement, hull as base case */
+  /* Categorical predictors */
+  /* Location of measurement */
   int<lower=1> numLoc;
-  matrix[N, numLoc - 1] locID;
-  matrix[nCens, numLoc - 1] locIDCens;
-  /* Paint type, ablative as base case */
+  int<lower=1,upper=numLoc> locID[N];
+  int<lower=1,upper=numLoc> locIDCens[nCens];
+  /* Paint type */
   int<lower=1> numPaint;
-  matrix[numBoat, numPaint - 1] paintType;
-  /* Boat type, yacht as base case */
+  int<lower=1,upper=numPaint> paintType[numBoat];
+  /* Boat type */
   int<lower=1> numType;
-  matrix[numBoat, numType - 1] boatType;
-  /* Days1:BoatType interaction */
-  matrix[numBoat, numType - 1] days1boat;
-  /* MidTrips:BoatType interaction */
-  matrix[numBoat, numType - 1] midTripsboat;
-  /* MidTrips:PaintType interaction */
-  matrix[numBoat, numPaint - 1] midTripspaint;
+  int<lower=1,upper=numType> boatType[numBoat];
   /* Boat random effect */
   int<lower=1,upper=numBoat> boatID[N];
   int<lower=1,upper=numBoat> boatIDCens[nCens];
@@ -46,6 +40,15 @@ data{
   real<lower=1.5> Y[N];
   /* Truncated data (brute force, all equal */
   real<upper=min(Y)> U;
+}
+
+transformed data{
+  real logY[N];
+  real logU;
+  for(n in 1:N){
+    logY[n] = log(Y[n]);
+  }
+  logU = log(U);
 }
 
 parameters{
@@ -56,67 +59,100 @@ parameters{
   real betaDays1;
   real betaDays2;
   real betaMidTrips;
-  /* Betas for categorical indicators */
-  vector[numLoc - 1] betaLoc;
-  vector[numPaint - 1] betaPaint;
-  vector[numType - 1] betaType;
-  /* Betas for interaction terms */
-  vector[numType - 1] betaDaysType;
-  vector[numType - 1] betaTripsType;
-  vector[numPaint - 1] betaTripsPaint;
-  /* Alphas for modelled random effect */
-  vector[numBoat] alphaBoat;
+  /* Raw betas for categorical indicators */
+  vector[numLoc] locRaw;
+  vector[numPaint] paintRaw;
+  vector[numType] typeRaw;
+  /* Raw betas for interaction terms */
+  vector[numType] daysTypeRaw;
+  vector[numType] tripsTypeRaw;
+  vector[numPaint] tripsPaintRaw;
+  /* Raw alphas for modelled random effect */
+  vector[numBoat] alphaRaw;
   /* Errors for categorical predictors */
   real<lower=0> sigma_alphaBoat;
+  real<lower=0> sigmaLoc;
+  real<lower=0> sigmaPaint;
+  real<lower=0> sigmaType;
+  /* Errors for interaction terms */
+  real<lower=0> sigmaDaysType;
+  real<lower=0> sigmaTripsType;
+  real<lower=0> sigmaTripsPaint;
   /* Error */
   real<lower=0> sigma;
 }
 
 transformed parameters{
-  // Make it easier for some sampling statements (not necessary)
+  /* Location intercept */
+  vector[numLoc] betaLoc;
+  /* Boat intercept */
+  vector[numBoat] alphaBoat;
+  /* Paint intercept */
+  vector[numPaint] betaPaint;
+  /* Vessel type intercept */
+  vector[numType] betaType;
+  /* days1 by vessel type interaction */
+  vector[numType] betaDaysType;
+  /* midtrips  by vessel type interaction */
+  vector[numType] betaTripsType;
+  /* midtrips by paint type interaction */
+  vector[numPaint] betaTripsPaint;
   /* Regression for observed data */
   vector[N] muHat;
   /* Regression for censored data */
   vector[nCens] muHatCens;
   /* Regression for boat-level intercept */
   vector[numBoat] alphaHat;
+  betaLoc = sigmaLoc * locRaw;
+  betaPaint = sigmaPaint * paintRaw;
+  betaType = sigmaType * typeRaw;
+  betaDaysType = sigmaDaysType * daysTypeRaw;
+  betaTripsType = sigmaTripsType * tripsTypeRaw;
+  betaTripsPaint = sigmaTripsPaint * tripsPaintRaw;
+  alphaBoat = sigma_alphaBoat * alphaRaw;
   for(n in 1:numBoat){
-    alphaHat[n] = betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + paintType[n] * betaPaint + boatType[n] * betaType + days1boat[n] * betaDaysType + midTripsboat[n] * betaTripsType + midTripspaint[n] * betaTripsPaint;
+    alphaHat[n] = alphaBoat[n] + betaDays1 * days1[n] + betaDays2 * days2[n] + betaMidTrips * midTrips[n] + betaPaint[paintType[n]] + betaType[boatType[n]] + betaDaysType[boatType[n]] * days1[n] + betaTripsType[boatType[n]] * midTrips[n] + betaTripsPaint[paintType[n]] * midTrips[n];
   }
   for(i in 1:N){
-    muHat[i] = mu + locID[i] * betaLoc + alphaBoat[boatID[i]];
+    muHat[i] = mu + betaLoc[locID[i]] + alphaHat[boatID[i]];
   }
   for(j in 1:nCens){
-    muHatCens[j] = mu + locIDCens[j] * betaLoc + alphaBoat[boatIDCens[j]];
+    muHatCens[j] = mu + betaLoc[locIDCens[j]] + alphaHat[boatIDCens[j]];
   }
 }
 
 model{
   // Model sampling statements
-  /* Priors for categorical indicators */
-  betaLoc ~ student_t(3, 0, 1);
-  /* Priors for modelled random effect */
+  /* Priors for intercept + continuous */
   mu ~ normal(0, 5);
   betaDays1 ~ student_t(3, 0, 1);
   betaDays2 ~ student_t(3, 0, 1);
   betaMidTrips ~ student_t(3, 0, 1);
   /* Priors for categorical indicators */
-  betaPaint ~ student_t(3, 0, 1);
-  betaType ~ student_t(3, 0, 1);
-  /* Priors for interactions */
-  betaDaysType ~ student_t(3, 0, 1);
-  betaTripsType ~ student_t(3, 0, 1);
-  betaTripsPaint ~ student_t(3, 0, 1);
-  /* Priors for modelled effects */
+  sigmaLoc ~ cauchy(0, 2.5);
+  locRaw ~ student_t(3, 0, 1);
+  sigmaPaint ~ cauchy(0, 2.5);
+  paintRaw ~ student_t(3, 0, 1);
+  sigmaType ~ cauchy(0, 2.5);
+  typeRaw ~ student_t(3, 0, 1);
   sigma_alphaBoat ~ cauchy(0, 2.5);
-  alphaBoat ~ cauchy(alphaHat, sigma_alphaBoat);
+  alphaRaw ~ student_t(3, 0, 1);
+  /* Priors for interactions */
+  sigmaDaysType ~ cauchy(0, 2.5);
+  daysTypeRaw ~ student_t(3, 0, 1);
+  sigmaTripsType ~ cauchy(0, 2.5);
+  tripsTypeRaw ~ student_t(3, 0, 1);
+  sigmaTripsPaint ~ cauchy(0, 2.5);
+  tripsPaintRaw ~ student_t(3, 0, 1);
   /* Prior for observation (model) error */
   sigma ~ cauchy(0, 2.5);
   /* Observed log-likelihood */
-  Y ~ lognormal(muHat, sigma);
+  for(i in 1:N){
+    target += normal_lpdf(logY[i] | muHat[i], sigma);
+  }
   /* Censored log-likelihood */
   for(i in 1:nCens){
-    target += lognormal_lcdf(U | muHatCens[i], sigma);
+    target += normal_lcdf(logU | muHatCens[i], sigma);
   }
 }
 
@@ -126,11 +162,11 @@ generated quantities{
   /* Replications for posterior predictive checks */
   vector[N + nCens] y_ppc;
   for(i in 1:N){
-    log_lik[i] = lognormal_lpdf(Y[i] | muHat[i], sigma);
-    y_ppc[i] = lognormal_rng(muHat[i], sigma);
+    log_lik[i] = normal_lpdf(logY[i] | muHat[i], sigma);
+    y_ppc[i] = normal_rng(muHat[i], sigma);
   }
   for(j in 1:nCens){
-    log_lik[N + j] = lognormal_lcdf(U | muHatCens[j], sigma);
-    y_ppc[N + j] = lognormal_rng(muHatCens[j], sigma);
+    log_lik[N + j] = normal_lcdf(logU | muHatCens[j], sigma);
+    y_ppc[N + j] = normal_rng(muHatCens[j], sigma);
   }
 }

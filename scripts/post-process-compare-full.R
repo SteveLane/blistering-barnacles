@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 11 May 2017
 ## Synopsis: Performs comparison between outcome models.
-## Time-stamp: <2017-10-19 09:21:07 (overlordR)>
+## Time-stamp: <2017-11-05 23:07:37 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -25,22 +25,22 @@ biofoul <- readRDS("../data/biofouling.rds")
 ## Begin Section: looic table for t model
 ################################################################################
 ################################################################################
-m0 <- readRDS("../data/censored-mle-m0-t-var-bayes.rds")
+m0 <- readRDS("../data/censored-mle-m0-t.rds")
 m0ll <- loo::extract_log_lik(m0)
 m0loo <- loo::loo(m0ll)
 message("m0 finished.")
 rm(m0ll)
-m1 <- readRDS("../data/censored-mle-m1-t-var-bayes.rds")
+m1 <- readRDS("../data/censored-mle-m1-t.rds")
 m1ll <- loo::extract_log_lik(m1)
 m1loo <- loo::loo(m1ll)
 message("m1 finished.")
 rm(m1, m1ll)
-m2 <- readRDS("../data/censored-mle-m2-t-var-bayes.rds")
+m2 <- readRDS("../data/censored-mle-m2-t.rds")
 m2ll <- loo::extract_log_lik(m2)
 m2loo <- loo::loo(m2ll)
 message("m2 finished.")
 rm(m2, m2ll)
-m3 <- readRDS("../data/censored-mle-m3-t-var-bayes.rds")
+m3 <- readRDS("../data/censored-mle-m3-t.rds")
 m3ll <- loo::extract_log_lik(m3)
 m3loo <- loo::loo(m3ll)
 message("m3 finished.")
@@ -64,21 +64,25 @@ message("Finished t section.")
 ## Begin Section: looic for normal model
 ################################################################################
 ################################################################################
-m0N <- readRDS("../data/censored-mle-m0-var-bayes.rds")
+m0N <- readRDS("../data/censored-mle-m0.rds")
 m0Nll <- loo::extract_log_lik(m0N)
 m0Nloo <- loo::loo(m0Nll)
+message("m0 finished.")
 rm(m0Nll)
-m1N <- readRDS("../data/censored-mle-m1-var-bayes.rds")
+m1N <- readRDS("../data/censored-mle-m1.rds")
 m1Nll <- loo::extract_log_lik(m1N)
 m1Nloo <- loo::loo(m1Nll)
+message("m1 finished.")
 rm(m1N, m1Nll)
-m2N <- readRDS("../data/censored-mle-m2-var-bayes.rds")
+m2N <- readRDS("../data/censored-mle-m2.rds")
 m2Nll <- loo::extract_log_lik(m2N)
 m2Nloo <- loo::loo(m2Nll)
+message("m2 finished.")
 rm(m2N, m2Nll)
-m3N <- readRDS("../data/censored-mle-m3-var-bayes.rds")
+m3N <- readRDS("../data/censored-mle-m3.rds")
 m3Nll <- loo::extract_log_lik(m3N)
 m3Nloo <- loo::loo(m3Nll)
+message("m3 finished.")
 rm(m3Nll)
 looTabN <- as.data.frame(compare(m0Nloo, m1Nloo, m2Nloo, m3Nloo)) %>%
     mutate(mID = rownames(.))
@@ -111,7 +115,7 @@ diffs <- rbind(
 compTab <- left_join(compTab, diffs)
 compTab$elpd_diff <- 2*compTab$elpd_diff
 compTab$se <- sqrt(2)*compTab$se
-saveRDS(compTab, "../data/looic-compare.rds")
+saveRDS(compTab, "../data/looic-compare-full.rds")
 ################################################################################
 ################################################################################
 
@@ -157,7 +161,7 @@ plPPC <- ggplot(allPPC, aes(x = value)) +
     ylab("Count") +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank())
-ggsave("../graphics/ppc-compare-m0.pdf", plPPC)
+ggsave("../graphics/ppc-compare-m0-full.pdf", plPPC)
 ################################################################################
 ################################################################################
 
@@ -198,6 +202,6 @@ plPPC <- ggplot(allPPC, aes(x = value)) +
     ylab("Count") +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank())
-ggsave("../graphics/ppc-compare-m3.pdf", plPPC)
+ggsave("../graphics/ppc-compare-m3-full.pdf", plPPC)
 ################################################################################
 ################################################################################

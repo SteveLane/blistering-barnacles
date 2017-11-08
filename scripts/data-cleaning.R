@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## Date: Wednesday, 08 March 2017
 ## Synopsis: Cleans data for manuscript and model fitting, and performs
 ## imputation on the vessel level.
-## Time-stamp: <2017-05-02 11:41:53 (slane)>
+## Time-stamp: <2017-11-08 00:13:41 (overlordR)>
 ################################################################################
 ################################################################################
 if(!(length(args) %in% 0:1)){
@@ -33,8 +33,10 @@ if(!(length(args) %in% 0:1)){
 }
 ## Add github packages using gitname/reponame format
 source("../scripts/imputation-functions.R")
-packages <- c("dplyr", "mice", "parallel")
+packages <- c("dplyr", "mice")
 ipak(packages)
+## Turn off messages
+options(warn = -1, verbose = FALSE)
 samplesdata <- read.csv("../data-raw/samples.csv")
 ## Bring in vessel data as well.
 vessels <- read.csv("../data-raw/vessel.csv")
@@ -74,27 +76,81 @@ data <- left_join(
         boatType = as.factor(boatType),
         LocID = recode(LocID,
                        "HA" = "Hull", "HP" = "Keel", "PJ" = "Rudder"),
-        LocID = as.factor(LocID),
+        LocID = factor(LocID),
         cens = ifelse(wetWeight < 1.5, 1, 0),
         paintType = as.factor(paintType)
     )
-## Data for imputations/modelling
-impData <- data %>% select(-samLoc, -cens, -LocID)
-## Level 1 data
-lvl1Data <- data %>% select(boatID, wetWeight, LocID, cens)
+## Boat ID 24 has ridiculously high wet weights, as does 36 in the rudder
+## locations. Remove 24 completely, and the bad 36 observations. Relabel boatID
+## for future use.
+data <- data %>%
+    filter(wetWeight <= 1000) %>%
+    mutate(boatIDOld = boatID,
+           boatID = ifelse(boatID > 24, boatID - 1, boatID))
 ## Loop to create multiple imputations - give a loop as I want to start each
 ## imputation off with a random draw from a U(0, 1.5) for the censored data just
 ## to inject a little randomness into it.
-## Create numMI imputations, join to full data, and also create stan data
-set.seed(787, "L'Ecuyer")
-impList <- mclapply(1:numMI, function(i){
-    imp <- lvl2Imp(impData)
+## Create numMI imputations, join to full data, and also create stan data.
+## Furthermore, I need indicators for categorical values, so probably easiest to
+## create a series of lookup tables.
+locLookup <- data_frame(
+    LocID = levels(data$LocID),
+    LocIDInt = seq_len(length(LocID))
+)
+boatLookup <- data_frame(
+    boatType = levels(data$boatType),
+    boatTypeInt = seq_len(length(boatType))
+)
+paintLookup <- data_frame(
+    paintType = levels(data$paintType),
+    paintTypeInt = seq_len(length(paintType))
+)
+## Data for imputations/modelling
+impData <- data %>% select(-samLoc, -cens, -LocID)
+## Level 1 data
+lvl1Data <- data %>%
+    left_join(., locLookup, by = "LocID") %>%
+    select(boatID, wetWeight, LocIDInt, cens)
+set.seed(13)
+impList <- lapply(1:numMI, function(i){
+    imp <- lvl2Imp(impData) %>%
+        left_join(., boatLookup, by = "boatType") %>%
+        left_join(., paintLookup, by = "paintType") %>%
+        select(-boatType, -paintType)
     stanData <- createStanData(lvl1Data, imp)
     list(lvl2 = imp, stanData = stanData)
 })
-## Save as rds for further use.
+data <- data %>%
+    left_join(., locLookup, by = "LocID") %>%
+    left_join(., boatLookup, by = "boatType") %>%
+    left_join(., paintLookup, by = "paintType")
+################################################################################
+################################################################################
+
+################################################################################
+################################################################################
+## Begin Section: Create newdata for predictions
+################################################################################
+################################################################################
+## Days2 at 0, 3, and 6 months.
+subData <- data %>% select(boatID, days2) %>% distinct(boatID, .keep_all = TRUE)
+newData <- expand.grid(
+    days2 = c(0, (365/4) / sd(subData$days2, na.rm = TRUE),
+    (365/2) / sd(subData$days2, na.rm = TRUE)),
+    locIDInt = 1:3, paintTypeInt = 1:3, boatTypeInt = 1:3) %>%
+    mutate(days1 = 0, midTrips = 0, hullSA = 0)
+################################################################################
+################################################################################
+
+################################################################################
+################################################################################
+## Begin Section: Save as rds for further use.
+################################################################################
+################################################################################
 if(!dir.exists("../data/")) dir.create("../data/")
 saveRDS(data, file = "../data/biofouling.rds")
 saveRDS(impList, file = "../data/imputations.rds")
+saveRDS(impList[1:10], file = "../data/imputations-short.rds")
+saveRDS(newData, file = "../data/newData.rds")
 ################################################################################
 ################################################################################
