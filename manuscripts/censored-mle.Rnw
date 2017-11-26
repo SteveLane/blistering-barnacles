@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 10:06:07 (slane)>
+% Time-stamp: <2017-11-27 10:07:19 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -253,7 +253,7 @@ pattern <- data_frame(
 
 @
 
-There is missing data at the vessel-level; Table~\ref{tab:miss} displays the observed data pattern, shown as (Days since last used, Paint type, Days since last trip), where a 1 denotes the variable is observed, and a 0 denotes the variable is missing. For example, Table~\ref{tab:miss} shows there are \Sexpr{rownames(miss)[1]} observations with complete vessel-level data, and 1 observation that is missing all measurements of days since last used, paint type, and days since last trip.
+There is missing data at the vessel level; Table~\ref{tab:miss} displays the observed data pattern, shown as (Days since last used, Paint type, Days since last trip), where a 1 denotes the variable is observed, and a 0 denotes the variable is missing. For example, Table~\ref{tab:miss} shows there are \Sexpr{rownames(miss)[1]} observations with complete vessel-level data, and 1 observation that is missing all measurements of days since last used, paint type, and days since last trip.
 
 <<missingness-table,results="asis">>=
 latex(pattern, file = "",
