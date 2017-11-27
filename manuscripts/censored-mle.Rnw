@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 11:25:12 (slane)>
+% Time-stamp: <2017-11-27 11:38:42 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -276,7 +276,7 @@ As all missing data was at the vessel-level, we used the median wet weight of bi
 
 To perform inference, we follow the advice of \citet{Zhou2010-pc} and mix the draws from the posterior distributions from the analysis of each completed dataset\footnote{The alternative would be to combine posterior estimates of summary parameters using Rubin's rules \citep{Rubin1996-jc}, which necessarily gives point estimates as opposed to full posterior distributions.}. \citet{Zhou2010-pc} recommend a large number of imputations be used; we generated 50 imputed datasets. For each dataset, 2000 samples were drawn from the posterior after a burn-in of 2000. Convergence was monitored by inspecting the mixed chains across the 50 multiple imputations, and by assessing the Gelman-Rubin statistic \citep{Gelman1992-zo}.
 
-All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; the multilevel models were fit using the RStan interface to stan \citep{Stan_Development_Team2016-xb}, and multiple imputation was performed use the R package mice \citep{Van_Buuren2011-ne}. R code and data to reproduce the analysis may be found at https://github.com/SteveLane/blistering-barnacles.
+All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; the multilevel models were fit using the RStan interface to stan \citep{Stan_Development_Team2016-xb}, and multiple imputation was performed using the R package mice \citep{Van_Buuren2011-ne}. R code and data to reproduce the analysis may be found at https://github.com/SteveLane/blistering-barnacles.
 
 \section{Results}
 \label{sec:results}
@@ -284,22 +284,7 @@ All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; th
 \subsection{Multiple imputation}
 \label{sec:multiple-imputation}
 
-Figure~\ref{fig:imp-cont} displays the observed and imputed vessel-level data for both the number of days since the vessel was last used, and the median number of trips (per year) by the vessel\footnote{Note that all numeric predictors were scaled to have mean 0, standard deviation 1, prior to modelling.}. Figure~\ref{fig:imp-cat} displays the observed and imputed vessel-level type of paint. Both Figures~\ref{fig:imp-cont} and \ref{fig:imp-cat} show that the distribution of imputed data is broadly consistent with the distribution of the observed data.
-
-\begin{figure}[!hbp]
-  \centering
-  \subfloat[Number of days since the vessel was last used.\label{fig:imp-cont-a}]{\includegraphics[width=0.45\linewidth]{../graphics/imp-days1.pdf}}
-  \subfloat[Median number of trips (per year) by the vessel.\label{fig:imp-cont-b}]{\includegraphics[width=0.45\linewidth]{../graphics/imp-trips.pdf}}
-  \caption{Comparison of observed and imputed data for the number of days since the vessel was last used, and the median number of trips by the vessel. The leftmost boxplot in each figure is the observed distribution, all others include the imputed values. Imputation has been successful as the distribution of imputed data is broadly consistent with that of the observed data.}
-  \label{fig:imp-cont}
-\end{figure}
-
-\begin{figure}[!hbp]
-  \centering
-  \includegraphics[width=0.7\linewidth]{../graphics/imp-paint.pdf}
-  \caption{Comparison of observed and imputed data for anti-fouling paint type. A random selection from the imputed datasets are shown. The top-left panel (labelled 0) shows the observed distribution. Imputation has been successful as the distribution of imputed data is broadly consistent with that of the observed data.}
-  \label{fig:imp-cat}
-\end{figure}
+Visual comparison between the observed and imputed data suggests that the imputation procedure has satisfactorily converged, i.e. there was no large discrepancies between the imputed data and the observed. The comparison between observed and imputed data is presented in the Supplemental Material.
 
 \subsection{Outcome model}
 \label{sec:outcome-model}
