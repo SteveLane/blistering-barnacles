@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 12:28:28 (slane)>
+% Time-stamp: <2017-11-27 05:32:15 (overlordR)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -87,11 +87,11 @@ options(digits = 1)
 \modulolinenumbers[3]
 
 \begin{abstract}
-  Invasive marine non indigenous species are a major threat to marine biodiversity. International commercial shipping has long been the major focus of research and government policy, however the role of recreational vessels is beginning to be recognised as an important vector of non indigenous species. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
+  Invasive marine non indigenous species are a major threat to marine biodiversity. Recreational vessels are beginning to be recognised as an important vector of non indigenous species. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
 
-  Biofouling is the most likely pathway for introduction of marin non indigenous species for both commercial and recreational vessels. This paper reports on a statistical analysis of biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet was different depending on the type of vessel. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass was not significant.
+  This paper reports on a statistical analysis of biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet was different depending on the type of vessel. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass per sample unit area was not significant.
 
-  In order to reduce the domestic spread of invasive species, owners of small vessels in particular should be encouraged to maintain a regular cleaning and maintenance schedule, particularly focussing on wet areas of the vessel.
+  In order to reduce the domestic spread of invasive species, owners of small vessels in particular should be encouraged to maintain a regular cleaning and maintenance schedule, and use an appropriate type of antifouling paint.
 \end{abstract}
 
 \section{Introduction}
@@ -310,8 +310,8 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
 
 \begin{figure}[!hbp]
   \centering
-  \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.8\linewidth]{../graphics/plM1boat-full.pdf}} \\
-  \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.8\linewidth]{../graphics/plM1paint-full.pdf}}
+  \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1boat-full.pdf}} \\
+  \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1paint-full.pdf}}
   \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}). The (median) regression lines for each predictor are overlaid.}
   \label{fig:m1-reg}
 \end{figure}
@@ -323,7 +323,9 @@ Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions
 
 Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors used in interaction terms in \eqref{eq:M2}: the number of days since the vessel was last used and the median number of trips (per year) undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from \ref{eq:M2}.
 
-Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vessel was last used varies by vessel type, as does the median number of trips taken by the vessel per year. Figure~\ref{fig:m3-reg-b} further suggests that the effect of the median number of trips taken by the vessel per year varies according to the paint type of the vessel. The uncertainty in these effects is however, large relative the estimates; Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered.
+Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vessel was last used varies by vessel type, as does the median number of trips taken by the vessel per year. Figure~\ref{fig:m3-reg-b} further suggests that the effect of the median number of trips taken by the vessel per year varies according to the paint type of the vessel. The uncertainty in these effects is however, large relative to the estimates.
+
+Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered. As can be seen in Figure~\ref{fig:coefs}, the effect of the number of days since the vessel was last cleaned ($\beta_{d2}$) is clearly larger than 0; the other predictors do not appear to have such a strong effect. Whilst the effect of these predictors is not estimated precisely, the direction and size of the coefficients is similar between models, and as such we choose Model~\eqref{eq:M2} as the final model form in order to estimate the interactions.
 
 \begin{figure}[!hbp]
   \centering
@@ -335,7 +337,7 @@ Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vess
 
 \begin{figure}[!hbp]
   \centering
-  \includegraphics[width=0.45\linewidth]{../graphics/plSummary-t.pdf}
+  \includegraphics[width=0.65\linewidth]{../graphics/plSummary-t.pdf}
   \caption{Estimated coefficients from \ref{eq:M0}--\ref{eq:M2}. Coefficients from each model (where applicable) are shown grouped within coefficient on the y-axis. The median is shown as a point estimate, with 50\% and 90\% credible intervals.}
   \label{fig:coefs}
 \end{figure}
