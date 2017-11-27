@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-08 22:07:49 (overlordR)>
+## Time-stamp: <2017-11-27 03:52:07 (overlordR)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -146,13 +146,16 @@ parsType <- tibble(intercept = rep(intType, 2),
               by = "boatTypeInt") %>%
     rename(`Vessel type` = boatType)
 plM3boat <- ggplot(a3Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                              colour = `Vessel type`)) +
-    geom_pointrange(fatten = 0.5) +
+                              colour = `Vessel type`, shape = `Vessel type`)) +
+    ## geom_pointrange(fatten = 0.5, alpha = 0.5) +
+    geom_linerange(size = 0.5, alpha = 0.5) +
+    geom_point(size = 1.5) +
     facet_wrap(~ type, ncol = 2) +
     geom_abline(aes(slope = slope, intercept = intercept,
                     colour = `Vessel type`),
                 data = parsType) +
-    ylab("Vessel-level intercept") +
+    ylab(expression(paste("Vessel-level intercept, ",
+                          gamma[j],"*"))) +
     xlab("Scaled value") +
     scale_colour_brewer(palette = "Dark2") +
     theme(legend.position = "bottom")
@@ -170,13 +173,16 @@ parsType <- tibble(intercept = intPaint,
     rename(`Paint type` = paintType)
 plM3paint <- ggplot(a3Dat %>% filter(type == "Median number of trips"),
                     aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = `Paint type`)) +
-    geom_pointrange(fatten = 1) +
+                        colour = `Paint type`, shape = `Paint type`)) +
+    ## geom_pointrange(fatten = 1) +
+    geom_linerange(size = 0.5, alpha = 0.5) +
+    geom_point(size = 1.5) +
     facet_wrap(~ type) +
     geom_abline(aes(slope = slope, intercept = intercept,
                     colour = `Paint type`),
                 data = parsType) +
-    ylab("Vessel-level intercept") +
+    ylab(expression(paste("Vessel-level intercept, ",
+                          gamma[j],"*"))) +
     xlab("Scaled value") +
     scale_colour_brewer(palette = "Dark2") +
     guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
