@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 05:53:15 (overlordR)>
+% Time-stamp: <2017-11-27 06:08:17 (overlordR)>
 \documentclass[a4paper,11pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -15,7 +15,7 @@
 \usepackage{units}
 \usepackage{graphicx}
 \usepackage[margin=15pt,font=small,labelfont=bf]{caption}
-\usepackage[backend=biber,style=numeric,natbib=true,url=false,doi=true]{biblatex}
+\usepackage[backend=biber,style=authoryear,natbib=true,url=false,doi=true]{biblatex}
 \addbibresource{biofouling.bib}
 \usepackage{pdflscape}
 \usepackage{verbatim}
@@ -124,7 +124,7 @@ plGeog
 \section{Convergence of Multiple Imputation}
 \label{sec:conv-mult-imput}
 
-Figure~\ref{fig:imp-cont} displays the observed and imputed vessel-level data for both the number of days since the vessel was last used, and the median number of trips (per year) by the vessel\footnote{Note that all numeric predictors were scaled to have mean 0, standard deviation 1, prior to modelling.}. Figure~\ref{fig:imp-cat} displays the observed and imputed vessel-level type of paint. Both Figures~\ref{fig:imp-cont} and \ref{fig:imp-cat} show that the distribution of imputed data is broadly consistent with the distribution of the observed data.
+Figure~\ref{fig:imp-cont} displays the observed and imputed vessel-level data for both the number of days since the vessel was last used, and the median number of trips (per year) by the vessel\footnote{Note that all numeric predictors were scaled to have mean 0, standard deviation 1, prior to modelling.}. Figure~\ref{fig:imp-cat} displays the observed and imputed vessel-level type of paint. Both Figures~\ref{fig:imp-cont} and \ref{fig:imp-cat} show that the distribution of imputed data is broadly consistent with the distribution of the observed data, from which we conclude that the imputation has been successful. Note that in Figure~\ref{fig:imp-cat}, a random subset of imputations has been selected for display due to space limitations.
 
 \begin{figure}[!hbp]
   \centering
@@ -149,23 +149,20 @@ compTab <- readRDS("../data/looic-compare-full.rds")
 
 @ 
 
-The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}. A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M2}) is provided in Appendix~\ref{sec:comp-outc-models}.
+The $t$-distribution observation model (O2) outperform the Normal model (O1). The difference in the leave-one-out information criterion \citep[LOOIC, analogous to AIC, see][]{Vehtari2016-dp} was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model (O2). A full comparison of the observation models for latent-process model (M0)--(M2) is provided in Table~\ref{tab:looic-compare}.
 
-As a further check on model performance we examined if the models produce posterior predictions that are consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row); the specific PPCs are shown in the columns of the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model reproduces data consistent with the median or the proportion of measurements below the limit of detection, but nonetheless \ref{eq:O2} still appears to outperform \ref{eq:O1}. For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model \eqref{eq:O2}.
+As a further check on model performance we examined if the models produce posterior predictions that are consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between (O1, top row) and (O2, bottom row); the specific PPCs are shown in the columns of the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model reproduces data consistent with the median or the proportion of measurements below the limit of detection, but nonetheless (O2) still appears to outperform (O1). For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model (O2).
 
 \begin{figure}[!hbp]
   \centering
   \includegraphics[width=0.9\linewidth]{../graphics/ppc-compare-m0-full.pdf}
-  \caption{Comparison of posterior predictive checks from analysis model \ref{eq:M0} between outcome models \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row). From left to right the panels show posterior predicted histograms of: interquartile range (IQR); median; and the proportion of values below the limit of detection (1.5gm). The vertical lines in each panel show the observed values.}
+  \caption{Comparison of posterior predictive checks from analysis model (M0) between outcome models (O1, top row) and (O2, bottom row). From left to right the panels show posterior predicted histograms of: interquartile range (IQR); median; and the proportion of values below the limit of detection (1.5gm). The vertical lines in each panel show the observed values.}
   \label{fig:postM0}
 \end{figure}
 
-\section{Comparison of Outcome Models \eqref{eq:O1} and \eqref{eq:O2}}
-\label{sec:comp-outc-models}
-
 \begin{table}[!h]
   \centering
-  \caption{LOOIC-based comparison of analysis models \eqref{eq:M0}--\eqref{eq:M2}, for outcome models \eqref{eq:O1} and \eqref{eq:O2}. The model with the smallest LOOIC (M2) is shown first, with subsequent rows ordered by increasing LOOIC (smaller LOOIC values are preferred) within outcome model \eqref{eq:O2}. $\Delta$LOOIC shows the difference in LOOIC between analysis models fit using the outcome models \eqref{eq:O2} and \eqref{eq:O1} (positive values indicate \eqref{eq:O2} fits better); se($\Delta$LOOIC) shows the estimated standard error of the difference. Eff. P gives the estimated effective number of parameters; se(Eff. P) shows its standard error.}
+  \caption{LOOIC-based comparison of analysis models (M0)--(M2), for outcome models (O1) and (O2). The model with the smallest LOOIC (M2) is shown first, with subsequent rows ordered by increasing LOOIC (smaller LOOIC values are preferred) within outcome model (O2). $\Delta$LOOIC shows the difference in LOOIC between analysis models fit using the outcome models (O2) and (O1), positive values indicate (O2) fits better; se($\Delta$LOOIC) shows the estimated standard error of the difference. Eff. P gives the estimated effective number of parameters; se(Eff. P) shows its standard error.}
   \label{tab:looic-compare}
   %\resizebox{\textwidth}{!}{%
     \begin{scriptsize}
@@ -181,7 +178,7 @@ latex(cTab,
       booktabs = TRUE,
       col.just = c("l", rep("r", 6)),
       where = "!h",
-      cgroup = c("", "$t$ outcome model (\\eqref{eq:O2})", "Normal outcome model (\\eqref{eq:O1})"),
+      cgroup = c("", "$t$ outcome model (O2)", "Normal outcome model (O1)"),
       n.cgroup = c(1, 3, 3),
       colheads = c("Model", rep(c("LOOIC", "se(LOOIC)"), 2),
                    "$\\Delta$LOOIC", "se($\\Delta$LOOIC)"))
@@ -191,85 +188,8 @@ latex(cTab,
 \end{scriptsize}
 \end{table}
 
-The outcome model that used the $t$-distribution (O2) clearly outperformed that which used the normal distribution (O1). The difference in the leave-one-out information criterion (LOOIC) is shown in Table~\ref{tab:looic}.
+\clearpage
 
-\begin{landscape}
-\begin{table}[!h]
-  \caption{LOOIC-based comparison of analysis models M0--M4, for outcome models O1 and O2. The model with the smallest LOOIC (M4) is shown first, with subsequent rows ordered by increasing LOOIC (smaller LOOIC values are preferred) within outcome model O2. $\Delta$LOOIC shows the difference in LOOIC between analysis models fit using the outcome models O2 and O1 (positive values indicate O2 fits better); se($\Delta$LOOIC) shows the estimated standard error of the difference. Eff. P gives the estimated effective number of parameters; se(Eff. P) shows its standard error.}
-  \label{tab:looic}
-  %\resizebox{\textwidth}{!}{%
-    \begin{scriptsize}
-<<looic,results="asis",center=TRUE>>=
-compTab <- readRDS("../data/looic-compare.rds")
-latex(compTab %>% select(Model, everything()),
-      center = "none",
-      table.env = FALSE,
-      dig = 3, file = "",
-      rowname = NULL,
-      booktabs = TRUE,
-      col.just = c("l", rep("r", 14)),
-      where = "!h",
-      cgroup = c("", "$t$ outcome model (O2)", "Normal outcome model (O1)"),
-      n.cgroup = c(1, 7, 7),
-      colheads = c("Model", rep(c("LOOIC", "se(LOOIC)", "ELPD", "se(ELPD)",
-                                  "Eff. P", "se(Eff. P)"), 2),
-                   "$\\Delta$LOOIC", "se($\\Delta$LOOIC)"))
-
-@
-%}
-\end{scriptsize}
-\end{table}
-\end{landscape}
-
-\subsection{Regression results}
-\label{sec:regression-results}
-
-\subsubsection{Exploration of candidate interaction terms}
-\label{sec:expl-cand-inter}
-
-Figure~\ref{fig:m1-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the four ordinal predictors: the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area. Figure~\ref{fig:m1-reg-a} shows the vessel-level intercepts coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from M1. In each of the figures, we have used a randomly selected imputed dataset for display.
-
-\begin{figure}
-  \centering
-  \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1boat.pdf}} \\
-  \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1paint.pdf}}
-  \caption{Estimated vessel-level intercepts from M1, plotted against the four ordinal predictors. Regression lines for each predictor are overlaid.}
-  \label{fig:m1-reg}
-\end{figure}
-
-Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last cleaned and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type. There does not appear to be any relationship between the vessel's hull surface area and the vessel-level intercepts. These observations led to the development of M2 (removing the hull surface area predictor) and M3 (including the possible interaction terms).
-
-\subsubsection{Reduction to final model form}
-\label{sec:reduct-final-model}
-
-Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors remaining in M3: the number of days since the vessel was last used and the median number of trips undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from M3.
-
-Figure~\ref{fig:m3-reg-a} is suggestive of an interaction between the number of days since the vessel was last used and the vessel type, however an interaction between the median number of trips undertaken by the vessel and the vessel type or the anti-fouling paint (Figure~\ref{fig:m3-reg-b}) type do not appear likely. These observations led to the development of M4 as the most likely model.
-
-\begin{figure}
-  \centering
-  \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m3-reg-a}]{\includegraphics[width=0.9\linewidth]{../graphics/plM3boat.pdf}} \\
-  \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m3-reg-b}]{\includegraphics[width=0.45\linewidth]{../graphics/plM3paint.pdf}}
-  \caption{Estimated vessel-level intercepts from M3, plotted against the two ordinal predictors with interactions being assessed. Regression lines for each estimated interaction are overlaid.}
-  \label{fig:m3-reg}
-\end{figure}
-
-Figure~\ref{fig:m4-reg} shows the regression estimates from M4, in relation to the estimated vessel-level intercepts. The left panel of Figure~\ref{fig:m4-reg} shows the number of days since the vessel was last used and the vessel-type estimated interaction, and the right panel shows the estimated effect of the number of days since the vessel was last cleaned (adjusted by vessel-type).
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.9\linewidth]{../graphics/plM4type.pdf}
-  \caption{Estimated vessel-level intercepts from M4, plotted against the two ordinal predictors. Regression lines for each estimated regression are overlaid.}
-  \label{fig:m4-reg}
-\end{figure}
-
-Finally, Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.45\linewidth]{../graphics/plSummary.pdf}
-  \caption{Estimated coefficients from M0--M4. Coefficients from each model (where applicable) are shown grouped within coefficient on the y-axis. The median is shown as a point estimate, with 50\% and 90\% intervals.}
-  \label{fig:coefs}
-\end{figure}
+\printbibliography
 
 \end{document}
