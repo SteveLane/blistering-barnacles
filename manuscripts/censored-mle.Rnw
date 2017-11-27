@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 12:17:44 (slane)>
+% Time-stamp: <2017-11-27 12:28:28 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -310,13 +310,13 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
 
 \begin{figure}[!hbp]
   \centering
-  \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1boat-full.pdf}} \\
-  \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1paint-full.pdf}}
-  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Regression lines for each predictor are overlaid.}
+  \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.8\linewidth]{../graphics/plM1boat-full.pdf}} \\
+  \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.8\linewidth]{../graphics/plM1paint-full.pdf}}
+  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}). The (median) regression lines for each predictor are overlaid.}
   \label{fig:m1-reg}
 \end{figure}
 
-Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type.
+Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type. We form this opinion by visual comparison of the scatterplots. For example, the pattern in Figure~\ref{fig:m1-reg-a} suggests that the effect of days since the vessel was last used is negative for fishing vessels and positive for yachts and motor cruiser/other vessels. Similarly, the effect of the median number of trips undertaken by the vessel appears to be positive for fishing vessels, and negative for yachts and motor cruiser/other vessels.
 
 \subsubsection{Final Model Form}
 \label{sec:reduct-final-model}
