@@ -1,4 +1,4 @@
-% Time-stamp: <2017-05-11 15:56:39 (slane)>
+% Time-stamp: <2017-11-27 05:53:15 (overlordR)>
 \documentclass[a4paper,11pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -54,19 +54,20 @@
 
 \DeclareGraphicsExtensions{.pdf,.PDF,.png,.PNG}
 
+\author[1]{Tracey Hollings}
 \author[1]{Stephen E.\ Lane}
 \author[2]{Keith R.\ Hayes}
 \author[1]{Andrew P.\ Robinson}
-\affil[1]{CEBRA, The University of Melbourne}
-\affil[2]{CSIRO}
+\affil[1]{Centre of Excellence for Biosecurity Risk Analysis, The University of Melbourne}
+\affil[2]{Data61, Commonwealth Scientific and Industrial Research Organisation}
 \date{\today}
-\title{Risk factors for fouling biomass: Evidence from small vessels in Australia\\
-{\small{Supplemental results}}}
+\title{Risk Factors for Fouling Biomass: Evidence from Small Vessels in Australia\\
+{\small{Supplemental Material}}}
 
 <<knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide">>=
 ## Add github packages using gitname/reponame format
 source("../scripts/imputation-functions.R")
-packages <- c("dplyr", "tidyr", "ggplot2", "mice", "rstan", "loo", "Hmisc")
+packages <- c("dplyr", "tidyr", "ggplot2", "Hmisc")
 ipak(packages)
 theme_set(theme_bw())
 knitr::opts_chunk$set(cache = FALSE, error = FALSE, warning = FALSE,
@@ -91,13 +92,104 @@ options(digits = 1)
 \section{Introduction}
 \label{sec:introduction}
 
-This document provides supplemental results to the main text, \textit{Risk factors for fouling biomass: Evidence from small vessels in Australia}. In particular, results for the models using the normal outcome distribution are presented.
+This document provides supplemental results to the main text, \textit{Risk Factors for Fouling Biomass: Evidence from Small Vessels in Australia}.
 
-\section{Results}
-\label{sec:results}
+\section{Distribution of Biomass by Geographical Location}
+\label{sec:distr-biom-geogr}
 
-\subsection{Outcome model}
+<<load-biofouling>>=
+biofoulFull <- readRDS("../data/biofouling.rds")
+biofoul <- biofoulFull %>%
+    filter(wetWeight >= 1.5,
+           !(samLoc %in% c("Hobsons Bay Yacht Club",
+                           "Royal Yacht Club of Victoria"))) %>%
+    mutate(logWW = log(wetWeight))
+
+@
+
+As discussed in Section~2.1 of the main paper, data for this paper were collected from five geographical locations. Figure~\ref{fig:geog} shows the measured (log) wet weight of sampled biomass by the geographical location of the vessel. There are no clear differences in the distribution of measured biomass between geographical locations, hence our models (Section~2.2) do not contain an adjustment for geographical location.
+
+<<geog,fig.cap="Measured (log) wet weight (gm) of sampled biomass by geographical location of the vessel. Vessels from the Hobsons Bay Yacht Club (4) and the Royal Yacht Club of Victoria (2) were removed due to the low vessel numbers. Samples that measured less than the limit of detection (1.5gm) have been removed.">>=
+plGeog <- ggplot(biofoul, aes(x = logWW)) +
+    geom_histogram(bins = 11) +
+    facet_wrap(~ samLoc, ncol = 2) +
+    ylab("Count") +
+    xlab("") +
+    theme(panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank())
+plGeog
+
+@ 
+
+\section{Convergence of Multiple Imputation}
+\label{sec:conv-mult-imput}
+
+Figure~\ref{fig:imp-cont} displays the observed and imputed vessel-level data for both the number of days since the vessel was last used, and the median number of trips (per year) by the vessel\footnote{Note that all numeric predictors were scaled to have mean 0, standard deviation 1, prior to modelling.}. Figure~\ref{fig:imp-cat} displays the observed and imputed vessel-level type of paint. Both Figures~\ref{fig:imp-cont} and \ref{fig:imp-cat} show that the distribution of imputed data is broadly consistent with the distribution of the observed data.
+
+\begin{figure}[!hbp]
+  \centering
+  \subfloat[Number of days since the vessel was last used.\label{fig:imp-cont-a}]{\includegraphics[width=0.45\linewidth]{../graphics/imp-days1.pdf}}
+  \subfloat[Median number of trips (per year) by the vessel.\label{fig:imp-cont-b}]{\includegraphics[width=0.45\linewidth]{../graphics/imp-trips.pdf}}
+  \caption{Comparison of observed and imputed data for the number of days since the vessel was last used, and the median number of trips by the vessel. The leftmost boxplot in each figure is the observed distribution, all others include the imputed values. Imputation has been successful as the distribution of imputed data is broadly consistent with that of the observed data.}
+  \label{fig:imp-cont}
+\end{figure}
+
+\begin{figure}[!hbp]
+  \centering
+  \includegraphics[width=0.7\linewidth]{../graphics/imp-paint.pdf}
+  \caption{Comparison of observed and imputed data for anti-fouling paint type. A random selection from the imputed datasets are shown. The top-left panel (labelled 0) shows the observed distribution. Imputation has been successful as the distribution of imputed data is broadly consistent with that of the observed data.}
+  \label{fig:imp-cat}
+\end{figure}
+
+\section{Outcome Model}
 \label{sec:outcome-model}
+
+<<looic-compare>>=
+compTab <- readRDS("../data/looic-compare-full.rds")
+
+@ 
+
+The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}. A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M2}) is provided in Appendix~\ref{sec:comp-outc-models}.
+
+As a further check on model performance we examined if the models produce posterior predictions that are consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row); the specific PPCs are shown in the columns of the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model reproduces data consistent with the median or the proportion of measurements below the limit of detection, but nonetheless \ref{eq:O2} still appears to outperform \ref{eq:O1}. For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model \eqref{eq:O2}.
+
+\begin{figure}[!hbp]
+  \centering
+  \includegraphics[width=0.9\linewidth]{../graphics/ppc-compare-m0-full.pdf}
+  \caption{Comparison of posterior predictive checks from analysis model \ref{eq:M0} between outcome models \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row). From left to right the panels show posterior predicted histograms of: interquartile range (IQR); median; and the proportion of values below the limit of detection (1.5gm). The vertical lines in each panel show the observed values.}
+  \label{fig:postM0}
+\end{figure}
+
+\section{Comparison of Outcome Models \eqref{eq:O1} and \eqref{eq:O2}}
+\label{sec:comp-outc-models}
+
+\begin{table}[!h]
+  \centering
+  \caption{LOOIC-based comparison of analysis models \eqref{eq:M0}--\eqref{eq:M2}, for outcome models \eqref{eq:O1} and \eqref{eq:O2}. The model with the smallest LOOIC (M2) is shown first, with subsequent rows ordered by increasing LOOIC (smaller LOOIC values are preferred) within outcome model \eqref{eq:O2}. $\Delta$LOOIC shows the difference in LOOIC between analysis models fit using the outcome models \eqref{eq:O2} and \eqref{eq:O1} (positive values indicate \eqref{eq:O2} fits better); se($\Delta$LOOIC) shows the estimated standard error of the difference. Eff. P gives the estimated effective number of parameters; se(Eff. P) shows its standard error.}
+  \label{tab:looic-compare}
+  %\resizebox{\textwidth}{!}{%
+    \begin{scriptsize}
+<<looic-compare-table,results="asis",center=TRUE>>=
+cTab <- compTab %>% 
+    select(Model, contains("LOOIC"), elpd_diff, se) %>%
+    filter(Model != "M2")
+latex(cTab,
+      center = "none",
+      table.env = FALSE,
+      dig = 3, file = "",
+      rowname = NULL,
+      booktabs = TRUE,
+      col.just = c("l", rep("r", 6)),
+      where = "!h",
+      cgroup = c("", "$t$ outcome model (\\eqref{eq:O2})", "Normal outcome model (\\eqref{eq:O1})"),
+      n.cgroup = c(1, 3, 3),
+      colheads = c("Model", rep(c("LOOIC", "se(LOOIC)"), 2),
+                   "$\\Delta$LOOIC", "se($\\Delta$LOOIC)"))
+
+@
+%}
+\end{scriptsize}
+\end{table}
 
 The outcome model that used the $t$-distribution (O2) clearly outperformed that which used the normal distribution (O1). The difference in the leave-one-out information criterion (LOOIC) is shown in Table~\ref{tab:looic}.
 
