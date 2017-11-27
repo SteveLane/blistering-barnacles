@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 11:57:35 (slane)>
+% Time-stamp: <2017-11-27 12:17:44 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -194,7 +194,7 @@ latex(vessSumm, file = "",
 
 @ 
 
-\subsection{Statistical analysis}
+\subsection{Statistical Analysis}
 \label{sec:statistical-analysis}
 
 Figure~\ref{fig:obs-weight} shows histograms of the observed wet weight of biomass from the samples. Samples that were below the limit of detection (1.5gm, of which there were \Sexpr{sum(biofoul[['wetWeight']] < 1.5)}) are not shown in this figure. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight; the rows correspond to the sampled locations on each vessel (hull, keel and rudder).
@@ -239,7 +239,7 @@ We subsequently investigated two alternative specifications for the vessel-level
 
 The choice of these regression models was guided by both subject matter/process considerations and graphical exploration of the posterior distribution of the random-effect terms in the latent process models. In particular, we expect there to be interactions between paint type and vessel usage predictors: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not. For more details on the graphical exploration, see Section~\ref{sec:results}.
 
-\subsection{Missing data}
+\subsection{Missing Data}
 \label{sec:missing-data}
 
 <<missingness>>=
@@ -283,12 +283,12 @@ All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; th
 \section{Results}
 \label{sec:results}
 
-\subsection{Multiple imputation}
+\subsection{Multiple Imputation}
 \label{sec:multiple-imputation}
 
 Visual comparison between the observed and imputed data suggests that the imputation procedure has satisfactorily converged, i.e. there was no large discrepancies between the imputed data and the observed. The comparison between observed and imputed data is presented in the Supplemental Material.
 
-\subsection{Outcome model}
+\subsection{Outcome Model}
 \label{sec:outcome-model}
 
 <<looic-compare>>=
@@ -300,10 +300,10 @@ The $t$-distribution observation model \eqref{eq:O2} outperformed the Normal dis
 
 Posterior predictive checks likewise confirmed the superiority of the $t$-distribution observation model. Graphical checks were made using the proportion of posterior predictions that lie below the limit of detection; the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The graphical checks and LOOIC comparisons can be found in full in the Supplmental Material.
 
-\subsection{Regression results}
+\subsection{Regression Results}
 \label{sec:regression-results}
 
-\subsubsection{Exploration of candidate interaction terms}
+\subsubsection{Exploration of Candidate Interaction Terms}
 \label{sec:expl-cand-inter}
 
 Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors --- the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by anti-fouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet-weight from model \ref{eq:M1}, and is based on a randomly-selected imputed dataset for display purposes.
@@ -318,7 +318,7 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
 
 Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type.
 
-\subsubsection{Final model form}
+\subsubsection{Final Model Form}
 \label{sec:reduct-final-model}
 
 Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors used in interaction terms in \eqref{eq:M2}: the number of days since the vessel was last used and the median number of trips (per year) undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from \ref{eq:M2}.
@@ -340,7 +340,7 @@ Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vess
   \label{fig:coefs}
 \end{figure}
 
-\subsubsection{Predictive model comparison}
+\subsubsection{Predictive Model Comparison}
 \label{sec:pred-model-comp}
 
 <<read-looic>>=
