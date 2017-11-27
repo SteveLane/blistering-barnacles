@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 10:26:52 (slane)>
+% Time-stamp: <2017-11-27 11:25:12 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -259,8 +259,8 @@ There is missing data at the vessel level; Table~\ref{tab:miss} displays the obs
 latex(pattern, file = "",
       booktabs = TRUE, rowlabel = NULL, rowname = NULL,
       colheads = c("Observed data pattern", "Count"),
-      collabel.just = c("r", "r"),
-      col.just = c("r", "r"),
+      collabel.just = c("l", "r"),
+      col.just = c("l", "r"),
       where = "!hbp",
       label = "tab:miss",
       caption =
