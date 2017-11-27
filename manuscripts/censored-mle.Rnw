@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 11:42:39 (slane)>
+% Time-stamp: <2017-11-27 11:50:22 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -294,16 +294,9 @@ compTab <- readRDS("../data/looic-compare-full.rds")
 
 @ 
 
-The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}. A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M2}) is provided in Appendix~\ref{sec:comp-outc-models}.
+The $t$-distribution observation model \eqref{eq:O2} outperformed the Normal distribution observation model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}.
 
-As a further check on model performance we examined if the models produce posterior predictions that consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row); the specific PPCs are shown in the columns of the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model reproduces data consistent with the median or the proportion of measurements below the limit of detection, but nonetheless \ref{eq:O2} still appears to outperform \ref{eq:O1}. For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model \eqref{eq:O2}.
-
-\begin{figure}[!hbp]
-  \centering
-  \includegraphics[width=0.9\linewidth]{../graphics/ppc-compare-m0-full.pdf}
-  \caption{Comparison of posterior predictive checks from analysis model \ref{eq:M0} between outcome models \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row). From left to right the panels show posterior predicted histograms of: interquartile range (IQR); median; and the proportion of values below the limit of detection (1.5gm). The vertical lines in each panel show the observed values.}
-  \label{fig:postM0}
-\end{figure}
+Posterior predictive checks likewise confirmed the superiority of the $t$-distribution observation model. Graphical checks were made using the proportion of posterior predictions that lie below the limit of detection; the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The graphical checks and LOOIC comparisons can be found in full in the Supplmental Material.
 
 \subsection{Regression results}
 \label{sec:regression-results}
@@ -416,39 +409,6 @@ Preventing the introduction of invasive organisms is the key to reducing their s
 The authors would like to acknowledge Dr Enamul Kabir for his contribution to earlier analyses that were not a part of this manuscript. AR, SL and TH's contributions were funded in part by the Centre of Excellence for Biosecurity Risk Analysis.
 
 \clearpage
-
-\appendix
-
-\section{Comparison of Outcome Models \eqref{eq:O1} and \eqref{eq:O2}}
-\label{sec:comp-outc-models}
-
-\begin{table}[!h]
-  \centering
-  \caption{LOOIC-based comparison of analysis models \eqref{eq:M0}--\eqref{eq:M2}, for outcome models \eqref{eq:O1} and \eqref{eq:O2}. The model with the smallest LOOIC (M2) is shown first, with subsequent rows ordered by increasing LOOIC (smaller LOOIC values are preferred) within outcome model \eqref{eq:O2}. $\Delta$LOOIC shows the difference in LOOIC between analysis models fit using the outcome models \eqref{eq:O2} and \eqref{eq:O1} (positive values indicate \eqref{eq:O2} fits better); se($\Delta$LOOIC) shows the estimated standard error of the difference. Eff. P gives the estimated effective number of parameters; se(Eff. P) shows its standard error.}
-  \label{tab:looic-compare}
-  %\resizebox{\textwidth}{!}{%
-    \begin{scriptsize}
-<<looic-compare-table,results="asis",center=TRUE>>=
-cTab <- compTab %>% 
-    select(Model, contains("LOOIC"), elpd_diff, se) %>%
-    filter(Model != "M2")
-latex(cTab,
-      center = "none",
-      table.env = FALSE,
-      dig = 3, file = "",
-      rowname = NULL,
-      booktabs = TRUE,
-      col.just = c("l", rep("r", 6)),
-      where = "!h",
-      cgroup = c("", "$t$ outcome model (\\eqref{eq:O2})", "Normal outcome model (\\eqref{eq:O1})"),
-      n.cgroup = c(1, 3, 3),
-      colheads = c("Model", rep(c("LOOIC", "se(LOOIC)"), 2),
-                   "$\\Delta$LOOIC", "se($\\Delta$LOOIC)"))
-
-@
-%}
-\end{scriptsize}
-\end{table}
 
 \printbibliography
 
