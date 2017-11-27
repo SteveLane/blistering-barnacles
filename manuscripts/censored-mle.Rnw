@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 11:38:42 (slane)>
+% Time-stamp: <2017-11-27 11:42:39 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -58,10 +58,10 @@
 \author[1]{Stephen E.\ Lane}
 \author[2]{Keith R.\ Hayes}
 \author[1]{Andrew P.\ Robinson}
-\affil[1]{CEBRA, The University of Melbourne}
-\affil[2]{Data61, CSIRO}
+\affil[1]{Centre of Excellence for Biosecurity Risk Analysis, The University of Melbourne}
+\affil[2]{Data61, Commonwealth Scientific and Industrial Research Organisation}
 \date{\today}
-\title{Risk factors for fouling biomass: Evidence from small vessels in Australia}
+\title{Risk Factors for Fouling Biomass: Evidence from Small Vessels in Australia}
 
 <<knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide">>=
 ## Add github packages using gitname/reponame format
@@ -132,7 +132,7 @@ numSamp <- table(with(biofoul, tapply(boatID, boatID, length)))
 
 @ 
 
-The data used in this paper came from a prospective survey in Australia conducted by the CSIRO's Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, with access and permission gathered from owners via the Bosun and slipway managers at each of the sites.
+The data used in this paper came from a prospective survey in Australia conducted by the Commonwealth Scientific and Industrial Research Organisation's (CSIRO) Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, with access and permission gathered from owners via the Bosun and slipway managers at each of the sites.
 
 Samples were collected from both external and internal surfaces using plastic and metal putty knives. All samples were washed with 0.2$\mu$m filtered seawater, sieved and subsequently weighed using Sartorius BL3100 scales. Due to the unreliability of low wet weight measurements, samples that weighed less than 1.5gm were assigned a biomass of 0.5gm; that is, the lower limit of detection was 1.5gm.
 
