@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Monday, 06 November 2017
 ## Synopsis: Plot marginal random effects to look at interactions.
-## Time-stamp: <2017-11-06 02:44:01 (overlordR)>
+## Time-stamp: <2017-11-27 04:08:08 (overlordR)>
 ################################################################################
 ################################################################################
 rm(list = ls())
@@ -54,12 +54,16 @@ coefs <- tibble(slope = rep(slopes, 3),
               by = "boatTypeInt") %>%
     rename(`Vessel type` = boatType)
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = `Vessel type`)) +
-    geom_pointrange(fatten = 0.5) +
+                        colour = `Vessel type`, shape = `Vessel type`)) +
+    ## geom_pointrange(fatten = 0.5) +
+    geom_linerange(size = 0.5, alpha = 0.5) +
+    geom_point(size = 1.5) +
     facet_wrap(~ type) +
     geom_abline(aes(slope = slope, intercept = intercept,
-                    colour = `Vessel type`), data = coefs) +
-    ylab("Vessel-level intercept") +
+                    colour = `Vessel type`), data = coefs,
+                size = 0.5, alpha = 0.5) +
+    ylab(expression(paste("Vessel-level intercept, ",
+                          gamma[j],"*"))) +
     xlab("Scaled value") +
     scale_colour_brewer(palette = "Dark2") +
     theme_bw(base_size = 7.7) +
@@ -83,12 +87,16 @@ coefs <- tibble(slope = rep(slopes, 3),
               by = "paintTypeInt") %>%
     rename(`Paint type` = paintType)
 pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
-                        colour = `Paint type`)) +
-    geom_pointrange(fatten = 0.5) +
+                        colour = `Paint type`, shape = `Paint type`)) +
+    ## geom_pointrange(fatten = 0.5) +
+    geom_linerange(size = 0.5, alpha = 0.5) +
+    geom_point(size = 1.5) +
     facet_wrap(~ type) +
     geom_abline(aes(slope = slope, intercept = intercept,
-                    colour = `Paint type`), data = coefs) +
-    ylab("Vessel-level intercept") +
+                    colour = `Paint type`), data = coefs,
+                size = 0.5, alpha = 0.5) +
+    ylab(expression(paste("Vessel-level intercept, ",
+                          gamma[j],"*"))) +
     xlab("Scaled value") +
     scale_colour_brewer(palette = "Dark2") +
     theme_bw(base_size = 7.7) +
