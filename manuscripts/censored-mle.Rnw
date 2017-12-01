@@ -1,4 +1,4 @@
-% Time-stamp: <2017-12-01 14:28:33 (slane)>
+% Time-stamp: <2017-12-01 14:31:51 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -298,7 +298,7 @@ compTab <- readRDS("../data/looic-compare-full.rds")
 
 The $t$-distribution observation model \eqref{eq:O2} outperformed the Normal distribution observation model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}.
 
-Posterior predictive checks likewise confirmed the superiority of the $t$-distribution observation model. Graphical checks were made using the proportion of posterior predictions that lie below the limit of detection; the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The graphical checks and LOOIC comparisons can be found in full in the Supplmental Material.
+Posterior predictive checks likewise confirmed the superiority of the $t$-distribution observation model. Graphical checks were made using the proportion of posterior predictions that lie below the limit of detection; the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The graphical checks and LOOIC comparisons can be found in full in the Supplemental Material.
 
 \subsection{Regression Results}
 \label{sec:regression-results}
