@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-27 05:32:15 (overlordR)>
+% Time-stamp: <2017-12-01 14:28:33 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -112,7 +112,7 @@ Characteristics of recreational boats that increase both the rate and extent of 
 
 %Australia is bounded by ocean and therefore has a heavy reliance on shipping for international and domestic trade, and also has a large recreational boating fleet. It is therefore susceptible to the primary introduction and secondary spread of non indigenous species from a range of different vessel types \citep{Piola2012-bf}. More than 250 non-indigenous marine species have been found in Australia and now dominate many inshore communities \citep{Thresher1999-et}. Biodiversity impacts on Australia’s unique marine biota as well as economic losses have been documented following the establishment of non-indigenous marine species.
 
-No movements of vessels are without risk but minimising translocation of species requires a relevant and transparent risk based assessment \citep{Campbell2011-zq}, and these are being investigated in Australia as part of proposed regulatory interventions \citep{Piola2012-bf,Clarke2017-xv}. If specific attributes of small vessels can be identified which increase fouling biomass and therefore facilitate the movement of non indigenous species, then management actions and regulations can be implemented by authorities which could reduce their spread and impacts.
+No movements of vessels are without risk but minimising translocation of species requires a relevant and transparent risk based assessment \citep{Campbell2011-zq}; such assessments have been proposed in Australia as part of regulatory interventions to manage biofouling risk \citep{Piola2012-bf,Clarke2017-xv,Lott2016-nk}. If specific attributes of small vessels can be identified which increase fouling biomass and therefore facilitate the movement of non indigenous species, then management actions and regulations can be implemented by authorities which could reduce their spread and impacts.
 
 This paper investigates the recreational boating vector and aims to identify characteristics of recreational vessels which potentially increase the extent of fouling biomass. We develop predictive tools to estimate the effect of these vessel-level characteristics, including transport and maintenance history, on the biofouling wet weight biomass. Our data comprises samples collected from the hull and niche areas of small vessels from five locations in south-east Australia. While several studies have estimated fouling extent on a measure or index of in-situ fouling cover \citep[e.g.][]{Ashton2006-xw,Brine2013-dz,Floerl2005-nu} this may be the first to link vessel-level characteristics with the complete wet weight fouling biomass of individual vessels and may offer an alternative perspective to determine vessel characteristics which influence fouling extent.
 
