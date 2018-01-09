@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 11:39:36 (slane)>
+% Time-stamp: <2018-01-09 11:44:59 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -134,7 +134,7 @@ numSamp <- table(with(biofoul, tapply(boatID, boatID, length)))
 
 @ 
 
-The data used in this paper came from a prospective survey in Australia conducted by the Commonwealth Scientific and Industrial Research Organisation's (CSIRO) Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, with access and permission gathered from owners via the Bosun and slipway managers at each of the sites.
+The data used in this paper came from a prospective survey in Australia conducted by the Commonwealth Scientific and Industrial Research Organisation's (CSIRO) Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, when pulled out of the water for maintenance; access and permission was gathered from owners via the Bosun and slipway managers at each of the sites.
 
 Samples were collected from both external and internal surfaces using plastic and metal putty knives. All samples were washed with 0.2$\mu$m filtered seawater, sieved and subsequently weighed using Sartorius BL3100 scales. Due to the unreliability of low wet weight measurements, samples that weighed less than 1.5gm were assigned a biomass of 0.5gm; that is, the lower limit of detection was 1.5gm.
 
