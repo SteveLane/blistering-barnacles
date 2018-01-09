@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 13:52:58 (slane)>
+% Time-stamp: <2018-01-09 13:55:36 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -411,7 +411,7 @@ Preventing the introduction of invasive organisms is the key to reducing their s
 \section*{Acknowledgements}
 \label{sec:acknowledgements}
 
-The authors would like to acknowledge Dr Enamul Kabir for his contribution to earlier analyses that were not a part of this manuscript. AR, SL and TH's contributions were funded in part by the Centre of Excellence for Biosecurity Risk Analysis.
+The authors would like to acknowledge Dr Enamul Kabir for his contribution to earlier analyses that were not a part of this manuscript, and to Sandringham College, Melbourne, Victoria, for use of the school's laboratory space to process the samples taken within Melbourne. AR, SL and TH's contributions were funded in part by the Centre of Excellence for Biosecurity Risk Analysis.
 
 \clearpage
 
