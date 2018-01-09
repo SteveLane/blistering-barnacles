@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 13:48:04 (slane)>
+% Time-stamp: <2018-01-09 13:52:58 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -57,9 +57,12 @@
 \author[1]{Tracey Hollings}
 \author[1]{Stephen E.\ Lane}
 \author[2]{Keith R.\ Hayes}
+\author[3]{Felicity R.\ McEnnulty}
+\author[3]{Mark Green}
 \author[1]{Andrew P.\ Robinson}
 \affil[1]{Centre of Excellence for Biosecurity Risk Analysis, The University of Melbourne}
 \affil[2]{Data61, Commonwealth Scientific and Industrial Research Organisation}
+\affil[2]{Oceans and Atmosphere, Commonwealth Scientific and Industrial Research Organisation}
 \date{\today}
 \title{Risk Factors for Fouling Biomass: Evidence from Small Vessels in Australia}
 
