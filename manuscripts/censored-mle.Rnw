@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 12:30:20 (slane)>
+% Time-stamp: <2018-01-09 12:31:57 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -142,7 +142,7 @@ Most vessels were sampled in Hobart, Tasmania, Australia at the \Sexpr{names(loc
 
 Samples were collected from as many as 64 different locations in and around the hull, propeller, rudder and anchor, internal spaces, fishing gear and deck of the vessels. Samples taken from the hull, fixed keel and rudder surface were consistently collected using 0.5m\up{2} quadrats, so these form the focus of our analysis. There were \Sexpr{quads[1]} samples collected from the hull, \Sexpr{quads[2]} from the rudder surface, and \Sexpr{quads[3]} from the fixed keel; in all, \Sexpr{sum(quads)} samples were taken. The number of samples collected per vessel ranged from \Sexpr{min(as.integer(names(numSamp)))} to as many as \Sexpr{max(as.integer(names(numSamp)))}; most vessels (\Sexpr{max(numSamp)}) were sampled \Sexpr{names(numSamp)[which.max(numSamp)]} times.
 
-Vessel-level data collected from owners included: dimensions of the vessel; the type of antifouling paint applied (ablative, hard, and self-polishing); voyage history (number of days since the vessel was last used, median number of trips per year); the number of days since the vessel was last cleaned; the surface area of the hull (m\up{2}); and the type of vessel (yacht, fishing vessel, and motor cruisers and others). Table~\ref{tab:sum} shows summary statistics for these observed characteristics.
+Vessel-level data collected from owners included: dimensions of the vessel; the type of antifouling paint applied (ablative, hard, and self-polishing); voyage history (number of days since the vessel was last used, median number of trips per year); the number of days since the vessel was last cleaned; the surface area of the hull (m\up{2}); and the type of vessel (yacht, fishing, motor cruiser and others). Table~\ref{tab:sum} shows summary statistics for these observed characteristics.
 
 For more details on the data collected during the survey, see Australian Government Natural Heritage Trust Project 46630 \citep{Hayes2007-mm}.
 
