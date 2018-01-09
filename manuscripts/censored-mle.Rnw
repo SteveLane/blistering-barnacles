@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 12:58:17 (slane)>
+% Time-stamp: <2018-01-09 13:01:09 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -383,7 +383,7 @@ The results presented here demonstrate relationships that are largely consistent
 
 The size of the vessel, measured by the hull surface area, was found to have a small negative relationship if used to predict biofouling levels; however, the uncertainty in this estimate was relatively large. Given the same frequency of use, the modelling suggests that different types of vessels have different effects on biofouling levels. For example, assume that vessels have the same duration since last being cleaned, and the same duration since last being used; the model predicts that there is an \Sexpr{round(diffs[['diffType']][1] * 100)}\% predicted probability that a yacht will have a larger wet weight biomass within a 0.5m\up{2} area than the motor cruiser/other vessel; compared to a fishing vessel, this probability is \Sexpr{round(diffs[['diffType']][2] * 100)}\%.
 
-A weak varying effect of the median number of trips taken by the vessel per year and paint type was found in the model. The limited number of data points at the vessel level (\Sexpr{nrow(vessels)}) hampered estimation of this effect precisely, but the direction of effects conforms with prior expectations, namely that: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not.
+A weak varying effect of the median number of trips taken by the vessel per year and paint type was found in the model. The limited number of data points at the vessel level (\Sexpr{nrow(vessels)}) hampered the precision of estimating these effects, but the direction of effects conforms with prior expectations, namely that: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not.
 
 There is also evidence that the location of the sample is an important predictor for the wet weight of biomass. Figure~\ref{fig:coefs} shows a consistent result that the wet weight of biomass when sampled along the hull ($\beta^{L}_{1}$), is no different to samples made from the rudder ($\beta^{L}_{3}$). Measurements made on samples from the keel however, are generally smaller than those made along either the hull or on the rudder; in fact, there is a \Sexpr{round(diffs[['diffLoc']][1] * 100)}\% predicted probability of this being the case. This is not a characteristic of vessels, and thus cannot be used for management purposes; the location of the measurement does however need to be considered in any future work, and in particular may restrict vessel-level summaries of wet weight of biomass being analysed (for example, total wet weight of biomass). 
 
