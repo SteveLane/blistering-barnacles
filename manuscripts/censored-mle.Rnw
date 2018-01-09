@@ -1,4 +1,4 @@
-% Time-stamp: <2017-11-23 14:19:09 (slane)>
+% Time-stamp: <2017-12-01 14:31:51 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -58,10 +58,10 @@
 \author[1]{Stephen E.\ Lane}
 \author[2]{Keith R.\ Hayes}
 \author[1]{Andrew P.\ Robinson}
-\affil[1]{CEBRA, The University of Melbourne}
-\affil[2]{Data61, CSIRO}
+\affil[1]{Centre of Excellence for Biosecurity Risk Analysis, The University of Melbourne}
+\affil[2]{Data61, Commonwealth Scientific and Industrial Research Organisation}
 \date{\today}
-\title{Risk factors for fouling biomass: Evidence from small vessels in Australia}
+\title{Risk Factors for Fouling Biomass: Evidence from Small Vessels in Australia}
 
 <<knitr-setup,echo=FALSE,warning=FALSE,message=FALSE,cache=FALSE,results="hide">>=
 ## Add github packages using gitname/reponame format
@@ -87,30 +87,32 @@ options(digits = 1)
 \modulolinenumbers[3]
 
 \begin{abstract}
-  Invasive marine non indigenous species are a major threat to marine biodiversity. International commercial shipping has long been the major focus of research and government policy, however the role of recreational vessels is beginning to be recognised as an important vector of non indigenous species. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
+  Invasive marine non indigenous species are a major threat to marine biodiversity. Recreational vessels are beginning to be recognised as an important vector of non indigenous species. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
 
-  Biofouling is the most likely pathway for introduction of marin non indigenous species for both commercial and recreational vessels. This paper reports on a statistical analysis of biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet was different depending on the type of vessel. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass was not significant.
+  This paper reports on a statistical analysis of biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet was different depending on the type of vessel. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass per sample unit area was not significant.
 
-  In order to reduce the domestic spread of invasive species, owners of small vessels in particular should be encouraged to maintain a regular cleaning and maintenance schedule, particularly focussing on wet areas of the vessel.
+  In order to reduce the domestic spread of invasive species, owners of small vessels in particular should be encouraged to maintain a regular cleaning and maintenance schedule, and use an appropriate type of antifouling paint.
 \end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
 Commercial and recreational vessels are the most important vector for the introduction and spread of marine non indigenous species globally \citep{Molnar2008-dm}, effectively removing natural barriers to dispersal, including ocean currents and distance \citep{Paini2012-md,Ruiz1997-ji}. Invasive marine non indigenous species are a major threat to marine biodiversity leading to dramatic shifts in population, community and ecosystem dynamics, and many have serious environmental and economic implications \citep{Carlton1993-cc,Ruiz1997-ji,Vitousek1996-zr}. For example, the annual cost (losses and control costs) to the United States resulting from the introduction of the Zebra mussel (\textit{Dreissena polymorpha}), Asian clam (\textit{Corbicula fluminea}) and Shipworm (\textit{Teredo navalis}) is estimated at over USD\$3bn \citep{Pimentel2011-pe}. 
 
-Knowledge of invasion processes and pathways for non indigenous species in marine environments has developed considerably since \cite{Carlton1993-cc} but research studies and government policies have tended to focus exclusively on initial points of invasion which are predominantly biofouling and ballast water from international commercial shipping \citep{Acosta2010-gd,Campbell2011-zq}. There is, however, growing recognition of the role of recreational vessels as vectors of non indigenous species \citep{Ashton2014-me,Clarke_Murray2011-wf,Minchin2006-ig}, and recent studies have revealed the significant risk of secondary introductions in stepping stone invasions \citep[e.g.][]{Burgin2011-rj,Clarke_Murray2011-wf,Hewitt2007-eo,Lacoursiere-Roussel2012-cw,Minchin2006-ig}, whereby the movement of vessels within domestic borders has the potential to translocate invasive species from one port or region to another \citep{Campbell2011-zq}. The secondary spread of non indigenous species will ultimately determine the magnitude of economic and environmental damage caused by invasive species \citep{Zabin2014-ea}. In Australia impacts from secondary invasions are increasingly likely as recreational boat ownership continues to increase. In the decade from 1999-2009 boat ownership increased by more than 36\% to more than 800,000 individual registered vessels nationwide \citep{Burgin2011-rj}. 
+Knowledge of invasion processes and pathways for non indigenous species in marine environments has developed considerably since \citet{Carlton1993-cc} but research studies and government policies have tended to focus exclusively on initial points of invasion which are predominantly biofouling and ballast water from international commercial shipping \citep{Acosta2010-gd,Campbell2011-zq,Clarke2017-xv}. There is, however, growing recognition of the role of recreational vessels as vectors of non indigenous species \citep{Ashton2014-me,Clarke_Murray2011-wf,Minchin2006-ig}, and recent studies have revealed the significant risk of secondary introductions in stepping stone invasions \citep[e.g.][]{Burgin2011-rj,Clarke_Murray2011-wf,Hewitt2007-eo,Lacoursiere-Roussel2012-cw,Minchin2006-ig}, whereby the movement of vessels within domestic borders has the potential to translocate invasive species from one port or region to another \citep{Campbell2011-zq}. The secondary spread of non indigenous species will ultimately determine the magnitude of economic and environmental damage caused by invasive species \citep{Zabin2014-ea}. In Australia impacts from secondary invasions are increasingly likely as recreational boat ownership continues to increase. In the decade from 1999-2009 boat ownership increased by more than 36\% to more than 800,000 individual registered vessels nationwide \citep{Burgin2011-rj}. 
+
+Limited knowledge and complexities within the recreational boating pathway means that risk based assessment and non indigenous species management of the pathway is absent in most countries \citep{Acosta2010-gd}; concerns about recreational boating in the translocation of invasive species are often not acknowledged, even by local and international authorities \citep{Burgin2011-rj}.
 
 Furthermore, unlike large international and commercial shipping vessels, recreational yachts, boats and domestic fishing vessels are often unregulated by biosecurity agencies, and such vessels represent a significant gap in managing non indigenous species in marine environments \citep{Zabin2014-ea}. In Australia, most commercial and recreational vessels are not required to inspect their hulls for non indigenous species upon first entry in Australian waters or for travel domestically within Australia. Rather the government relies on education programs and voluntary actions by the vessel operators/owners to mitigate the risks of introduction and translocation \citep{Piola2012-bf}.
 
 Recreational vessels have been implicated in several high profile and significantly damaging incursions of non indigenous species including the introduction of the black striped mussel (\textit{Mytilopsis sallei}) into a recreational marina in Darwin, Australia in 1999. Strong evidence suggests it was introduced by hull fouling on an international yacht, and detections of the mussel outside of the marina were traced to movement of smaller vessels. This species has similar ecological and morphological characteristics to the Zebra mussel and when it was discovered densities were as high as 24,000 per square metre \citep{Thresher1999-et}. This incursion was successfully eradicated, unlike the majority of other eridacation attempts that have ultimately failed often despite concerted efforts. The inherent difficulties of marine invasion control has led to a focus on reducing the human-mediated spread of non indigenous species from major ports via high risk transport vectors \citep{Drake2004-aj,Floerl2005-nu,Forrest2013-cl} and recreational craft may constitute a significant portion of these vectors.
 
-Biofouling is the most common pathway for introduction of marine non indigenous species for both commercial and recreational vessels \citep{Acosta2010-gd,Hewitt2004-oz,Minchin2006-ig,Thresher1999-et}. Studies of international and domestic recreational boats have demonstrated a range of fouling rates, with most surveys showing that over 50\% of vessels, and sometimes as high as 80\% \citep{Ashton2014-me,Floerl2005-nu,Lacoursiere-Roussel2012-pk,Minchin2006-ig,Zabin2014-ea}, having some level of fouling. The extent of fouling on any individual vessel, however, is often highly, irrespective of sample sizes and methodology \citep{Ashton2014-me,Brine2013-dz,Clarke_Murray2011-wf,Floerl2005-nu}. Fouling of ``niche'' areas contribute to this variability, as these areas can have considerably higher levels of fouling than the hull \citep{Lacoursiere-Roussel2012-pk} and include internal water systems and intake pipes, rudder, propeller, anchors/chain cabinets, sea chests, fishing rods and ropes \citep{Acosta2010-gd,Burgin2011-rj,Hewitt2007-eo,Minchin2006-ig}.
+Biofouling is the most common pathway for introduction of marine non indigenous species for both commercial and recreational vessels \citep{Acosta2010-gd,Hewitt2004-oz,Minchin2006-ig,Thresher1999-et}. Studies of international and domestic recreational boats have demonstrated a range of fouling rates, with most surveys showing that over 50\% of vessels, and sometimes as high as 80\%, having some level of fouling \citep{Ashton2014-me,Floerl2005-nu,Lacoursiere-Roussel2012-pk,Minchin2006-ig,Zabin2014-ea}. The extent of fouling on any individual vessel, however, is often highly variable, irrespective of sample sizes and methodology \citep{Ashton2014-me,Brine2013-dz,Clarke_Murray2011-wf,Floerl2005-nu}. Fouling of ``niche'' areas contribute to this variability, as these areas can have considerably higher levels of fouling than the hull \citep{Lacoursiere-Roussel2012-pk} and include internal water systems and intake pipes, rudder, propeller, anchors/chain cabinets, sea chests, fishing rods and ropes \citep{Acosta2010-gd,Burgin2011-rj,Hewitt2007-eo,Minchin2006-ig}.
 
 Characteristics of recreational boats that increase both the rate and extent of fouling are substantially different to those of commercial vessels \citep{Lacoursiere-Roussel2012-pk}. Small vessels can have irregular maintenance and cleaning schedules, may spend significant amounts of time in port where opportunities for colonisation are high, travel at low speeds, and have varied presence and abundance of niche areas \citep{Brine2013-dz,Clarke_Murray2011-wf,Floerl2005-nu,Minchin2006-ig}. Considerable variation in boat users maintenance and vessel usage means there is equally likely to be variation in transport frequency and risk of non indigenous species \citep{Floerl2005-nu}. In addition, recreational boats visit pristine and often protected marine areas which may be highly susceptible to invasive marine species and disconnected from commercial shipping ports and aquaculture \citep{Clarke_Murray2011-wf}.
 
 %Australia is bounded by ocean and therefore has a heavy reliance on shipping for international and domestic trade, and also has a large recreational boating fleet. It is therefore susceptible to the primary introduction and secondary spread of non indigenous species from a range of different vessel types \citep{Piola2012-bf}. More than 250 non-indigenous marine species have been found in Australia and now dominate many inshore communities \citep{Thresher1999-et}. Biodiversity impacts on Australia’s unique marine biota as well as economic losses have been documented following the establishment of non-indigenous marine species.
 
-No movements of vessels are without risk but minimising translocation of species requires a relevant and transparent risk based assessment \citep{Campbell2011-zq}, and these are being investigated in Australia as part of proposed regulatory interventions \citep{Piola2012-bf}. If specific attributes of small vessels can be identified which increase fouling biomass and therefore facilitate the movement of non indigenous species, then management actions and regulations can be implemented by authorities which could reduce their spread and impacts.
+No movements of vessels are without risk but minimising translocation of species requires a relevant and transparent risk based assessment \citep{Campbell2011-zq}; such assessments have been proposed in Australia as part of regulatory interventions to manage biofouling risk \citep{Piola2012-bf,Clarke2017-xv,Lott2016-nk}. If specific attributes of small vessels can be identified which increase fouling biomass and therefore facilitate the movement of non indigenous species, then management actions and regulations can be implemented by authorities which could reduce their spread and impacts.
 
 This paper investigates the recreational boating vector and aims to identify characteristics of recreational vessels which potentially increase the extent of fouling biomass. We develop predictive tools to estimate the effect of these vessel-level characteristics, including transport and maintenance history, on the biofouling wet weight biomass. Our data comprises samples collected from the hull and niche areas of small vessels from five locations in south-east Australia. While several studies have estimated fouling extent on a measure or index of in-situ fouling cover \citep[e.g.][]{Ashton2006-xw,Brine2013-dz,Floerl2005-nu} this may be the first to link vessel-level characteristics with the complete wet weight fouling biomass of individual vessels and may offer an alternative perspective to determine vessel characteristics which influence fouling extent.
 
@@ -132,7 +134,7 @@ numSamp <- table(with(biofoul, tapply(boatID, boatID, length)))
 
 @ 
 
-The data used in this paper came from a prospective survey in Australia conducted by the CSIRO's Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, with access and permission gathered from owners via the Bosun and slipway managers at each of the sites.
+The data used in this paper came from a prospective survey in Australia conducted by the Commonwealth Scientific and Industrial Research Organisation's (CSIRO) Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, with access and permission gathered from owners via the Bosun and slipway managers at each of the sites.
 
 Samples were collected from both external and internal surfaces using plastic and metal putty knives. All samples were washed with 0.2$\mu$m filtered seawater, sieved and subsequently weighed using Sartorius BL3100 scales. Due to the unreliability of low wet weight measurements, samples that weighed less than 1.5gm were assigned a biomass of 0.5gm; that is, the lower limit of detection was 1.5gm.
 
@@ -192,7 +194,7 @@ latex(vessSumm, file = "",
 
 @ 
 
-\subsection{Statistical analysis}
+\subsection{Statistical Analysis}
 \label{sec:statistical-analysis}
 
 Figure~\ref{fig:obs-weight} shows histograms of the observed wet weight of biomass from the samples. Samples that were below the limit of detection (1.5gm, of which there were \Sexpr{sum(biofoul[['wetWeight']] < 1.5)}) are not shown in this figure. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight; the rows correspond to the sampled locations on each vessel (hull, keel and rudder).
@@ -233,11 +235,11 @@ We subsequently investigated two alternative specifications for the vessel-level
   \gamma^{*}_{j} & = \text{(M1)} + \beta_{dt[j]} \cdot \text{days1}_{j} + \beta_{mt[j]} \cdot \text{midTrips}_{j} + \beta_{mp[j]} \cdot \text{midTrips}_{j} \label{eq:M2}\tag{M2}
 \end{align}
 
-\ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; and $\text{hullSA}_{j}$ is the hull surface area. $\beta_{p[j]}$ is the effect of paint type $p$ on vessel $j$, $p=1$ denotes ablative paint, $p=2$ denotes hard paint, and $p=3$ denotes self-polishing anti-fouling paint. $\beta_{t[j]}$ is an effect for vessel type; $t=1$ denotes motor cruiser/other, $p=2$ denotes fishing vessels, and $p=3$ denotes yachts. freddie consists of all terms in \ref{eq:M1}, less the hull surface area. \ref{eq:M2} adds interaction terms to freddie between: the number of days since the vessel was last used and the vessel type ($\beta_{dt[j]}$); the median number of trips and the vessel type ($\beta_{mt[j]}$); and the median number of trips and the paint type ($\beta_{mp[j]}$).
+\ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; and $\text{hullSA}_{j}$ is the hull surface area. $\beta_{p[j]}$ is the effect of paint type $p$ on vessel $j$, $p=1$ denotes ablative paint, $p=2$ denotes hard paint, and $p=3$ denotes self-polishing anti-fouling paint. $\beta_{t[j]}$ is an effect for vessel type; $t=1$ denotes motor cruiser/other, $t=2$ denotes fishing vessels, and $t=3$ denotes yachts. \ref{eq:M2} adds interaction terms to \ref{eq:M1} between: the number of days since the vessel was last used and the vessel type ($\beta_{dt[j]}$); the median number of trips and the vessel type ($\beta_{mt[j]}$); and the median number of trips and the paint type ($\beta_{mp[j]}$).
 
 The choice of these regression models was guided by both subject matter/process considerations and graphical exploration of the posterior distribution of the random-effect terms in the latent process models. In particular, we expect there to be interactions between paint type and vessel usage predictors: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not. For more details on the graphical exploration, see Section~\ref{sec:results}.
 
-\subsection{Missing data}
+\subsection{Missing Data}
 \label{sec:missing-data}
 
 <<missingness>>=
@@ -253,14 +255,14 @@ pattern <- data_frame(
 
 @
 
-There is missing data at the vessel-level; Table~\ref{tab:miss} displays the observed data pattern, shown as (Days since last used, Paint type, Days since last trip), where a 1 denotes the variable is observed, and a 0 denotes the variable is missing. For example, Table~\ref{tab:miss} shows there are \Sexpr{rownames(miss)[1]} observations with complete vessel-level data, and 1 observation that is missing all measurements of days since last used, paint type, and days since last trip.
+There is missing data at the vessel level; Table~\ref{tab:miss} displays the observed data pattern, shown as (Days since last used, Paint type, Days since last trip), where a 1 denotes the variable is observed, and a 0 denotes the variable is missing. For example, Table~\ref{tab:miss} shows there are \Sexpr{rownames(miss)[1]} observations with complete vessel-level data, and 1 observation that is missing all measurements of days since last used, paint type, and days since last trip.
 
 <<missingness-table,results="asis">>=
 latex(pattern, file = "",
       booktabs = TRUE, rowlabel = NULL, rowname = NULL,
       colheads = c("Observed data pattern", "Count"),
-      collabel.just = c("r", "r"),
-      col.just = c("r", "r"),
+      collabel.just = c("l", "r"),
+      col.just = c("l", "r"),
       where = "!hbp",
       label = "tab:miss",
       caption =
@@ -274,34 +276,19 @@ Because of the amount of missing data, we used multiple imputation to impute the
 
 As all missing data was at the vessel-level, we used the median wet weight of biomass as a predictor in the imputation models \citep{Gelman2007-lc}. To account for the censoring in the wet weight of biomass (observations below the 1.5gm limit of detection), we replaced the censored data by a random draw from a Uniform(0, 1.5) distribution. We justify this procedure in the following way: i) some level of variability is required as we don't know the true value of the censored observations; ii) Figure~\ref{fig:obs-weight} shows that weights below 1.5gm (\Sexpr{log(1.5)} on the log-scale) form a very small part of the range of observed values. This small variability will have limited impact in the imputation of the missing data due to the fact that we are summarising within-vessel wet weight of biomass measurements by the median for input into the imputation models.
 
-To perform inference, we use the advice of \citet{Zhou2010-pc} and mix the draws from the posterior distributions from the analysis of each completed dataset. \citet{Zhou2010-pc} recommend a large number of imputations be used; we generated 50 imputed datasets. For each dataset, 2000 samples were drawn from the posterior after a burn-in of 2000. Convergence was monitored by inspecting the mixed chains across the 50 multiple imputations, and by assessing the Gelman-Rubin statistic \citep{Gelman1992-zo}.
+To perform inference, we follow the advice of \citet{Zhou2010-pc} and mix the draws from the posterior distributions from the analysis of each completed dataset\footnote{The alternative would be to combine posterior estimates of summary parameters using Rubin's rules \citep{Rubin1996-jc}, which necessarily gives point estimates as opposed to full posterior distributions.}. \citet{Zhou2010-pc} recommend a large number of imputations be used; we generated 50 imputed datasets. For each dataset, 2000 samples were drawn from the posterior after a burn-in of 2000. Convergence was monitored by inspecting the mixed chains across the 50 multiple imputations, and by assessing the Gelman-Rubin statistic \citep{Gelman1992-zo}.
 
-All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; the multilevel models were fit using the RStan interface to stan \citep{Stan_Development_Team2016-xb}, and multiple imputation was performed use the R package mice \citep{Van_Buuren2011-ne}. R code and data to reproduce the analysis may be found at https://github.com/SteveLane/blistering-barnacles.
+All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; the multilevel models were fit using the RStan interface to stan \citep{Stan_Development_Team2016-xb}, and multiple imputation was performed using the R package mice \citep{Van_Buuren2011-ne}. R code and data to reproduce the analysis may be found at https://github.com/SteveLane/blistering-barnacles.
 
 \section{Results}
 \label{sec:results}
 
-\subsection{Multiple imputation}
+\subsection{Multiple Imputation}
 \label{sec:multiple-imputation}
 
-Figure~\ref{fig:imp-cont} displays the observed and imputed vessel-level data for both the number of days since the vessel was last used, and the median number of trips (per year) by the vessel\footnote{Note that all numeric predictors were scaled to have mean 0, standard deviation 1, prior to modelling.}. Figure~\ref{fig:imp-cat} displays the observed and imputed vessel-level type of paint. Both Figures~\ref{fig:imp-cont} and \ref{fig:imp-cat} show that the distribution of imputed data is broadly consistent with the distribution of the observed data.
+Visual comparison between the observed and imputed data suggests that the imputation procedure has satisfactorily converged, i.e. there was no large discrepancies between the imputed data and the observed. The comparison between observed and imputed data is presented in the Supplemental Material.
 
-\begin{figure}[!hbp]
-  \centering
-  \subfloat[Number of days since the vessel was last used.\label{fig:imp-cont-a}]{\includegraphics[width=0.45\linewidth]{../graphics/imp-days1.pdf}}
-  \subfloat[Median number of trips (per year) by the vessel.\label{fig:imp-cont-b}]{\includegraphics[width=0.45\linewidth]{../graphics/imp-trips.pdf}}
-  \caption{Comparison of observed and imputed data for the number of days since the vessel was last used, and the median number of trips by the vessel. The leftmost boxplot in each figure is the observed distribution, all others include the imputed values. Imputation has been successful as the distribution of imputed data is broadly consistent with that of the observed data.}
-  \label{fig:imp-cont}
-\end{figure}
-
-\begin{figure}[!hbp]
-  \centering
-  \includegraphics[width=0.7\linewidth]{../graphics/imp-paint.pdf}
-  \caption{Comparison of observed and imputed data for anti-fouling paint type. A random selection from the imputed datasets are shown. The top-left panel (labelled 0) shows the observed distribution. Imputation has been successful as the distribution of imputed data is broadly consistent with that of the observed data.}
-  \label{fig:imp-cat}
-\end{figure}
-
-\subsection{Outcome model}
+\subsection{Outcome Model}
 \label{sec:outcome-model}
 
 <<looic-compare>>=
@@ -309,21 +296,14 @@ compTab <- readRDS("../data/looic-compare-full.rds")
 
 @ 
 
-The $t$-distribution observation model \eqref{eq:O2} appears to outperform the Normal model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}. A full comparison of the observation models for latent-process model (\ref{eq:M0}--\ref{eq:M2}) is provided in Appendix~\ref{sec:comp-outc-models}.
+The $t$-distribution observation model \eqref{eq:O2} outperformed the Normal distribution observation model \eqref{eq:O1}. The difference in the leave-one-out information criterion (LOOIC, analogous to AIC, see \cite{Vehtari2016-dp}) was \Sexpr{round(compTab[1, "elpd_diff"])} (standard error \Sexpr{round(compTab[1, "se"])}) in favour of the $t$-distribution observation model \eqref{eq:O2}.
 
-As a further check on model performance we examined if the models produce posterior predictions that consistent with the observed data. An obvious choice of posterior predictive check (PPC) is the proportion of posterior predictions that lie below the limit of detection; we also compare the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The last two PPCs test the model's ability at generating data with a similar location and spread as the observed data. Figure~\ref{fig:postM0} compares the distribution of the PPCs between \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row); the specific PPCs are shown in the columns of the figure, with the observed value shown as the solid vertical line. Both models capture the spread of the data well, with the observed interquartile range falling in the middle of the distribution of the posterior predicted values. Neither model reproduces data consistent with the median or the proportion of measurements below the limit of detection, but nonetheless \ref{eq:O2} still appears to outperform \ref{eq:O1}. For this reason, all latent-process model coefficients were subsequently estimated assuming the $t$ distribution observation model \eqref{eq:O2}.
+Posterior predictive checks likewise confirmed the superiority of the $t$-distribution observation model. Graphical checks were made using the proportion of posterior predictions that lie below the limit of detection; the median posterior predictions and the interquartile range (IQR) of the posterior predictions. The graphical checks and LOOIC comparisons can be found in full in the Supplemental Material.
 
-\begin{figure}[!hbp]
-  \centering
-  \includegraphics[width=0.9\linewidth]{../graphics/ppc-compare-m0-full.pdf}
-  \caption{Comparison of posterior predictive checks from analysis model \ref{eq:M0} between outcome models \ref{eq:O1} (top row) and \ref{eq:O2} (bottom row). From left to right the panels show posterior predicted histograms of: interquartile range (IQR); median; and the proportion of values below the limit of detection (1.5gm). The vertical lines in each panel show the observed values.}
-  \label{fig:postM0}
-\end{figure}
-
-\subsection{Regression results}
+\subsection{Regression Results}
 \label{sec:regression-results}
 
-\subsubsection{Exploration of candidate interaction terms}
+\subsubsection{Exploration of Candidate Interaction Terms}
 \label{sec:expl-cand-inter}
 
 Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors --- the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by anti-fouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet-weight from model \ref{eq:M1}, and is based on a randomly-selected imputed dataset for display purposes.
@@ -332,18 +312,20 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
   \centering
   \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1boat-full.pdf}} \\
   \subfloat[Vessel-level intercepts coloured by anti-fouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1paint-full.pdf}}
-  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Regression lines for each predictor are overlaid.}
+  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}). The (median) regression lines for each predictor are overlaid.}
   \label{fig:m1-reg}
 \end{figure}
 
-Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type.
+Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the anti-fouling paint type. We form this opinion by visual comparison of the scatterplots. For example, the pattern in Figure~\ref{fig:m1-reg-a} suggests that the effect of days since the vessel was last used is negative for fishing vessels and positive for yachts and motor cruiser/other vessels. Similarly, the effect of the median number of trips undertaken by the vessel appears to be positive for fishing vessels, and negative for yachts and motor cruiser/other vessels.
 
-\subsubsection{Final model form}
+\subsubsection{Final Model Form}
 \label{sec:reduct-final-model}
 
 Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors used in interaction terms in \eqref{eq:M2}: the number of days since the vessel was last used and the median number of trips (per year) undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by anti-fouling paint type. Shown in each panel are the estimated (median) regression lines from \ref{eq:M2}.
 
-Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vessel was last used varies by vessel type, as does the median number of trips taken by the vessel per year. Figure~\ref{fig:m3-reg-b} further suggests that the effect of the median number of trips taken by the vessel per year varies according to the paint type of the vessel. The uncertainty in these effects is however, large relative the estimates; Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered.
+Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vessel was last used varies by vessel type, as does the median number of trips taken by the vessel per year. Figure~\ref{fig:m3-reg-b} further suggests that the effect of the median number of trips taken by the vessel per year varies according to the paint type of the vessel. The uncertainty in these effects is however, large relative to the estimates.
+
+Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered. As can be seen in Figure~\ref{fig:coefs}, the effect of the number of days since the vessel was last cleaned ($\beta_{d2}$) is clearly larger than 0; the other predictors do not appear to have such a strong effect. Whilst the effect of these predictors is not estimated precisely, the direction and size of the coefficients is similar between models, and as such we choose Model~\eqref{eq:M2} as the final model form in order to estimate the interactions.
 
 \begin{figure}[!hbp]
   \centering
@@ -355,12 +337,12 @@ Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vess
 
 \begin{figure}[!hbp]
   \centering
-  \includegraphics[width=0.45\linewidth]{../graphics/plSummary-t.pdf}
+  \includegraphics[width=0.65\linewidth]{../graphics/plSummary-t.pdf}
   \caption{Estimated coefficients from \ref{eq:M0}--\ref{eq:M2}. Coefficients from each model (where applicable) are shown grouped within coefficient on the y-axis. The median is shown as a point estimate, with 50\% and 90\% credible intervals.}
   \label{fig:coefs}
 \end{figure}
 
-\subsubsection{Predictive model comparison}
+\subsubsection{Predictive Model Comparison}
 \label{sec:pred-model-comp}
 
 <<read-looic>>=
@@ -393,11 +375,11 @@ diffs <- readRDS("../data/diffs.rds")
 @ 
 Several previous studies have proposed vessel characteristics that should be indicative of biofouling translocation risks, including voyage time, time in the water and time since application of anti-fouling paint, frequency of vessel use and stationary period \citep{Ashton2006-xw,HewittCampbellCouttsEtAl2011}.
 
-Subsequent analysis, however, has often either failed to find a strong relationships between vessel characteristics and fouling extent or abundance, or provided contradictory evidence. \citet{Clarke_Murray2011-wf} for example, found percent fouling cover on recreational yachts was not related to travel frequency or the age of antifouling paint. \citet{Floerl2005-nu} conclude that the abundance of non indigenous species on yacht hulls could not be associated with maintenance schedules, travel history or owners maintenance behaviour. Similarly, \citet{Ashton2014-me} did not find significant correlations between last cleaning and extent of fouling using in-water surveys, and also concluded that the type of recreational vessel does not explain differences in biofouling patterns.
+Subsequent analysis, however, has often either failed to find a strong relationships between vessel characteristics and fouling extent or abundance, or provided contradictory evidence. \citet{Clarke_Murray2011-wf} for example, found percent fouling cover on recreational yachts was not related to travel frequency or the age of antifouling paint. \citet{Floerl2005-nu} concluded that the abundance of non indigenous species on yacht hulls could not be associated with maintenance schedules, travel history or owners maintenance behaviour. Similarly, \citet{Ashton2014-me} did not find significant correlations between last cleaning and extent of fouling using in-water surveys, and also concluded that the type of recreational vessel does not explain differences in biofouling patterns.
 
 Other studies, however, suggest that age of antifouling paint is a consistently reliable predictor of biofouling \citep{Ashton2006-xw,Floerl2005-nu,Lacoursiere-Roussel2012-pk, Ashton2014-me}, and that time in the water, stationary periods, and voyage types are relevant factors \citep{Ashton2006-xw,Lacoursiere-Roussel2012-pk}. \cite{Lacoursiere-Roussel2012-pk} also suggest that vessel type does play a role because powerboats and catermarans have greater risk of fouling due to higher number of niche areas. 
 
-The results presented here demonstrate relationships that are largely consistent with prior expectations about important risks factors; that is the amount of hull fouling biomass is related to the time since a vessel was last cleaned and last used, how frequently a vessel is used and the type of antifouling paint applied. Consider for example a yacht that hasn't been cleaned in \Sexpr{round(mean(vessels[['days2']], na.rm = TRUE))} days (the mean number of days since the vessel was last cleaned). The model predicts that for such a vessel, there is a \Sexpr{round(diffs[['diffDays2']][2] * 100)}\% probability that delaying cleaning by six months would result in an increase of wet weight biomass within a 0.5m\up{2} area on the hull of the vessel.
+The results presented here demonstrate relationships that are largely consistent with prior expectations about important risk factors; that is the amount of hull fouling biomass is related to the time since a vessel was last cleaned and last used, how frequently a vessel is used and the type of antifouling paint applied. Consider for example a yacht that hasn't been cleaned in \Sexpr{round(mean(vessels[['days2']], na.rm = TRUE))} days (the mean number of days since the vessel was last cleaned). The model predicts that for such a vessel, there is a \Sexpr{round(diffs[['diffDays2']][2] * 100)}\% probability that delaying cleaning by six months would result in an increase of wet weight biomass within a 0.5m\up{2} area on the hull of the vessel.
 
 The size of the vessel, measured by the hull surface area, was found to have a small negative relationship in predicting biofouling levels; the uncertainty in this estimate was relatively large however. Given the same frequency of use, different types of vessels had different effects on biofouling levels. Compare a yacht to a motor cruiser/other vessel and a fishing vessel, all not having been cleaned in \Sexpr{round(mean(vessels[['days2']], na.rm = TRUE))} days (the mean number of days since the vessel was last cleaned), nor used in \Sexpr{round(mean(vessels[['days1']], na.rm = TRUE))} days (the mean number of days since the vessel was last used). The model predicts that there is an \Sexpr{round(diffs[['diffType']][1] * 100)}\% predicted probability that the yacht will have a larger wet weight biomass within a 0.5m\up{2} area than the motor cruiser/other vessel; compared to the fishing vessel, this probability is \Sexpr{round(diffs[['diffType']][2] * 100)}\%.
 
@@ -411,7 +393,7 @@ This study is not without its limitations. We found that the (log-transformed) w
 
 The small number of vessels sampled also limits the precision at which we can estimate the effect of vessel-level characteristics, and in particular, any interactions between them. We demonstrated a number of possible interaction effects, yet the error in those estimates was found to be relatively large. The nature of these varying effects however, did conform to prior expectations of the direction of the effect; it is the size of such effects that is not known with a high degree of certainty.
 
-Sample size reservations notwithstanding, we have demonstrated that vessel-level characteristics can be used to predict the amount of wet weight of fouling biomass that may be present on small vessels in Australia. The development of such predictive tools could aid authorities in assessing the risk posed by individual vessels and classifying those that are a risk of having high levels of fouling will potentially reduce the introduction and spread of invasive species \citep{Minchin2006-ig}.
+Sample size reservations notwithstanding, we have demonstrated that vessel-level characteristics can be used to predict the amount of wet weight of fouling biomass that may be present on small vessels in Australia. The development of such predictive tools could aid authorities in assessing the risk posed by individual vessels and classifying those that are a risk of having high levels of fouling will potentially reduce the introduction and spread of invasive species \citep{Minchin2006-ig,Clarke2017-xv}.
 
 %we have demonstrated that vessel-level characteristics can be used to predict the amount of wet weight of biomass that may be present on small vessels in Australia. Differences in recreational boat use in different regions means that risk assessments should be regionally specific \citep{Lacoursiere-Roussel2012-pk}.
 
@@ -419,11 +401,9 @@ Sample size reservations notwithstanding, we have demonstrated that vessel-level
 
 The results suggest that in particular, owners of small vessels should be encouraged to maintain a regular cleaning and maintenance schedule, particularly wet areas of the vessel. Management interventions, such as diver inspections, directive to clean at a dry dock etc, can be implemented to varying degrees based on increasing levels of risk, but also with a prohibitive increase in resources, cost and time \citep{Campbell2011-zq}. Therefore strategies and incentives could be investigated to encourage boat owners to improve their cleaning and maintenance, as well as education and outreach programs for boat owners to increase awareness of invasive species and their impacts \citep{Brine2013-dz,Minchin2006-ig}. 
 
-Authorities could also introduce regulated antifouling paint regimes, e.g. every 12 months, regular inspections and providing cleaning facilities for recreational boat users \citep{Zabin2014-ea}. Many dry docks for recreational small vessels do not have the procedures and/or facilities to deal with the material removed from hull cleaning which is often released back into the ocean \citep{Hewitt2007-eo}. Even if only a small percentage of recreational boats have biofouling, the sheer number of boats around Australia mean that the number transporting non indigenous species could in the tens of thousands. This danger can occur from just a few voyages of heavily fouled vessels, or large numbers of boats with minimal fouling but high transport frequency, and therefore propagule pressure is large \citep{Clarke_Murray2011-wf,Kauano2016-nk}.
+Authorities could also introduce regulated antifouling paint regimes, e.g. every 12 months, regular inspections and providing cleaning facilities for recreational boat users \citep{Zabin2014-ea}. Many dry docks for recreational small vessels do not have the procedures and/or facilities to deal with the material removed from hull cleaning which is often released back into the ocean \citep{Hewitt2007-eo}. Even if only a small percentage of recreational boats have biofouling, the sheer number of boats around Australia mean that the number transporting non indigenous species could in the tens of thousands. This danger can occur from just a few voyages of heavily fouled vessels, or large numbers of boats with minimal fouling but high transport frequency, and therefore propagule pressure is large \citep{Clarke_Murray2011-wf,Kauano2016-nk}. 
 
-Recreational boating is rising globally which makes it crucial to understand the risk associated with secondary spread of non-indigenous species locally, regionally and internationally \citep{Clarke_Murray2011-wf}. Small vessels could potentially have a significant impact on the secondary spread of non indigenous species, even just due to the considerable and increasing number of recreational vessels and annual voyages \citep{Zabin2014-ea}. But limited knowledge and complexities within the recreational boating pathway means that risk based assessment and non indigenous species management of the pathway is absent in most countries \citep{Acosta2010-gd} and concerns about recreational boating in the translocation of invasive species are often not acknowledged, even by local and international authorities \citep{Burgin2011-rj}. 
-
-Preventing the introduction of invasive organisms is the key to reducing their spread, requiring stringent implementation of measures to reduce invasions through all vector routes \citep{Bax2001-vy}. No movements of vessels are without risk but minimising translocation of species will require a relevant and transparent risk based assessment \citep{Campbell2011-zq} and characterising the risk of biological invasions requires understanding species assemblages at ports and the characteristics of transport vectors \citep{Floerl2005-qo}. Recreational boating in particular has complex and interacting risks and invasion scenarios, which need to be modelled and assessed in order to implement effective biosecurity management programs \citep{Acosta2010-gd}.
+Preventing the introduction of invasive organisms is the key to reducing their spread, requiring stringent implementation of measures to reduce invasions through all vector routes \citep{Bax2001-vy}. No movements of vessels are without risk but minimising translocation of species will require a relevant and transparent risk based assessment \citep{Campbell2011-zq,Clarke2017-xv} and characterising the risk of biological invasions requires understanding species assemblages at ports and the characteristics of transport vectors \citep{Floerl2005-qo}. Recreational boating in particular has complex and interacting risks and invasion scenarios, which need to be modelled and assessed in order to implement effective biosecurity management programs \citep{Acosta2010-gd}.
 
 \section*{Acknowledgements}
 \label{sec:acknowledgements}
@@ -431,39 +411,6 @@ Preventing the introduction of invasive organisms is the key to reducing their s
 The authors would like to acknowledge Dr Enamul Kabir for his contribution to earlier analyses that were not a part of this manuscript. AR, SL and TH's contributions were funded in part by the Centre of Excellence for Biosecurity Risk Analysis.
 
 \clearpage
-
-\appendix
-
-\section{Comparison of Outcome Models \eqref{eq:O1} and \eqref{eq:O2}}
-\label{sec:comp-outc-models}
-
-\begin{table}[!h]
-  \centering
-  \caption{LOOIC-based comparison of analysis models \eqref{eq:M0}--\eqref{eq:M2}, for outcome models \eqref{eq:O1} and \eqref{eq:O2}. The model with the smallest LOOIC (M2) is shown first, with subsequent rows ordered by increasing LOOIC (smaller LOOIC values are preferred) within outcome model \eqref{eq:O2}. $\Delta$LOOIC shows the difference in LOOIC between analysis models fit using the outcome models \eqref{eq:O2} and \eqref{eq:O1} (positive values indicate \eqref{eq:O2} fits better); se($\Delta$LOOIC) shows the estimated standard error of the difference. Eff. P gives the estimated effective number of parameters; se(Eff. P) shows its standard error.}
-  \label{tab:looic-compare}
-  %\resizebox{\textwidth}{!}{%
-    \begin{scriptsize}
-<<looic-compare-table,results="asis",center=TRUE>>=
-cTab <- compTab %>% 
-    select(Model, contains("LOOIC"), elpd_diff, se) %>%
-    filter(Model != "M2")
-latex(cTab,
-      center = "none",
-      table.env = FALSE,
-      dig = 3, file = "",
-      rowname = NULL,
-      booktabs = TRUE,
-      col.just = c("l", rep("r", 6)),
-      where = "!h",
-      cgroup = c("", "$t$ outcome model (\\eqref{eq:O2})", "Normal outcome model (\\eqref{eq:O1})"),
-      n.cgroup = c(1, 3, 3),
-      colheads = c("Model", rep(c("LOOIC", "se(LOOIC)"), 2),
-                   "$\\Delta$LOOIC", "se($\\Delta$LOOIC)"))
-
-@
-%}
-\end{scriptsize}
-\end{table}
 
 \printbibliography
 
