@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 12:31:57 (slane)>
+% Time-stamp: <2018-01-09 12:34:08 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -136,7 +136,7 @@ numSamp <- table(with(biofoul, tapply(boatID, boatID, length)))
 
 The data used in this paper came from an exploratory survey in Australia conducted by the Commonwealth Scientific and Industrial Research Organisation's (CSIRO) Centre for Research on Introduced Marine Pests (CRIMP). Biomass samples were collected from \Sexpr{nrow(vessels) + 1} vessels\footnote{One vessel was removed from analysis due to its abnormally high biomass measurements.} at \Sexpr{length(locs)} geographical locations during the project. All vessels were selected based on convenience, when pulled out of the water for maintenance; access and permission was gathered from owners via the Bosun and slipway managers at each of the sites.
 
-Samples were collected from both external and internal surfaces using plastic and metal putty knives, immediately following the vessels removal from the water. All samples were washed with 0.2$\mu$m filtered seawater, sieved and subsequently weighed using Sartorius BL3100 scales. Due to the unreliability of low wet weight measurements, samples that weighed less than 1.5gm were assigned a biomass of 0.5gm; that is, the lower limit of detection was 1.5gm.
+Samples were collected from both external and internal surfaces using plastic and metal putty knives, immediately following the vessels removal from the water. All samples were washed with 0.2$\mu$m filtered seawater, sieved and subsequently weighed using Sartorius BL3100 scales. Due to the unreliability of low wet weight measurements, samples that weighed less than 1.5 gm were assigned a biomass of 0.5 gm; that is, the lower limit of detection was 1.5 gm.
 
 Most vessels were sampled in Hobart, Tasmania, Australia at the \Sexpr{names(locs)[1]} (\Sexpr{locs[1]}) and the \Sexpr{names(locs)[2]} (\Sexpr{locs[2]}). The remaining vessels were sampled in Melbourne, Victoria, Australia at the \Sexpr{names(locs)[3]} (\Sexpr{locs[3]}), the \Sexpr{names(locs)[4]} (\Sexpr{locs[4]}), and the \Sexpr{names(locs)[5]} (\Sexpr{locs[5]}). Most of the sample vessels were yachts (\Sexpr{types[1]}), followed by fishing vessels (\Sexpr{types[2]}), motor cruisers and others (\Sexpr{types[3]}).
 
@@ -197,12 +197,12 @@ latex(vessSumm, file = "",
 \subsection{Statistical Analysis}
 \label{sec:statistical-analysis}
 
-Figure~\ref{fig:obs-weight} shows histograms of the observed wet weight of biomass from the samples. Samples that were below the limit of detection (1.5gm, of which there were \Sexpr{sum(biofoul[['wetWeight']] < 1.5)}) are not shown in this figure. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight; the rows correspond to the sampled locations on each vessel (hull, keel and rudder).
+Figure~\ref{fig:obs-weight} shows histograms of the observed wet weight of biomass from the samples. Samples that were below the limit of detection (1.5 gm, of which there were \Sexpr{sum(biofoul[['wetWeight']] < 1.5)}) are not shown in this figure. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight; the rows correspond to the sampled locations on each vessel (hull, keel and rudder).
 
 \begin{figure}[!hbp]
   \centering
   \includegraphics[width=0.9\linewidth]{../graphics/obs-hist.pdf}
-  \caption{Measured wet weight of sampled biomass from the \Sexpr{nrow(vessels)} vessels. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight. Samples that measured less than the limit of detection (1.5gm) have been removed.}
+  \caption{Measured wet weight of sampled biomass from the \Sexpr{nrow(vessels)} vessels. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight. Samples that measured less than the limit of detection (1.5 gm) have been removed.}
   \label{fig:obs-weight}
 \end{figure}
 
@@ -274,7 +274,7 @@ A complete-case data analysis would only utilise \Sexpr{as.integer(rownames(miss
 
 Because of the amount of missing data, we used multiple imputation to impute the missing vessel-level data. Specifically, we used iterative conditional imputation, with all vessel-level variables used in the imputation specification; to account for any non-linearities, random forest imputation was used.
 
-As all missing data was at the vessel-level, we used the median wet weight of biomass as a predictor in the imputation models \citep{Gelman2007-lc}. To account for the censoring in the wet weight of biomass (observations below the 1.5gm limit of detection), we replaced the censored data by a random draw from a Uniform(0, 1.5) distribution. We justify this procedure in the following way: i) some level of variability is required as we don't know the true value of the censored observations; ii) Figure~\ref{fig:obs-weight} shows that weights below 1.5gm (\Sexpr{log(1.5)} on the log-scale) form a very small part of the range of observed values. This small variability will have limited impact in the imputation of the missing data due to the fact that we are summarising within-vessel wet weight of biomass measurements by the median for input into the imputation models.
+As all missing data was at the vessel-level, we used the median wet weight of biomass as a predictor in the imputation models \citep{Gelman2007-lc}. To account for the censoring in the wet weight of biomass (observations below the 1.5 gm limit of detection), we replaced the censored data by a random draw from a Uniform(0, 1.5) distribution. We justify this procedure in the following way: i) some level of variability is required as we don't know the true value of the censored observations; ii) Figure~\ref{fig:obs-weight} shows that weights below 1.5 gm (\Sexpr{log(1.5)} on the log-scale) form a very small part of the range of observed values. This small variability will have limited impact in the imputation of the missing data due to the fact that we are summarising within-vessel wet weight of biomass measurements by the median for input into the imputation models.
 
 To perform inference, we follow the advice of \citet{Zhou2010-pc} and mix the draws from the posterior distributions from the analysis of each completed dataset\footnote{The alternative would be to combine posterior estimates of summary parameters using Rubin's rules \citep{Rubin1996-jc}, which necessarily gives point estimates as opposed to full posterior distributions.}. \citet{Zhou2010-pc} recommend a large number of imputations be used; we generated 50 imputed datasets. For each dataset, 2000 samples were drawn from the posterior after a burn-in of 2000. Convergence was monitored by inspecting the mixed chains across the 50 multiple imputations, and by assessing the Gelman-Rubin statistic \citep{Gelman1992-zo}.
 
