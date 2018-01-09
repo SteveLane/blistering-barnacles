@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 12:34:08 (slane)>
+% Time-stamp: <2018-01-09 12:35:47 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -216,9 +216,9 @@ To allow for the possible effects of outliers we examined the effect of changing
   Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \label{eq:O2}\tag{O2} \\
   \nu & \sim \text{Gamma}(2, 10) \nonumber
 \end{align}
-are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyperparameters for the degrees freedom were chosen to be weakly informative, favouring a robust $t$ model with lower degrees of freedom; indeed, the mode of the prior distribution for the degrees of freedom is 10.
+are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyperparameters for the degrees of freedom were chosen to be weakly informative, favouring a robust $t$ model with lower degrees of freedom; indeed, the mode of the prior distribution for the degrees of freedom is 10.
 
-We initially inferred the latent process --- that is the process that determines the log wet-weight of fouling biomass on each vessel --- as a linear function of the location of the measurement location allowing for a vessel-level intercept:
+We initially inferred the latent process --- that is, the process that determines the log wet weight of fouling biomass on each vessel --- as a linear function of the location of the measurement location allowing for a vessel-level intercept:
 \begin{align}
   \mu_{i} & = \mu + \alpha_{j[i]} + \beta_{l[i]} \nonumber \\
   \mu & \sim N(0, 5) \nonumber \\
@@ -226,7 +226,7 @@ We initially inferred the latent process --- that is the process that determines
   \beta_{l} & \sim t_{3}(0, \sigma_{l}) \nonumber \\
   \sigma,\sigma_{\alpha},\sigma_{l} & \sim \text{half-cauchy}(0, 2.5) \nonumber
 \end{align}
-where $\mu_{i}$ is the expected log wet-weight in grams; $\mu$ is the intercept for the model; $\beta_{l}$ are coefficients that measure the effect of location on the log wet-weight of fouling biomass: $l=1$ denotes the measurement was taken at the hull, $l=2$ denotes the measurement was taken at the rudder, and $l=3$ for measurements taken at the keel\footnote{The notation $l[i]$ denotes the location level ($l$) of the $i\up{th}$ observation. The vessel-level intercept ($\alpha_{j[i]}$)is similarly referenced.}. $\alpha_{j}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$, which is modelled as a $t$ distribution with 3 degrees of freedom, and scale $\sigma_{l}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-Cauchy}(0, 2.5)$ priors.
+where $\mu_{i}$ is the expected log wet weight in grams; $\mu$ is the intercept for the model; $\beta_{l}$ are coefficients that measure the effect of location on the log wet weight of fouling biomass: $l=1$ denotes the measurement was taken at the hull, $l=2$ denotes the measurement was taken at the rudder, and $l=3$ for measurements taken at the keel\footnote{The notation $l[i]$ denotes the location level ($l$) of the $i\up{th}$ observation. The vessel-level intercept ($\alpha_{j[i]}$)is similarly referenced.}. $\alpha_{j}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$, which is modelled as a $t$ distribution with 3 degrees of freedom, and scale $\sigma_{l}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-Cauchy}(0, 2.5)$ priors.
 
 We subsequently investigated two alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
 \begin{align}
@@ -306,7 +306,7 @@ Posterior predictive checks likewise confirmed the superiority of the $t$-distri
 \subsubsection{Exploration of Candidate Interaction Terms}
 \label{sec:expl-cand-inter}
 
-Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors --- the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by anti-fouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet-weight from model \ref{eq:M1}, and is based on a randomly-selected imputed dataset for display purposes.
+Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors --- the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by anti-fouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet weight from model \ref{eq:M1}, and is based on a randomly-selected imputed dataset for display purposes.
 
 \begin{figure}[!hbp]
   \centering
