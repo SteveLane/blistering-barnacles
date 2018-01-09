@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 10:20:33 (slane)>
+% Time-stamp: <2018-01-09 11:39:36 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -87,7 +87,7 @@ options(digits = 1)
 \modulolinenumbers[3]
 
 \begin{abstract}
-  Invasive marine non indigenous species are a major threat to marine biodiversity. Recreational vessels are beginning to be recognised as an important vector of non indigenous species. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
+  Invasive marine non indigenous species are a major threat to marine biodiversity. Recreational vessels have been recognised by the scientific community as an important vector of non indigenous species, but have been slow to be picked up by recreational boaters/vessel owners and marina management. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
 
   This paper reports on a statistical analysis of biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet was different depending on the type of vessel. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass per sample unit area was not significant.
 
