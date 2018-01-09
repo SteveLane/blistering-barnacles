@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 11:59:24 (slane)>
+% Time-stamp: <2018-01-09 12:25:05 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -138,7 +138,7 @@ The data used in this paper came from an exploratory survey in Australia conduct
 
 Samples were collected from both external and internal surfaces using plastic and metal putty knives, immediately following the vessels removal from the water. All samples were washed with 0.2$\mu$m filtered seawater, sieved and subsequently weighed using Sartorius BL3100 scales. Due to the unreliability of low wet weight measurements, samples that weighed less than 1.5gm were assigned a biomass of 0.5gm; that is, the lower limit of detection was 1.5gm.
 
-Most vessels were sampled in Hobart at the \Sexpr{names(locs)[1]} (\Sexpr{locs[1]}) and the \Sexpr{names(locs)[2]} (\Sexpr{locs[2]}). The remaining vessels were sampled in Melbourne at the \Sexpr{names(locs)[3]} (\Sexpr{locs[3]}), the \Sexpr{names(locs)[4]} (\Sexpr{locs[4]}), and the \Sexpr{names(locs)[5]} (\Sexpr{locs[5]}). Most of the sample vessels were yachts (\Sexpr{types[1]}), followed by fishing vessels (\Sexpr{types[2]}), motor cruisers and others (\Sexpr{types[3]}).
+Most vessels were sampled in Hobart, Tasmania, Australia at the \Sexpr{names(locs)[1]} (\Sexpr{locs[1]}) and the \Sexpr{names(locs)[2]} (\Sexpr{locs[2]}). The remaining vessels were sampled in Melbourne, Victoria, Australia at the \Sexpr{names(locs)[3]} (\Sexpr{locs[3]}), the \Sexpr{names(locs)[4]} (\Sexpr{locs[4]}), and the \Sexpr{names(locs)[5]} (\Sexpr{locs[5]}). Most of the sample vessels were yachts (\Sexpr{types[1]}), followed by fishing vessels (\Sexpr{types[2]}), motor cruisers and others (\Sexpr{types[3]}).
 
 Samples were collected from as many as 64 different locations in and around the hull, propeller, rudder and anchor, internal spaces, fishing gear and deck of the vessels. Samples taken from the hull, fixed keel and rudder surface were consistently collected using 0.5m\up{2} quadrats, so these form the focus of our analysis. There were \Sexpr{quads[1]} samples collected from the hull, \Sexpr{quads[2]} from the rudder surface, and \Sexpr{quads[3]} from the fixed keel; in all, \Sexpr{sum(quads)} samples were taken. The number of samples collected per vessel ranged from \Sexpr{min(as.integer(names(numSamp)))} to as many as \Sexpr{max(as.integer(names(numSamp)))}; most vessels (\Sexpr{max(numSamp)}) were sampled \Sexpr{names(numSamp)[which.max(numSamp)]} times.
 
