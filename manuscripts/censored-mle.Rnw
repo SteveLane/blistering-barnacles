@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-09 12:35:47 (slane)>
+% Time-stamp: <2018-01-09 12:40:10 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -278,7 +278,7 @@ As all missing data was at the vessel-level, we used the median wet weight of bi
 
 To perform inference, we follow the advice of \citet{Zhou2010-pc} and mix the draws from the posterior distributions from the analysis of each completed dataset\footnote{The alternative would be to combine posterior estimates of summary parameters using Rubin's rules \citep{Rubin1996-jc}, which necessarily gives point estimates as opposed to full posterior distributions.}. \citet{Zhou2010-pc} recommend a large number of imputations be used; we generated 50 imputed datasets. For each dataset, 2000 samples were drawn from the posterior after a burn-in of 2000. Convergence was monitored by inspecting the mixed chains across the 50 multiple imputations, and by assessing the Gelman-Rubin statistic \citep{Gelman1992-zo}.
 
-All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; the multilevel models were fit using the RStan interface to stan \citep{Stan_Development_Team2016-xb}, and multiple imputation was performed using the R package mice \citep{Van_Buuren2011-ne}. R code and data to reproduce the analysis may be found at https://github.com/SteveLane/blistering-barnacles.
+All analyses were performed using R version 3.4.0 \citep{R_Core_Team2017-zb}; the multilevel models were fit using the RStan interface to Stan \citep{Stan_Development_Team2016-xb}, and multiple imputation was performed using the R package mice \citep{Van_Buuren2011-ne}. R code and data to reproduce the analysis may be found at https://github.com/SteveLane/blistering-barnacles.
 
 \section{Results}
 \label{sec:results}
