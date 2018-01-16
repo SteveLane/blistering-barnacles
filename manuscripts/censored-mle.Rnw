@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-15 16:34:42 (slane)>
+% Time-stamp: <2018-01-15 16:48:54 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -15,7 +15,7 @@
 \usepackage{units}
 \usepackage{graphicx}
 \usepackage[margin=15pt,font=small,labelfont=bf]{caption}
-\usepackage[backend=biber,style=authoryear,uniquename=false,uniquelist=false,natbib=true,url=false,doi=true,maxcitenames=2]{biblatex}
+\usepackage[backend=biber,style=authoryear,uniquename=false,uniquelist=false,natbib=true,url=false,doi=true,maxcitenames=2,maxbibnames=99]{biblatex}
 \addbibresource{biofouling.bib}
 \usepackage{pdflscape}
 \usepackage{verbatim}
