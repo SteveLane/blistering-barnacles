@@ -1,4 +1,4 @@
-% Time-stamp: <2018-01-15 16:48:54 (slane)>
+% Time-stamp: <2018-03-16 16:23:28 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -59,10 +59,12 @@
 \author[2]{Keith R.\ Hayes}
 \author[3]{Felicity R.\ McEnnulty}
 \author[3]{Mark Green}
+\author[4]{Eugene Georgiades}
 \author[1]{Andrew P.\ Robinson}
 \affil[1]{Centre of Excellence for Biosecurity Risk Analysis, The University of Melbourne}
 \affil[2]{Data61, Commonwealth Scientific and Industrial Research Organisation}
-\affil[2]{Oceans and Atmosphere, Commonwealth Scientific and Industrial Research Organisation}
+\affil[3]{Oceans and Atmosphere, Commonwealth Scientific and Industrial Research Organisation}
+\affil[4]{Ministry for Primary Industries, New Zealand}
 \date{\today}
 \title{Risk Factors for Fouling Biomass: Evidence from Small Vessels in Australia}
 
@@ -90,11 +92,11 @@ options(digits = 1)
 \modulolinenumbers[3]
 
 \begin{abstract}
-  Invasive marine non indigenous species are a major threat to marine biodiversity. Recreational vessels have been recognised by the scientific community as an important vector of non indigenous species, but have been slow to be picked up by recreational boaters/vessel owners and marina management. In particular, the translocation of invasive species from one region to another (domestically) may be at least partially due to recreational vessels.
+  Invasive marine non indigenous species are a major threat to marine biodiversity and marine related industries. Recreational vessels are recognised as an important vector of non-indigenous species translocation, particularly the secondary translocation of species domestically.
+  
+  This paper reports on a novel application of multilevel modelling and multiple imputation to biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet differed depending on the vessel type. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass per sample unit area was not significant.
 
-  This paper reports on a statistical analysis of biomass samples gathered from the hull and other external surfaces of recreational yachts and fishing vessels in order to quantify the relationship between the wet biomass of biofouling and vessel-level characteristics. Unsurprisingly, we find that the number of days since the vessel was last cleaned was strongly related to the wet weight of biomass. The number of days since the vessel was last used was also related to the wet weight of biomass, yet was different depending on the type of vessel. Similarly, the median number of trips undertaken by the vessel was related to the wet weight of biomass, and varied according to the type of antifouling paint used by the vessel. The relationship between vessel size, as measured by hull surface area, and wet weight biomass per sample unit area was not significant.
-
-  In order to reduce the domestic spread of invasive species, owners of small vessels (that sit around in marinas/moorings for extended periods between uses in particular) should be encouraged to maintain a regular cleaning and maintenance schedule, and use an appropriate type of antifouling paint.
+  In order to reduce the international and domestic spread of invasive species, small vessel owners should use an appropriate type of antifouling paint that suits their vessel's operational profile, and be encouraged to maintain a maintenance schedule in accordance with the paint manufacturer's specifications.
 \end{abstract}
 
 \section{Introduction}
