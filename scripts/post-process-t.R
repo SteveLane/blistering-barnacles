@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Thursday, 04 May 2017
 ## Synopsis: Post process the output from the regression models
-## Time-stamp: <2017-11-27 03:52:07 (overlordR)>
+## Time-stamp: <2018-03-19 11:18:54 (slane)>
 ################################################################################
 ################################################################################
 ## Add github packages using gitname/reponame format
@@ -36,8 +36,8 @@ bLookup <- biofoul %>%
 histData <- biofoul %>%
     filter(wetWeight >= 1.5) %>%
     mutate(wwLog = log(wetWeight)) %>%
-    select(LocID, `Weight (gm)` = wetWeight,
-           `Weight (gm), log-scale` = wwLog) %>%
+    select(LocID, `Weight (g)` = wetWeight,
+           `Weight (g), log-scale` = wwLog) %>%
     gather("logged", "ww", 2:3)
 plHist <- ggplot(histData, aes(x = ww)) + geom_histogram(bins = 11) +
     facet_grid(LocID ~ logged, scales = "free") +
