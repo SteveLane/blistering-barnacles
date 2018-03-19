@@ -4,7 +4,7 @@
 ## Author: Steve Lane
 ## Date: Monday, 06 November 2017
 ## Synopsis: Plot marginal random effects to look at interactions.
-## Time-stamp: <2017-11-27 04:08:08 (overlordR)>
+## Time-stamp: <2018-03-19 00:53:01 (slane)>
 ################################################################################
 ################################################################################
 rm(list = ls())
@@ -59,9 +59,9 @@ pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
     geom_linerange(size = 0.5, alpha = 0.5) +
     geom_point(size = 1.5) +
     facet_wrap(~ type) +
-    geom_abline(aes(slope = slope, intercept = intercept,
-                    colour = `Vessel type`), data = coefs,
-                size = 0.5, alpha = 0.5) +
+    ## geom_abline(aes(slope = slope, intercept = intercept,
+    ##                 colour = `Vessel type`), data = coefs,
+    ##             size = 0.5, alpha = 0.5) +
     ylab(expression(paste("Vessel-level intercept, ",
                           gamma[j],"*"))) +
     xlab("Scaled value") +
@@ -92,9 +92,9 @@ pl <- ggplot(a1Dat, aes(x = value, y = mid, ymin = low, ymax = high,
     geom_linerange(size = 0.5, alpha = 0.5) +
     geom_point(size = 1.5) +
     facet_wrap(~ type) +
-    geom_abline(aes(slope = slope, intercept = intercept,
-                    colour = `Paint type`), data = coefs,
-                size = 0.5, alpha = 0.5) +
+    ## geom_abline(aes(slope = slope, intercept = intercept,
+    ##                 colour = `Paint type`), data = coefs,
+    ##             size = 0.5, alpha = 0.5) +
     ylab(expression(paste("Vessel-level intercept, ",
                           gamma[j],"*"))) +
     xlab("Scaled value") +
