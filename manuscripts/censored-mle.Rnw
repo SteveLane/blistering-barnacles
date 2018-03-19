@@ -1,4 +1,4 @@
-% Time-stamp: <2018-03-19 12:15:25 (slane)>
+% Time-stamp: <2018-03-19 12:22:49 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -228,7 +228,7 @@ We initially inferred the latent process --- that is, the process that determine
   \beta_{l} & \sim t_{3}(0, \sigma_{l}) \nonumber \\
   \sigma,\sigma_{\alpha},\sigma_{l} & \sim \text{half-cauchy}(0, 2.5) \nonumber
 \end{align}
-where $\mu_{i}$ is the expected log wet weight in grams; $\mu$ is the intercept for the model; $\beta_{l}$ are coefficients that measure the effect of location on the log wet weight of fouling biomass: $l=1$ denotes the measurement was taken at the hull, $l=2$ denotes the measurement was taken at the rudder, and $l=3$ for measurements taken at the keel\footnote{The notation $l[i]$ denotes the location level ($l$) of the $i\up{th}$ observation. The vessel-level intercept ($\alpha_{j[i]}$)is similarly referenced.}. $\alpha_{j}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$, which is modelled as a $t$ distribution with 3 degrees of freedom, and scale $\sigma_{l}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-Cauchy}(0, 2.5)$ priors.
+where $\mu_{i}$ is the expected log wet weight in grams; $\mu$ is the intercept for the model; $\beta_{l}$ are coefficients that measure the effect of location on the log wet weight of fouling biomass: $l=1$ denotes the measurement was taken at the hull, $l=2$ denotes the measurement was taken at the rudder, and $l=3$ for measurements taken at the keel\footnote{The notation $l[i]$ denotes the location level ($l$) of the $i\up{th}$ observation. The vessel-level intercept ($\alpha_{j[i]}$) is similarly referenced.}. $\alpha_{j}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$, which is modelled as a $t$ distribution with 3 degrees of freedom, and scale $\sigma_{l}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-Cauchy}(0, 2.5)$ priors.
 
 We subsequently investigated two alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
 \begin{align}
