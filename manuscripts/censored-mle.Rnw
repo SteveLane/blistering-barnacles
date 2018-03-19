@@ -1,4 +1,4 @@
-% Time-stamp: <2018-03-16 17:09:07 (slane)>
+% Time-stamp: <2018-03-19 11:22:17 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -192,7 +192,9 @@ latex(vessSumm, file = "",
       caption =
           "Summary statistics for vessel-level characteristics. Categorical variables are shown as n (\\%), and numeric variables are shown as median (interquartile range, IQR).")
 
-@ 
+@
+
+\clearpage
 
 \subsection{Statistical Analysis}
 \label{sec:statistical-analysis}
@@ -237,7 +239,7 @@ We subsequently investigated two alternative specifications for the vessel-level
 
 \ref{eq:M1} includes all vessel-level characteristics, where $\text{days1}_{j}$ is the number of days since vessel $j$ was last used; $\text{days2}_{j}$ is the number of days since the vessel was last cleaned; $\text{midTrips}_{j}$ is the median number of trips undertaken by the vessel per year; and $\text{hullSA}_{j}$ is the hull surface area. $\beta_{p[j]}$ is the effect of paint type $p$ on vessel $j$, $p=1$ denotes ablative paint, $p=2$ denotes hard paint, and $p=3$ denotes self-polishing antifouling paint. $\beta_{t[j]}$ is an effect for vessel type; $t=1$ denotes motor cruiser/other, $t=2$ denotes fishing vessels, and $t=3$ denotes yachts. \ref{eq:M2} adds interaction terms to \ref{eq:M1} between: the number of days since the vessel was last used and the vessel type ($\beta_{dt[j]}$); the median number of trips and the vessel type ($\beta_{mt[j]}$); and the median number of trips and the paint type ($\beta_{mp[j]}$).
 
-The choice of these regression models was guided by both subject matter/process considerations and graphical exploration of the posterior distribution of the random-effect terms in the latent process models. In particular, we expect there to be interactions between paint type and vessel usage predictors: both ablative and self-polishing paints require the vessel to be used in order to be effective, whilst hard paints do not. For more details on the graphical exploration, see Section~\ref{sec:results}.
+The choice of these regression models was guided by both subject matter/process considerations and graphical exploration of the posterior distribution of the random-effect terms in the latent process models. For more details on the graphical exploration, see Section~\ref{sec:results}.
 
 \subsection{Missing Data}
 \label{sec:missing-data}
