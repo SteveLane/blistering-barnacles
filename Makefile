@@ -1,4 +1,4 @@
-# Time-stamp: <2017-11-05 23:03:12 (overlordR)>
+# Time-stamp: <2018-06-25 10:36:23 (slane)>
 .PHONY: all input-data models output-VB output-MCMC \
 	paper supplement \
 	clean-models clean-manuscripts clobber
@@ -123,7 +123,14 @@ manuscripts/censored-mle-supplement.tex: manuscripts/censored-mle-supplement.Rnw
 paper: manuscripts/censored-mle.Rnw data/biofouling.rds
 	cd $(<D); \
 	Rscript --no-save --no-restore -e "knitr::knit('$(<F)')"; \
-	latexmk -pdf $(<F:Rnw=tex)
+	latexmk -pdf $(<F:Rnw=tex); \
+	pandoc --filter pandoc-crossref --filter pandoc-citeproc \
+		-t docx -o $(<F:Rnw=docx) $(<F:Rnw=tex)
+
+# Create word versions of the equations
+word-eqn: manuscripts/eqn.tex
+	cd $(<D); \
+	pandoc -t docx -o $(<F:tex=docx) $(<F)
 
 supplement: manuscripts/censored-mle-supplement.Rnw data/biofouling.rds
 	cd $(<D); \

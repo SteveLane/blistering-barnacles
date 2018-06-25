@@ -1,0 +1,39 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+First set of equations, O1, O2:
+
+\[ Y_{i} \sim \text{Normal}(\mu_{i}, \sigma) \]
+
+\[ Y_{i} \sim t_{\nu}(\mu_{i}, \sigma) \]
+
+\[ \nu \sim \text{Gamma}(2, 10) \]
+
+Second set of equations (model formulations):
+
+\[ \mu_{i} = \mu + \alpha_{j[i]} + \beta_{l[i]} \]
+
+\[\mu \sim N(0, 5) \]
+
+\[ \alpha_{j} \sim t_{3}(0, \sigma_{\alpha}) \]
+
+\[ \beta_{l} \sim t_{3}(0, \sigma_{l}) \]
+
+\[ \sigma,\sigma_{\alpha},\sigma_{l} \sim \text{half-cauchy}(0, 2.5) \]
+
+Third set of equations, more model formulation:
+
+\[ \mu_{i} = \mu + \gamma_{j[i]} + \beta_{l[i]} \]
+
+\[ \gamma_{j}^{*} = \alpha_{j} + \beta_{d1} \cdot \text{days1}_{j} + \beta_{d2} \cdot \text{days2}_{j} + \beta_{m} \cdot \text{midTrips}_{j} + \beta_{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]} \]
+
+\[ \gamma^{*}_{j} = \text{(M1)} + \beta_{dt[j]} \cdot \text{days1}_{j} + \beta_{mt[j]} \cdot \text{midTrips}_{j} + \beta_{mp[j]} \cdot \text{midTrips}_{j} \]
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
