@@ -1,0 +1,50 @@
+\documentclass[aspectratio=169]{beamer}
+% Use the metropolis theme
+\usetheme[progressbar=frametitle]{metropolis}
+
+% booktabs for better tables
+\usepackage{booktabs}
+% add the logo (must be in the same directory as this file, or somewhere in your path where tex can find it)
+\usetikzlibrary{positioning}
+\titlegraphic{
+  \begin{tikzpicture}[overlay, remember picture]
+    \node[at=(current page.south east), anchor=south east] {%
+      \includegraphics[height=1.75cm]{PRIMARY_A_Vertical_Housed_RGB}
+      \includegraphics[height=1.75cm]{CEBRALogo-01}
+    };
+  \end{tikzpicture}
+}
+
+% Title goes here
+\title{My awesome title}
+\subtitle{My subtitle}
+\date{\today}
+\author{Me}
+\institute{Centre of Excellence for Biosecurity Risk Analysis\\The University of Melbourne}
+
+\begin{document}
+
+\maketitle
+
+% Sections look nicer with an alternative section slide. This one makes it dark.
+
+{
+\metroset{background=dark}
+\section{First Section}
+\metroset{background=light}
+}
+
+\begin{frame}
+  \frametitle{This frame's title}
+  \begin{itemize}
+  \item My first item
+  \item My second item
+  \end{itemize}
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
