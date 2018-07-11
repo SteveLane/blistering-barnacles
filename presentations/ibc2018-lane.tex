@@ -105,7 +105,7 @@
     \begin{itemize}
     \item Summarise wet weight biomass by median (within vessel)
     \item Impute (via chained equations) missing vessel data
-    \item Fit a censored regression (using stan/HMC)
+    \item Fit a censored regression (using Stan/HMC)
       \begin{align*}
         L(\theta) & = \prod_{i=1}^{n} f_{Y}(y_{i}; \theta, x)^{I(y_{i} > c)} F_{Y}(c; \theta, x)^{I(y_{i} \leq c)}
       \end{align*}
@@ -116,11 +116,11 @@
 
 % Or rather, we form a multilevel model, allow for different locations, multiple imputation, censoring. Write down the likelihood.
 
-\begin{frame}
-  \frametitle{Posterior Predictive Checks}
-  \centering
-  \includegraphics[height=0.8\paperheight]{../graphics/ppc-compare-m3-full}
-\end{frame}
+% \begin{frame}
+%   \frametitle{Posterior Predictive Checks}
+%   \centering
+%   \includegraphics[height=0.8\paperheight]{../graphics/ppc-compare-m3-full}
+% \end{frame}
 
 \begin{frame}
   \frametitle{Graphical Summary}
