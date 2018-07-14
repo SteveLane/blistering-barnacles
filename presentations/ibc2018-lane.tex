@@ -114,13 +114,35 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Model Formulation}
+  \begin{align*}
+    Y_{i} & \sim t_{\nu}(\mu_{i}, \sigma) \\
+    \mu_{i} & = \mu + \gamma_{j[i]} + \beta_{l[i]} \\
+    \gamma_{j}^{*} & = \alpha_{j} + \beta_{d1} \cdot \text{days1}_{j} + \beta_{d2} \cdot \text{days2}_{j} + \beta_{m} \cdot \text{midTrips}_{j} + \beta_{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]} + \\
+          & \quad \text{(M1)} + \beta_{dt[j]} \cdot \text{days1}_{j} + \beta_{mt[j]} \cdot \text{midTrips}_{j} + \beta_{mp[j]} \cdot \text{midTrips}_{j}
+  \end{align*}
+\end{frame}
+
 % Or rather, we form a multilevel model, allow for different locations, multiple imputation, censoring. Write down the likelihood.
 
-% \begin{frame}
-%   \frametitle{Posterior Predictive Checks}
-%   \centering
-%   \includegraphics[height=0.8\paperheight]{../graphics/ppc-compare-m3-full}
-% \end{frame}
+\begin{frame}
+  \frametitle{Diagnostics}
+  \centering
+  \includegraphics[width=0.9\textwidth]{trace}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Diagnostics}
+  \centering
+  \includegraphics[width=0.9\textwidth]{rhat}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Posterior Predictive Checks}
+  \centering
+  \includegraphics[height=0.8\paperheight]{../graphics/ppc-compare-m3-full}
+\end{frame}
 
 \begin{frame}
   \frametitle{Graphical Summary}
