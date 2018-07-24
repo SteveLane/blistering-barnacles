@@ -1,7 +1,8 @@
-# Time-stamp: <2018-06-25 10:36:23 (slane)>
+# Time-stamp: <2018-07-05 11:28:25 (slane)>
 .PHONY: all input-data models output-VB output-MCMC \
 	paper supplement \
-	clean-models clean-manuscripts clobber
+	clean-models clean-manuscripts clobber \
+	presentation
 
 all: manuscripts/censored-mle.html \
 	processed-data \
@@ -136,6 +137,12 @@ supplement: manuscripts/censored-mle-supplement.Rnw data/biofouling.rds
 	cd $(<D); \
 	Rscript --no-save --no-restore -e "knitr::knit('$(<F)')"; \
 	latexmk -pdf $(<F:Rnw=tex)
+
+# Create presentation/s
+presentation: presentations/ibc2018-lane.pdf
+presentations/ibc2018-lane.pdf: presentations/ibc2018-lane.tex
+	cd $(<D); \
+	latexmk -pdf $(<F)
 
 ################################################################################
 # Cleaning targets
