@@ -1,4 +1,4 @@
-% Time-stamp: <2018-03-21 13:39:36 (slane)>
+% Time-stamp: <2018-07-24 11:18:16 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -222,7 +222,7 @@ To allow for the possible effects of outliers we examined the effect of changing
 \end{align}
 are two alternative models for the outcomes, where \ref{eq:O1} is the model assuming a Normal distribution for log weight biomass, and \ref{eq:O2} is the model assuming a $t$ distribution with $\nu$ degrees of freedom. The hyperparameters for the degrees of freedom were chosen to be weakly informative, favouring a robust $t$ model with lower degrees of freedom; indeed, the mode of the prior distribution for the degrees of freedom is 10.
 
-We initially inferred the latent process --- that is, the process that determines the log wet weight of fouling biomass on each vessel --- as a linear function of the location of the measurement location allowing for a vessel-level intercept:
+We initially inferred the latent process---that is, the process that determines the log wet weight of fouling biomass on each vessel---as a linear function of the location of the measurement location allowing for a vessel-level intercept:
 \begin{align}
   \mu_{i} & = \mu + \alpha_{j[i]} + \beta_{l[i]} \nonumber \\
   \mu & \sim N(0, 5) \nonumber \\
@@ -310,13 +310,13 @@ Posterior predictive checks likewise confirmed the superiority of the $t$-distri
 \subsubsection{Exploration of Candidate Interaction Terms}
 \label{sec:expl-cand-inter}
 
-Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors --- the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by antifouling paint type. Each panel also shows the posterior (median) estimate of the expected log wet weight from model \ref{eq:M1}, and is based on a randomly selected imputed dataset for display purposes.
+Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors---the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by antifouling paint type. Each panel is based on a randomly selected imputed dataset for display purposes.
 
 \begin{figure}[!hbp]
   \centering
   \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1boat-full.pdf}} \\
   \subfloat[Vessel-level intercepts coloured by antifouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1paint-full.pdf}}
-  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}). The (median) regression lines for each predictor are overlaid.}
+  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}).}
   \label{fig:m1-reg}
 \end{figure}
 
