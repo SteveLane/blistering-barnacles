@@ -1,4 +1,4 @@
-% Time-stamp: <2018-07-24 12:47:02 (slane)>
+% Time-stamp: <2018-07-24 16:49:33 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -406,7 +406,7 @@ Biofouling regulations have recently been implemented by various jurisdictions t
 
 %Even well maintained recreational vessels can transport NIS, with upwards of two-thirds of boats are still fouled even with high numbers of boats having anti fouling paint and manual cleaning \citep{Clarke_Murray2011-wf,Zabin2014-ea}. Even where the percentage of fouling cover may be small, the risk of NIS invasion may still be large due to the sheer number of boats and associated propagule pressure \citep{Clarke_Murray2011-wf}.
 
-To prevent the spread of NIS, owners of small vessels should be encouraged to apply an antifouling paint that is appropriate to their vessel operational profile and to maintain a regular cleaning and maintenance schedule in accordance with the manufacturer's instructions as per Australian and New Zealand guidance \citep{Department_of_Agriculture_Canberra2015-hk,Georgiades2018-qj}. Management interventions, such as diver inspections, directive to clean at a dry dock etc, can be implemented to varying degrees based on increasing levels of risk, but also with a prohibitive increase in resources, cost and time \citep{Campbell2011-zq}. Therefore strategies and incentives could be investigated to encourage vessel owners to improve ongoing vessel maintenance, as well as education and outreach programs for vessel owners to increase awareness of NIS and their impacts \citep{Brine2013-dz,Minchin2006-ig}. 
+To prevent the spread of NIS, owners of small vessels are encouraged to apply an antifouling paint that is appropriate to their vessel operational profile and to maintain a regular cleaning and maintenance schedule in accordance with the manufacturer's instructions as per Australian and New Zealand guidance \citep{Department_of_Agriculture_and_Water_Resources2009-yb,Department_of_Agriculture_Canberra2015-hk,Georgiades2018-qj}. Management interventions, such as diver inspections, directive to clean at a dry dock etc, can be implemented to varying degrees based on increasing levels of risk, but also with a prohibitive increase in resources, cost and time \citep{Campbell2011-zq}. Therefore strategies and incentives could be investigated to encourage vessel owners to improve ongoing vessel maintenance, as well as education and outreach programs for vessel owners to increase awareness of NIS and their impacts \citep{Brine2013-dz,Minchin2006-ig}. 
 
 Authorities could also introduce regulated antifouling paint regimes, e.g. every 12 months, regular inspections and provide biosecure cleaning facilities for recreational vessel users \citep{Zabin2014-ea}.
 
