@@ -27,6 +27,10 @@ Third set of equations, more model formulation:
 
 \[ \mu_{i} = \mu + \gamma_{j[i]} + \beta_{l[i]} \]
 
+\[ \gamma_{j} & = t_{3}(\gamma_{j}^{*}, \sigma_{\gamma}) \]
+
+\[ \sigma_{\gamma} & \sim \text{half-Cauchy}(0, 2.5) \]
+
 \[ \gamma_{j}^{*} = \alpha_{j} + \beta_{d1} \cdot \text{days1}_{j} + \beta_{d2} \cdot \text{days2}_{j} + \beta_{m} \cdot \text{midTrips}_{j} + \beta_{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]} \]
 
 \[ \gamma^{*}_{j} = \text{(M1)} + \beta_{dt[j]} \cdot \text{days1}_{j} + \beta_{mt[j]} \cdot \text{midTrips}_{j} + \beta_{mp[j]} \cdot \text{midTrips}_{j} \]

@@ -1,4 +1,4 @@
-% Time-stamp: <2018-07-24 17:02:24 (slane)>
+% Time-stamp: <2018-08-06 14:07:02 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -228,13 +228,15 @@ We initially inferred the latent process---that is, the process that determines 
   \mu & \sim N(0, 5) \nonumber \\
   \alpha_{j} & \sim t_{3}(0, \sigma_{\alpha}) \label{eq:M0}\tag{M0} \\
   \beta_{l} & \sim t_{3}(0, \sigma_{l}) \nonumber \\
-  \sigma,\sigma_{\alpha},\sigma_{l} & \sim \text{half-cauchy}(0, 2.5) \nonumber
+  \sigma,\sigma_{\alpha},\sigma_{l} & \sim \text{half-Cauchy}(0, 2.5) \nonumber
 \end{align}
 where $\mu_{i}$ is the expected log wet weight in grams; $\mu$ is the intercept for the model; $\beta_{l}$ are coefficients that measure the effect of location on the log wet weight of fouling biomass: $l=1$ denotes the measurement was taken at the hull, $l=2$ denotes the measurement was taken at the rudder, and $l=3$ for measurements taken at the keel\footnote{The notation $l[i]$ denotes the location level ($l$) of the $i\up{th}$ observation. The vessel-level intercept ($\alpha_{j[i]}$) is similarly referenced.}. $\alpha_{j}$ is the vessel-level intercept that allows the hull intercept to vary from vessel to vessel, $j=1,\ldots,\Sexpr{nrow(vessels)}$, which is modelled as a $t$ distribution with 3 degrees of freedom, and scale $\sigma_{l}$. The intercept is given a weakly informative $N(0, 5)$ prior. Similarly the regression coefficients are given weakly informative $t_{3}(0, 1)$ priors; as are the observation model and latent process scale parameters using $\text{half-Cauchy}(0, 2.5)$ priors.
 
 We subsequently investigated two alternative specifications for the vessel-level intercept by including various vessel-level characteristics and interaction terms:
 \begin{align}
   \mu_{i} & = \mu + \gamma_{j[i]} + \beta_{l[i]} \nonumber \\
+  \gamma_{j} & = t_{3}(\gamma_{j}^{*}, \sigma_{\gamma}) \nonumber \\
+  \sigma_{\gamma} & \sim \text{half-Cauchy}(0, 2.5) \nonumber \\
   \gamma_{j}^{*} & = \alpha_{j} + \beta_{d1} \cdot \text{days1}_{j} + \beta_{d2} \cdot \text{days2}_{j} + \beta_{m} \cdot \text{midTrips}_{j} + \beta_{h} \cdot \text{hullSA}_{j} + \beta_{p[j]} + \beta_{t[j]} \label{eq:M1}\tag{M1} \\
   \gamma^{*}_{j} & = \text{(M1)} + \beta_{dt[j]} \cdot \text{days1}_{j} + \beta_{mt[j]} \cdot \text{midTrips}_{j} + \beta_{mp[j]} \cdot \text{midTrips}_{j} \label{eq:M2}\tag{M2}
 \end{align}
@@ -310,7 +312,7 @@ Posterior predictive checks likewise confirmed the superiority of the $t$-distri
 \subsubsection{Exploration of Candidate Interaction Terms}
 \label{sec:expl-cand-inter}
 
-Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the regression coefficients in the vessel-level intercept models (for each of the four ordinal predictors---the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area). Figure~\ref{fig:m1-reg-a} shows the coefficients coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the coefficients coloured by antifouling paint type. Each panel is based on a randomly selected imputed dataset for display purposes.
+Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible intervals of the estimated 53 vessel-level intercepts plotted against each of the four ordinal predictors---the number of days since the vessel was last used; the number of days since the vessel was last cleaned; the median number of trips undertaken by the vessel; and the vessel's hull surface area. Figure~\ref{fig:m1-reg-a} shows the intercepts coloured by vessel type, whilst Figure~\ref{fig:m1-reg-b} shows the intercepts coloured by antifouling paint type. Each panel is based on a randomly selected imputed dataset for display purposes.
 
 \begin{figure}[!hbp]
   \centering
@@ -320,14 +322,16 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
   \label{fig:m1-reg}
 \end{figure}
 
-Figures~\ref{fig:m1-reg-a} and \ref{fig:m1-reg-b} are suggestive of interactions between the number of days since the vessel was last used and the vessel type, the median number of trips undertaken by the vessel and the vessel type, and the median number of trips taken by the vessel and the antifouling paint type. We form this opinion by visual comparison of the scatterplots. For example, the pattern in Figure~\ref{fig:m1-reg-a} suggests that the effect of days since the vessel was last used is negative for fishing vessels and positive for yachts and motor cruiser/other vessels. Similarly, the effect of the median number of trips undertaken by the vessel appears to be positive for fishing vessels, and negative for yachts and motor cruiser/other vessels.
+Visual examination of the plots in Figure~\ref{fig:m1-reg-a} show how the vessel types vary across the four ordinal predictors and how the estimated vessel level intercepts vary according to vessel type. For example, compared to yachts, fishing vessels in the sample were generally larger (Figure~\ref{fig:m1-reg-a} bottom left panel), and typically not left idle for long periods of time (Figure~\ref{fig:m1-reg-b} top right panel).  More importantly these plots suggest the presence of interactions in the data set, meaning that the effect of the ordinal predictors on fouling biomass may vary depending on the type of vessel and antifouling paint it uses.
+
+The vessel level intercepts for yachts and motor cruisers are predominately positive, and tend to increase in value if the vessel is left idle (Figure~\ref{fig:m1-reg-a} top right panel) and for yachts tends to increase if the vessels are left uncleaned for long periods of time (Figure~\ref{fig:m1-reg-a} top left panel). Comparing these patterns with other vessel types, however, suggests there may be interactions between the number of days since the vessel was last used and the vessel type, and between the median number of trips undertaken by the vessel and the vessel type. For example, the pattern in the top right panel of Figure~\ref{fig:m1-reg-a} suggests that the effect of days since the vessel was last used is negative for fishing vessels but positive for yachts. Similarly, the effect of the median number of trips on the vessel level intercept appears to be positive for fishing vessels but negative for motor cruisers and other vessels.
+
+Figure~\ref{fig:m1-reg-b} shows how the paint types vary across the four ordinal predictors and how the estimated vessel level intercepts vary according to paint type. This figure suggests that there may also be an interaction between the median number of trips taken by the vessel and the antifouling paint type. Self-polishing paints, for example, may have a positive effect on vessel-level intercepts as the median number of trips increases. Ablative paints on the other hand appear to be mainly associated with relatively smaller vessels (Figure~\ref{fig:m1-reg-b} bottom left panel) and with vessels that are used relatively less frequently, but here have a negative effect on vessel-level intercepts as the median number of trips increases (Figure~\ref{fig:m1-reg-b} bottom right panel).
 
 \subsubsection{Final Model Form}
 \label{sec:reduct-final-model}
 
-Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors used in interaction terms in \eqref{eq:M2}: the number of days since the vessel was last used and the median number of trips (per year) undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by antifouling paint type. Shown in each panel are the estimated (median) regression lines from \ref{eq:M2}.
-
-Figure~\ref{fig:m3-reg-a} suggests that the of the number of days since the vessel was last used varies by vessel type, as does the median number of trips taken by the vessel per year. Figure~\ref{fig:m3-reg-b} further suggests that the effect of the median number of trips taken by the vessel per year varies according to the paint type of the vessel. The uncertainty in these effects is however, large relative to the estimates.
+Figure~\ref{fig:m3-reg} displays the median and 80\% intervals of the estimated vessel-level intercepts, with respect to the two ordinal predictors that were identified above as being potentially involved in vessel type and paint type interactions and therefore included in interaction terms in \eqref{eq:M2}: the number of days since the vessel was last used and the median number of trips (per year) undertaken by the vessel. Figure~\ref{fig:m3-reg-a} shows the vessel-level intercepts coloured by vessel type and Figure~\ref{fig:m3-reg-b} shows the vessel-level intercepts coloured by antifouling paint type. Each panel also shows the estimated (median) regression lines for these interaction terms in \ref{eq:M2}. These plots appear to confirm that the number of days since the vessel was last used, and the median number of trips, has the opposite effect in fishing vessels than it does in yachts or motor cruiser/other vessels, which may be due to the different use patterns (e.g. commercial versus recreational) and different types of antifouling paints used by fishing vessels. The uncertainty in these effects is however, large relative to the estimates, hence our confidence in these conclusions is low, due to the relatively small number of fishing vessels included in the sample.
 
 Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-level regression coefficients for each of the models considered. As can be seen in Figure~\ref{fig:coefs}, the effect of the number of days since the vessel was last cleaned ($\beta_{d2}$) is clearly larger than 0; the other predictors do not appear to have such a strong effect. Whilst the effect of these predictors is not estimated precisely, the direction and size of the coefficients is similar between models, and as such we choose Model~\eqref{eq:M2} as the final model form in order to estimate the interactions.
 
