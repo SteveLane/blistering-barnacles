@@ -1,4 +1,4 @@
-% Time-stamp: <2018-08-06 14:07:02 (slane)>
+% Time-stamp: <2018-08-06 14:23:24 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -206,7 +206,7 @@ Figure~\ref{fig:obs-weight} shows histograms of the observed wet weight of bioma
 \begin{figure}[!hbp]
   \centering
   \includegraphics[width=0.9\linewidth]{../graphics/obs-hist.pdf}
-  \caption{Measured wet weight of sampled biomass from the \Sexpr{nrow(vessels)} vessels. The left column shows the measured wet weight, whilst the right column shows the log-transformed wet weight. Samples that measured less than the limit of detection (1.5 g) have been removed.}
+  \caption{Measured wet weight (grams) of the fouling biomass scraped from \Sexpr{sum(quads)} 0.5m\up{2} quadrats placed haphazardly on the hull (top row), keel (middle row) and rudder (bottom row) of \Sexpr{nrow(vessels)} vessels. The measured wet weight (left column) is heavily skewed towards values less than 50 grams. The log-transformed wet weight (right column) displays an approximately normal distribution. Samples that measured less than the limit of detection (1.5 g) have been removed.}
   \label{fig:obs-weight}
 \end{figure}
 
@@ -251,7 +251,7 @@ The choice of these regression models was guided by both subject matter/process 
 <<missingness>>=
 missVessels <- vessels %>% select(days1, midTrips, paintType) %>%
     mutate(paintType = as.factor(paintType))
-miss <- md.pattern(missVessels)
+miss <- md.pattern(missVessels, plot = FALSE)
 ccData <- biofoul %>% na.omit()
 miss <- miss[-nrow(miss),]
 pattern <- data_frame(
@@ -318,7 +318,7 @@ Figure~\ref{fig:m1-reg} displays the posterior median and 80\% credible interval
   \centering
   \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m1-reg-a}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1boat-full.pdf}} \\
   \subfloat[Vessel-level intercepts coloured by antifouling paint type.\label{fig:m1-reg-b}]{\includegraphics[width=0.7\linewidth]{../graphics/plM1paint-full.pdf}}
-  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}).}
+  \caption{Estimated vessel-level intercepts from \ref{eq:M1}, plotted against the four ordinal predictors. Each plot shows the posterior median and 80\% credible interval, coloured by vessel type (\ref{fig:m1-reg-a}) and paint type (\ref{fig:m1-reg-b}). The scatter of points in these plots show how the vessel and paint types vary across the four ordinal predictors and how the estimated vessel level intercepts vary according to vessel and paint type. More importantly they suggest the presence of interactions in the data set, meaning that the effect of the ordinal predictors on fouling biomass may vary depending on the type of vessel and antifouling paint it uses.}
   \label{fig:m1-reg}
 \end{figure}
 
@@ -339,14 +339,14 @@ Figure~\ref{fig:coefs} compares estimates of the measurement-level and vessel-le
   \centering
   \subfloat[Vessel-level intercepts coloured by vessel type.\label{fig:m3-reg-a}]{\includegraphics[width=0.9\linewidth]{../graphics/plM3boat-t.pdf}} \\
   \subfloat[Vessel-level intercepts coloured by antifouling paint type.\label{fig:m3-reg-b}]{\includegraphics[width=0.45\linewidth]{../graphics/plM3paint-t.pdf}}
-  \caption{Estimated vessel-level intercepts from \ref{eq:M2}, plotted against the two ordinal predictors with interactions being assessed. Regression lines for each estimated interaction are overlaid.}
+  \caption{Estimated vessel-level intercepts from \ref{eq:M2}, plotted against the two ordinal predictors that were previously identified as potentially interacting the paint type or vessel type. Each plot shows the posterior median and 80\% credible interval coloured by vessel type (\ref{fig:m3-reg-a}) and paint type (\ref{fig:m3-reg-b}). Regression lines for each estimated interaction are overlaid to show the direction and strength of the estimated interaction (as indicated by the sign and magnitude of the slope of the regression line). These plots show that the number of days since the vessel was last used, and the median number of trips, have the opposite effect on fouling biomass in fishing vessels than in yachts or motor cruiser/other vessels. Similarly the effect of median number of trips on fouling biomass reverses when switching between hard and self-polishing paints.}
   \label{fig:m3-reg}
 \end{figure}
 
 \begin{figure}[!hbp]
   \centering
   \includegraphics[width=0.65\linewidth]{../graphics/plSummary-t.pdf}
-  \caption{Estimated coefficients from \ref{eq:M0}--\ref{eq:M2}. Coefficients from each model (where applicable) are shown grouped within coefficient on the y-axis. The median is shown as a point estimate, with 50\% and 90\% credible intervals.}
+  \caption{Estimated coefficients from \ref{eq:M0}--\ref{eq:M2}. Coefficients from each model (where applicable) are shown grouped within coefficient on the y-axis. The median is shown as a point estimate, with 50\% and 90\% credible intervals. Credible intervals that do not span zero indicate that there is good evidence in the sample for a statistically significant effect.}
   \label{fig:coefs}
 \end{figure}
 
