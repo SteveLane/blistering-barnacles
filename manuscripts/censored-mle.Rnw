@@ -1,4 +1,4 @@
-% Time-stamp: <2018-09-20 15:27:17 (slane)>
+% Time-stamp: <2018-10-11 09:44:20 (slane)>
 \documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -54,8 +54,8 @@
 
 \DeclareGraphicsExtensions{.pdf,.PDF,.png,.PNG}
 
-\author[1]{Tracey Hollings}
 \author[1]{Stephen E.\ Lane}
+\author[1]{Tracey Hollings}
 \author[2]{Keith R.\ Hayes}
 \author[3]{Felicity R.\ McEnnulty}
 \author[3]{Mark Green}
